@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Home{% endblock %}</title>
+    {% block stylesheets %}{% endblock %}
+</head>
+<body>
+    {% block header %}
+    <header>
+        <nav>
+            <!-- Navigation menu -->
+        </nav>
+    </header>
+    {% endblock %}
+
+    {% block content %}
+    <main>
+        <section class="hero">
+            <h1>Welcome to FEU SDG Microsite</h1>
+            <p>Your content here</p>
+        </section>
+    </main>
+    {% endblock %}
+
+    {% block footer %}
+    <footer>
+        <p>&copy; 2024 FEU SDG. All rights reserved.</p>
+    </footer>
+    {% endblock %}
+
+    {% block javascripts %}{% endblock %}
+</body>
+</html>
