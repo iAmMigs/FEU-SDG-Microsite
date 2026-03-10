@@ -27,18 +27,26 @@
                         </div>
 
                         <div>
-                            <label for="goal" class="block text-sm font-semibold text-gray-700 mb-2">Filter by SDG</label>
-                            <select id="goal" name="goal" class="w-full rounded-lg border-gray-300 shadow-sm focus:border-green-700 focus:ring-green-700 px-4 py-2 border bg-white">
-                                <option value="">All</option>
-                                <option value="3">Goal 3: Good Health</option>
-                                <option value="4">Goal 4: Quality Education</option>
-                                <option value="7">Goal 7: Clean Energy</option>
-                                <option value="8">Goal 8: Economic Growth</option>
-                                <option value="9">Goal 9: Industry & Innovation</option>
-                                <option value="11">Goal 11: Sustainable Cities</option>
-                                <option value="12">Goal 12: Responsible Consumption</option>
-                                <option value="17">Goal 17: Partnerships</option>
-                            </select>
+                            <label class="block text-sm font-semibold text-gray-700 mb-3">Filter by SDG (Select multiple)</label>
+                            
+                            <div class="grid grid-cols-4 gap-2">
+                                {% set available_goals = [3, 4, 7, 8, 9, 11, 12, 17] %}
+                                
+                                {% for goal in available_goals %}
+                                    <label class="cursor-pointer relative block aspect-square rounded-md overflow-hidden shadow-sm hover:shadow-md transition group border border-gray-100 bg-white">
+                                        <input type="checkbox" name="goals[]" value="{{ goal }}" class="peer hidden" 
+                                            {% if goal in selected_goals %}checked{% endif %}>
+                                        
+                                        <img src="{{ asset('images/sdg-' ~ goal ~ '-inv.jpg') }}" alt="SDG {{ goal }}" 
+                                             class="absolute inset-0 w-full h-full object-cover transition-opacity duration-300 opacity-100 peer-checked:opacity-0 group-hover:opacity-75">
+                                        
+                                        <img src="{{ asset('images/sdg-' ~ goal ~ '.jpg') }}" alt="SDG {{ goal }}" 
+                                             class="absolute inset-0 w-full h-full object-cover transition-opacity duration-300 opacity-0 peer-checked:opacity-100">
+                                             
+                                        <div class="absolute inset-0 border-2 border-green-700 rounded-md opacity-0 peer-checked:opacity-100 transition-opacity pointer-events-none"></div>
+                                    </label>
+                                {% endfor %}
+                            </div>
                         </div>
 
                         <div>
