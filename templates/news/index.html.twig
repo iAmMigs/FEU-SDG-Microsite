@@ -1,0 +1,41 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}News & Activities - FEU SDG Microsite{% endblock %}
+
+{% block body %}
+    <section class="bg-green-950 py-16 px-6 text-white text-center">
+        <h1 class="text-4xl font-bold tracking-tight mb-3">Activities & Updates</h1>
+        <p class="text-green-200">The latest sustainability projects, seminars, and initiatives at FEU.</p>
+    </section>
+
+    <section class="py-16 px-6 bg-gray-50 min-h-screen">
+        <div class="max-w-5xl mx-auto space-y-10">
+            
+            <article class="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden flex flex-col md:flex-row hover:shadow-lg transition">
+                <div class="md:w-2/5 h-64 md:h-auto relative bg-gray-200">
+                    <img src="{{ asset('images/news-placeholder.jpg') }}" alt="Placeholder Img" class="absolute inset-0 w-full h-full object-cover">
+                </div>
+                
+                <div class="p-8 md:w-3/5 flex flex-col justify-center">
+                    <div class="flex items-center gap-3 mb-3">
+                        <span class="bg-green-100 text-green-800 text-xs font-bold px-3 py-1 rounded-full uppercase tracking-wide">Seminar</span>
+                        <span class="text-gray-400 text-xs font-medium">March 4, 2026</span>
+                    </div>
+                    
+                    <h2 class="text-2xl font-bold text-gray-900 mb-4 hover:text-green-700 transition">
+                        <a href="#">Capacity Building: Patent Search Workshop</a>
+                    </h2>
+                    
+                    <div class="text-gray-600 text-sm leading-relaxed mb-6 line-clamp-3 prose">
+                        <p>An in-depth capability building workshop for engineering students to understand patent searches, intellectual property rights, and how to protect their technological innovations...</p>
+                    </div>
+                    
+                    <a href="#" class="text-green-700 font-bold hover:text-[#FCC30B] transition flex items-center gap-2 text-sm mt-auto w-max">
+                        Read Full Story <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"></path></svg>
+                    </a>
+                </div>
+            </article>
+
+        </div>
+    </section>
+{% endblock %}
