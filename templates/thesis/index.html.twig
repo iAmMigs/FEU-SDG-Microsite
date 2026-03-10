@@ -1,13 +1,13 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}Theses Library - FEU SDG Microsite{% endblock %}
+{% block title %}Project Library - FEU SDG Microsite{% endblock %}
 
 {% block body %}
     <section class="bg-green-900 py-16 px-6 relative overflow-hidden">
         <div class="relative max-w-7xl mx-auto z-10 text-center md:text-left">
             <h1 class="text-3xl md:text-5xl font-bold text-white tracking-tight mb-4">SDG Theses Repository</h1>
             <p class="text-green-100 text-lg max-w-2xl">
-                Browse, search, and discover student-led research dedicated to advancing the UN Sustainable Development Goals.
+                Browse, search, and discover student-led research and projects dedicated to for the betterment of communities and companies in alignment with the United Nations Sustainable Development Goals.
             </p>
         </div>
     </section>
@@ -29,7 +29,7 @@
                         <div>
                             <label for="goal" class="block text-sm font-semibold text-gray-700 mb-2">Filter by SDG</label>
                             <select id="goal" name="goal" class="w-full rounded-lg border-gray-300 shadow-sm focus:border-green-700 focus:ring-green-700 px-4 py-2 border bg-white">
-                                <option value="">All 8 Focus Goals</option>
+                                <option value="">All</option>
                                 <option value="3">Goal 3: Good Health</option>
                                 <option value="4">Goal 4: Quality Education</option>
                                 <option value="7">Goal 7: Clean Energy</option>
@@ -52,7 +52,7 @@
                         </div>
 
                         <button type="submit" class="w-full bg-green-800 hover:bg-green-700 text-white font-bold py-3 rounded-lg transition shadow-sm">
-                            Apply Filters
+                            Search
                         </button>
                     </form>
                 </div>
@@ -61,7 +61,7 @@
             <main class="w-full lg:w-3/4">
                 
                 <div class="flex justify-between items-center mb-6">
-                    <p class="text-gray-600 font-medium">Showing <span class="font-bold text-green-900">3</span> theses found.</p>
+                    <p class="text-gray-600 font-medium">Showing <span class="font-bold text-green-900">3</span> studies found.</p>
                     <div class="flex items-center gap-2 text-sm">
                         <label for="sort" class="text-gray-500">Sort by:</label>
                         <select id="sort" class="border-gray-300 rounded-md shadow-sm py-1 px-2 border bg-white text-gray-700">
@@ -88,7 +88,7 @@
                             <h3 class="text-xl font-bold text-gray-900 mb-1 hover:text-green-700">
                                 <a href="#">Development of a Solar-Powered Water Filtration System for Rural Communities</a>
                             </h3>
-                            <p class="text-sm text-gray-500 mb-4">By Juan Dela Cruz, Maria Santos &bull; Published: May 2025 &bull; Engineering</p>
+                            <p class="text-sm text-gray-500 mb-4">By Miguel Osinada; Published: May 2025 &bull; Engineering</p>
                             <p class="text-gray-600 text-sm leading-relaxed line-clamp-3 mb-4">
                                 This study explores the feasibility and efficiency of integrating solar panels with portable water filtration units to provide clean drinking water in off-grid rural communities in the Philippines. The prototype demonstrated a 95% success rate in removing common waterborne pathogens...
                             </p>
