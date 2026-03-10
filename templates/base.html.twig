@@ -1,17 +1,45 @@
 <!DOCTYPE html>
-<html>
+<html lang="en" class="scroll-smooth">
     <head>
         <meta charset="UTF-8">
-        <title>{% block title %}Welcome!{% endblock %}</title>
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>{% block title %}FEU SDG Microsite{% endblock %}</title>
+        
         <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 128 128%22><text y=%221.2em%22 font-size=%2296%22>⚫️</text><text y=%221.3em%22 x=%220.2em%22 font-size=%2276%22 fill=%22%23fff%22>sf</text></svg>">
+        
         {% block stylesheets %}
+            {# 1. Load Eudeka Template CSS FIRST #}
+            <link rel="stylesheet" href="{{ asset('eudeka/css/bootstrap.min.css') }}">
+            <link rel="stylesheet" href="{{ asset('eudeka/css/style.css') }}">
+            
+            {# 2. Load Tailwind CSS LAST (so it overrides template styles) #}
+            <link rel="stylesheet" href="{{ asset('styles/app.css') }}">
         {% endblock %}
 
         {% block javascripts %}
+            {# Symfony UX & AssetMapper #}
             {% block importmap %}{{ importmap('app') }}{% endblock %}
         {% endblock %}
     </head>
-    <body>
-        {% block body %}{% endblock %}
+    
+    <body class="flex flex-col min-h-screen font-sans text-gray-900 bg-white">
+        
+        {# 1. Include Header #}
+        {% include 'partials/header.html.twig' %}
+
+        {# 2. Main Content Area #}
+        <main class="flex-grow">
+            {% block body %}{% endblock %}
+        </main>
+
+        {# 3. Include Footer #}
+        {% include 'partials/footer.html.twig' %}
+
+        {# 4. Load Template Javascripts at the bottom #}
+        {% block template_javascripts %}
+            <script src="{{ asset('eudeka/js/jquery-3.6.0.min.js') }}"></script>
+            <script src="{{ asset('eudeka/js/bootstrap.bundle.min.js') }}"></script>
+            <script src="{{ asset('eudeka/js/main.js') }}"></script>
+        {% endblock %}
     </body>
 </html>
