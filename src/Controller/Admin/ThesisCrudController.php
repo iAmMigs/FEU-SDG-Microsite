@@ -4,8 +4,11 @@ namespace App\Controller\Admin;
 
 use App\Entity\Thesis;
 use EasyCorp\Bundle\EasyAdminBundle\Controller\AbstractCrudController;
-use EasyCorp\Bundle\EasyAdminBundle\Field\IdField;
-use EasyCorp\Bundle\EasyAdminBundle\Field\TextEditorField;
+use EasyCorp\Bundle\EasyAdminBundle\Field\AssociationField;
+use EasyCorp\Bundle\EasyAdminBundle\Field\DateTimeField;
+use EasyCorp\Bundle\EasyAdminBundle\Field\ImageField;
+use EasyCorp\Bundle\EasyAdminBundle\Field\IntegerField;
+use EasyCorp\Bundle\EasyAdminBundle\Field\TextareaField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\TextField;
 
 class ThesisCrudController extends AbstractCrudController
@@ -15,14 +18,29 @@ class ThesisCrudController extends AbstractCrudController
         return Thesis::class;
     }
 
-    /*
     public function configureFields(string $pageName): iterable
     {
         return [
-            IdField::new('id'),
             TextField::new('title'),
-            TextEditorField::new('description'),
+            TextField::new('authors'),
+            
+            // Textarea is perfect for abstracts
+            TextareaField::new('description')->hideOnIndex(),
+            
+            // This automatically looks up the SdgGoal database and creates a multi-select box!
+            AssociationField::new('sdgGoals')
+                ->setFormTypeOptions(['by_reference' => false]),
+            
+            // Hide these fields from the form so they are automatically handled
+            IntegerField::new('views')->hideOnForm(),
+            DateTimeField::new('createdAt')->hideOnForm(),
+
+            // Cover Image Uploader
+            ImageField::new('coverImage')
+                ->setBasePath('uploads/theses')
+                ->setUploadDir('public/uploads/theses')
+                ->setUploadedFileNamePattern('[randomhash].[extension]')
+                ->setRequired(false),
         ];
     }
-    */
 }

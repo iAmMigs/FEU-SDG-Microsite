@@ -32,6 +32,11 @@ class SdgGoal
         $this->theses = new ArrayCollection();
     }
 
+    public function __toString(): string
+    {
+        return 'SDG ' . $this->goalNumber . ' - ' . $this->name;
+    }
+
     public function getId(): ?int
     {
         return $this->id;
