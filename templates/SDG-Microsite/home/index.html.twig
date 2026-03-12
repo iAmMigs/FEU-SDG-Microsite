@@ -1,4 +1,4 @@
-{% extends 'base.html.twig' %}
+{% extends 'SDG-Microsite/base.html.twig' %}
 
 {% block title %}FEU SDG Microsite - Advancing Sustainability{% endblock %}
 
@@ -80,6 +80,7 @@
         </div>
     </section>
 
+
     <section class="py-20 px-6 bg-white border-t border-gray-200">
         <div class="max-w-7xl mx-auto">
             <div class="grid grid-cols-1 md:grid-cols-3 gap-8 text-center">
@@ -99,21 +100,63 @@
         </div>
     </section>
 
-    <section class="py-20 px-6 bg-gray-50">
+    <section class="py-24 px-6 bg-gray-50 border-t border-gray-100">
         <div class="max-w-7xl mx-auto">
-            <h2 class="text-3xl font-bold text-gray-900 mb-10 text-center">Latest Activities</h2>
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
-                <div class="bg-white rounded-xl shadow-sm overflow-hidden border border-gray-100">
-                    <div class="h-48 bg-gray-200"></div> {# Image placeholder #}
-                    <div class="p-6">
-                        <span class="text-xs font-bold text-[#C5192D] uppercase tracking-wider">Quality Education</span>
-                        <h3 class="text-xl font-bold mt-2 mb-3">Capacity Building Seminar</h3>
-                        <p class="text-gray-600 text-sm line-clamp-3">Highlights from the recent patent search and capability building workshop for engineering students.</p>
-                        <a href="#" class="inline-block mt-4 text-green-700 font-semibold hover:text-green-800">Read more &rarr;</a>
-                    </div>
+            
+            <div class="flex justify-between items-end mb-12">
+                <div>
+                    <h2 class="text-4xl md:text-5xl font-bold text-gray-900 font-bebas tracking-wide mb-3">Latest Updates</h2>
+                    <p class="text-lg text-gray-600 font-work">Stay informed with our newest research, seminars, and community events.</p>
                 </div>
-                {# Add more placeholders as needed to see the design #}
+                <a href="{{ path('app_news') }}" class="hidden md:flex items-center gap-2 text-green-700 font-bold hover:text-[#FCC30B] transition font-work">
+                    View All News <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"></path></svg>
+                </a>
             </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+                {% for activity in latest_activities %}
+                    <article class="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden flex flex-col hover:shadow-xl transition duration-300 group">
+                        
+                        <div class="h-56 relative bg-gray-100 overflow-hidden shrink-0">
+                            {% if activity.image %}
+                                <img src="{{ asset(activity.image) }}" alt="{{ activity.title }}" class="absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition duration-500">
+                            {% else %}
+                                <img src="{{ asset('images/hero-3.jpg') }}" alt="FEU Event" class="absolute inset-0 w-full h-full object-cover opacity-90 group-hover:scale-105 transition duration-500">
+                            {% endif %}
+                        </div>
+                        
+                        <div class="p-8 flex flex-col flex-grow">
+                            <div class="flex items-center gap-3 mb-4">
+                                <span class="bg-green-100 text-green-800 text-[10px] font-bold px-3 py-1 rounded-full uppercase tracking-widest">{{ activity.category }}</span>
+                                <span class="text-gray-400 text-xs font-medium">{{ activity.eventDate|date('M j, Y') }}</span>
+                            </div>
+                            
+                            <h3 class="text-2xl font-bold text-gray-900 mb-3 group-hover:text-green-700 transition font-bebas tracking-wide">
+                                <a href="#">{{ activity.title }}</a>
+                            </h3>
+                            
+                            <div class="text-gray-600 text-sm leading-relaxed mb-6 line-clamp-2 font-work prose max-w-none">
+                                {{ activity.content|raw }}
+                            </div>
+                            
+                            <a href="#" class="text-green-700 font-bold hover:text-[#FCC30B] transition flex items-center gap-1 text-sm mt-auto w-max font-work">
+                                Read Article &rarr;
+                            </a>
+                        </div>
+                    </article>
+                {% else %}
+                    <div class="col-span-3 p-12 text-center bg-white rounded-2xl border border-dashed border-gray-300">
+                        <p class="text-gray-500 font-medium font-work">No recent updates found.</p>
+                    </div>
+                {% endfor %}
+            </div>
+            
+            <div class="mt-8 text-center md:hidden">
+                <a href="{{ path('app_news') }}" class="inline-block bg-green-800 text-white px-8 py-3 rounded-full font-bold font-work shadow-md">
+                    View All News
+                </a>
+            </div>
+
         </div>
     </section>
 {% endblock %}

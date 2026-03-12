@@ -1,0 +1,89 @@
+{% extends 'SDG-Microsite/base.html.twig' %}
+
+{% block title %}Our SDG Focus - FEU SDG Microsite{% endblock %}
+
+{% block body %}
+    {% set sdg_data = [
+        { num: 3, title: 'Good Health and Well-Being', desc: 'Ensuring healthy lives and promoting well-being for all at all ages is essential to sustainable development. We focus on research that improves local healthcare access and innovations in medical technology.' },
+        { num: 4, title: 'Quality Education', desc: 'Obtaining a quality education is the foundation to improving people’s lives. Our initiatives target accessible learning modules, AI-assisted tutoring, and continuous capability building for educators.' },
+        { num: 7, title: 'Affordable and Clean Energy', desc: 'Energy is central to nearly every major challenge and opportunity. FEU champions student projects focused on solar integrations, waste-to-energy tech, and sustainable power grids.' },
+        { num: 8, title: 'Decent Work and Economic Growth', desc: 'Sustainable economic growth requires societies to create the conditions that allow people to have quality jobs. We foster entrepreneurship through programs like TamLabs.' },
+        { num: 9, title: 'Industry, Innovation and Infrastructure', desc: 'Investments in infrastructure are crucial to achieving sustainable development. Our engineering departments actively design resilient and sustainable local infrastructures.' },
+        { num: 11, title: 'Sustainable Cities and Communities', desc: 'Making cities safe and sustainable means ensuring access to safe and affordable housing, and upgrading slum settlements. We support urban planning and smart city research.' },
+        { num: 12, title: 'Responsible Consumption and Production', desc: 'Sustainable consumption and production is about promoting resource and energy efficiency. Our community projects actively tackle waste reduction and recycling.' },
+        { num: 17, title: 'Partnerships for the Goals', desc: 'A successful sustainable development agenda requires partnerships between governments, the private sector and civil society. FEU actively collaborates with industry leaders.' }
+    ] %}
+
+    <div data-controller="modal" class="relative min-h-screen bg-gray-50 pb-24">
+        
+        <section class="bg-green-950 py-20 px-6 mb-16 relative overflow-hidden text-center">
+            <div class="absolute inset-0 z-0 opacity-20 bg-[url('{{ asset('images/hero-1.jpg') }}')] bg-cover bg-center mix-blend-overlay"></div>
+            <div class="relative z-10 max-w-4xl mx-auto">
+                <h1 class="text-5xl md:text-6xl font-bold text-white mb-6 font-bebas tracking-wide">Our Global Focus</h1>
+                <p class="text-xl text-green-100 font-work max-w-2xl mx-auto leading-relaxed">
+                    FEU is committed to the United Nations Sustainable Development Goals. Explore our primary areas of impact below.
+                </p>
+            </div>
+        </section>
+
+        <div class="max-w-7xl mx-auto px-6">
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
+                {% for sdg in sdg_data %}
+                    <button type="button" 
+                            data-action="click->modal#open"
+                            data-goal="{{ sdg.num }}"
+                            data-title="{{ sdg.title }}"
+                            data-description="{{ sdg.desc }}"
+                            data-image="{{ asset('images/sdg-' ~ sdg.num ~ '.jpg') }}"
+                            class="group relative bg-white rounded-2xl overflow-hidden shadow-md border border-gray-100 hover:-translate-y-2 hover:shadow-2xl transition-all duration-300 ease-out text-left focus:outline-none focus:ring-4 focus:ring-green-700/30">
+                        
+                        <div class="aspect-square relative overflow-hidden bg-gray-100">
+                            <img src="{{ asset('images/sdg-' ~ sdg.num ~ '.jpg') }}" alt="SDG {{ sdg.num }}" class="absolute inset-0 w-full h-full object-cover group-hover:scale-110 transition-transform duration-700">
+                            <div class="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+                        </div>
+                        
+                        <div class="p-6">
+                            <span class="text-green-700 font-bold text-sm tracking-widest uppercase mb-1 block font-work">SDG {{ sdg.num }}</span>
+                            <h3 class="text-xl font-bold text-gray-900 font-bebas tracking-wide group-hover:text-green-800 transition-colors">{{ sdg.title }}</h3>
+                        </div>
+                    </button>
+                {% endfor %}
+            </div>
+        </div>
+
+        <div data-modal-target="backdrop" class="fixed inset-0 z-[100] hidden opacity-0 transition-opacity duration-300 flex items-center justify-center p-4 md:p-6">
+            
+            <div class="absolute inset-0 bg-black/60 backdrop-blur-md cursor-pointer" data-action="click->modal#close"></div>
+            
+            <div data-modal-target="panel" class="relative bg-white rounded-3xl overflow-hidden shadow-2xl w-full max-w-4xl flex flex-col md:flex-row transform opacity-0 scale-95 translate-y-4 transition-all duration-300 ease-out z-10">
+                
+                <button data-action="click->modal#close" class="absolute top-4 right-4 z-20 bg-white/50 hover:bg-white backdrop-blur-sm text-gray-900 p-2 rounded-full transition duration-200 shadow-sm focus:outline-none">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+                </button>
+
+                <div class="md:w-1/2 h-64 md:h-auto relative bg-gray-100">
+                    <img data-modal-target="image" src="" alt="SDG Cover" class="absolute inset-0 w-full h-full object-cover">
+                </div>
+                
+                <div class="md:w-1/2 p-10 md:p-14 flex flex-col justify-center bg-white">
+                    <span data-modal-target="badge" class="inline-block bg-[#FCC30B] text-yellow-950 font-bold px-4 py-1 rounded-full text-sm w-max mb-6 font-work tracking-wide uppercase">
+                        SDG Badge
+                    </span>
+                    <h2 data-modal-target="title" class="text-4xl md:text-5xl font-bold text-green-950 mb-6 font-bebas tracking-wide leading-none">
+                        Goal Title
+                    </h2>
+                    <p data-modal-target="description" class="text-gray-600 text-lg leading-relaxed font-work">
+                        Goal Description goes here.
+                    </p>
+                    
+                    <div class="mt-10 pt-8 border-t border-gray-100">
+                        <a href="{{ path('app_library') }}" class="text-green-700 font-bold hover:text-green-900 transition flex items-center gap-2 font-work">
+                            View Related Projects <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3"></path></svg>
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+    </div>
+{% endblock %}

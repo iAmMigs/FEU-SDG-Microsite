@@ -1,0 +1,46 @@
+{% extends 'SDG-Microsite/base.html.twig' %}
+
+{% block title %}Trending Research - FEU SDG Microsite{% endblock %}
+
+{% block body %}
+    <section class="bg-gray-50 py-16 px-6 border-b border-gray-200">
+        <div class="max-w-7xl mx-auto text-center">
+            <span class="text-[#FCC30B] font-bold tracking-widest uppercase text-sm mb-2 block">Top Impact</span>
+            <h1 class="text-4xl md:text-5xl font-bold text-green-950 tracking-tight">Trending Studies</h1>
+        </div>
+    </section>
+
+    <section class="py-16 px-6 bg-white min-h-screen">
+        <div class="max-w-7xl mx-auto">
+            
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                {% for thesis in theses %}
+                    <article class="bg-white rounded-2xl p-8 border border-gray-100 shadow-sm hover:shadow-xl transition duration-300 relative overflow-hidden group flex flex-col">
+                        <div class="absolute top-0 right-0 {% if loop.index == 1 %}bg-[#FCC30B] text-green-950{% else %}bg-gray-200 text-gray-700{% endif %} font-black px-4 py-1 rounded-bl-xl z-10 shadow-sm">
+                            #{{ loop.index }} Most Viewed
+                        </div>
+                        
+                        <div class="flex gap-1 mb-2">
+                            {% for goal in thesis.sdgGoals|slice(0, 2) %}
+                                <span class="text-xs font-bold text-green-700 uppercase tracking-wider block">SDG {{ goal.goalNumber }}{% if not loop.last %}, {% endif %}</span>
+                            {% endfor %}
+                        </div>
+
+                        <h3 class="text-2xl font-bold text-gray-900 mb-4 group-hover:text-green-700 transition">
+                            <a href="#">{{ thesis.title }}</a>
+                        </h3>
+                        <p class="text-gray-600 text-sm mb-6 line-clamp-3">{{ thesis.description }}</p>
+                        
+                        <div class="flex items-center justify-between border-t border-gray-100 pt-4 mt-auto">
+                            <span class="text-xs text-gray-500 font-medium">By {{ thesis.authors }}</span>
+                            <div class="flex items-center text-xs font-bold text-green-700 gap-1">
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path></svg>
+                                {{ thesis.views|number_format }}
+                            </div>
+                        </div>
+                    </article>
+                {% endfor %}
+            </div>
+        </div>
+    </section>
+{% endblock %}
