@@ -3,29 +3,29 @@
 {% block title %}FEU SDG Microsite - Advancing Sustainability{% endblock %}
 
 {% block body %}
-    <section class="relative bg-green-950 text-white py-24 px-6 md:py-32 overflow-hidden" data-controller="carousel">
+    <section class="relative h-screen w-full bg-green-950 text-white overflow-hidden" data-controller="carousel">
+    
+    <div class="absolute inset-0 z-0 pointer-events-none">
+        <img data-carousel-target="slide" src="{{ asset('images/hero-1.jpg') }}" class="absolute inset-0 w-full h-full object-cover transition-opacity duration-1000 opacity-0" alt="FEU Campus 1">
+        <img data-carousel-target="slide" src="{{ asset('images/hero-2.jpg') }}" class="absolute inset-0 w-full h-full object-cover transition-opacity duration-1000 opacity-0" alt="FEU Campus 2">
+        <img data-carousel-target="slide" src="{{ asset('images/hero-3.jpg') }}" class="absolute inset-0 w-full h-full object-cover transition-opacity duration-1000 opacity-0" alt="FEU Campus 3">
+        <img data-carousel-target="slide" src="{{ asset('images/hero-4.jpg') }}" class="absolute inset-0 w-full h-full object-cover transition-opacity duration-1000 opacity-0" alt="FEU Campus 4">
         
-        <div class="absolute inset-0 z-0 pointer-events-none">
-            <img data-carousel-target="slide" src="{{ asset('images/hero-1.jpg') }}" class="absolute inset-0 w-full h-full object-cover transition-opacity duration-1000 opacity-0" alt="FEU Campus 1">
-            <img data-carousel-target="slide" src="{{ asset('images/hero-2.jpg') }}" class="absolute inset-0 w-full h-full object-cover transition-opacity duration-1000 opacity-0" alt="FEU Campus 2">
-            <img data-carousel-target="slide" src="{{ asset('images/hero-3.jpg') }}" class="absolute inset-0 w-full h-full object-cover transition-opacity duration-1000 opacity-0" alt="FEU Campus 3">
-            <img data-carousel-target="slide" src="{{ asset('images/hero-4.jpg') }}" class="absolute inset-0 w-full h-full object-cover transition-opacity duration-1000 opacity-0" alt="FEU Campus 4">
-            
-            <div class="absolute inset-0 bg-green-950/75 mix-blend-multiply"></div>
-        </div>
+        <div class="absolute inset-0 bg-green-950/60 mix-blend-multiply"></div>
+    </div>
 
-        <div class="relative max-w-7xl mx-auto flex flex-col items-center text-center z-10">
-            <h1 class="text-4xl md:text-6xl font-bold tracking-tight mb-6">
-                Driving Sustainable Impact at FEU
-            </h1>
-            <p class="text-lg md:text-xl max-w-3xl mb-10 text-green-50">
-                Explore our research, student theses, and community projects dedicated to solving global challenges through local action.
-            </p>
-            <a href="#goals" class="bg-[#FCC30B] text-green-950 px-8 py-3 rounded-full font-semibold hover:bg-yellow-300 transition duration-300 shadow-lg">
-                Explore Our Focus Goals
-            </a>
-        </div>
-    </section>
+    <div class="relative h-full max-w-7xl mx-auto flex flex-col items-center justify-center text-center z-10 px-6">
+        <h1 class="text-5xl md:text-7xl font-bold tracking-tight mb-6 font-bebas">
+            Driving Sustainable Impact at FEU
+        </h1>
+        <p class="text-lg md:text-2xl max-w-3xl mb-10 text-green-50 font-work">
+            Explore our research, student theses, and community projects dedicated to solving global challenges through local action.
+        </p>
+        <a href="#goals" class="bg-[#FCC30B] text-green-950 px-10 py-4 rounded-full font-bold text-lg hover:bg-yellow-300 transition duration-300 shadow-xl">
+            Explore Our Focus Goals
+        </a>
+    </div>
+</section>
 
     <section id="goals" class="py-20 px-6 bg-gray-50">
         <div class="max-w-7xl mx-auto">
