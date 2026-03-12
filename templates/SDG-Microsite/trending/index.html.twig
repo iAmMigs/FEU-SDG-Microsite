@@ -1,46 +1,70 @@
 {% extends 'SDG-Microsite/base.html.twig' %}
 
-{% block title %}Trending Research - FEU SDG Microsite{% endblock %}
+{% block title %}Trending Studies - FEU SDG Microsite{% endblock %}
 
 {% block body %}
-    <section class="bg-gray-50 py-16 px-6 border-b border-gray-200">
-        <div class="max-w-7xl mx-auto text-center">
-            <span class="text-[#FCC30B] font-bold tracking-widest uppercase text-sm mb-2 block">Top Impact</span>
-            <h1 class="text-4xl md:text-5xl font-bold text-green-950 tracking-tight">Trending Studies</h1>
+    <section class="bg-feu-green-900 py-16 px-6 text-center border-b-4 border-feu-gold-400">
+        <div class="max-w-4xl mx-auto">
+            <h1 class="text-4xl md:text-5xl font-bold text-white mb-4 font-bebas tracking-wide">Trending Research</h1>
+            <p class="text-lg text-feu-green-50 font-medium font-work max-w-2xl mx-auto">
+                Discover the most viewed and impactful studies from our student and faculty researchers.
+            </p>
         </div>
     </section>
 
-    <section class="py-16 px-6 bg-white min-h-screen">
+    <section class="py-16 px-6 bg-gray-100 min-h-screen">
         <div class="max-w-7xl mx-auto">
             
             <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
                 {% for thesis in theses %}
-                    <article class="bg-white rounded-2xl p-8 border border-gray-100 shadow-sm hover:shadow-xl transition duration-300 relative overflow-hidden group flex flex-col">
-                        <div class="absolute top-0 right-0 {% if loop.index == 1 %}bg-[#FCC30B] text-green-950{% else %}bg-gray-200 text-gray-700{% endif %} font-black px-4 py-1 rounded-bl-xl z-10 shadow-sm">
-                            #{{ loop.index }} Most Viewed
-                        </div>
+                    <article class="bg-white rounded-2xl p-8 border border-gray-200 shadow-md hover:shadow-xl transition duration-300 relative overflow-hidden group flex flex-col">
                         
-                        <div class="flex gap-1 mb-2">
-                            {% for goal in thesis.sdgGoals|slice(0, 2) %}
-                                <span class="text-xs font-bold text-green-700 uppercase tracking-wider block">SDG {{ goal.goalNumber }}{% if not loop.last %}, {% endif %}</span>
+                        {% if loop.index <= 3 %}
+                            <div class="absolute top-0 right-0 {% if loop.index == 1 %}bg-feu-gold-400 text-feu-green-900{% elseif loop.index == 2 %}bg-gray-300 text-gray-800{% else %}bg-amber-700 text-white{% endif %} font-black px-4 py-1.5 rounded-bl-xl z-10 shadow-sm font-work tracking-wide text-sm">
+                                #{{ loop.index }} Most Viewed
+                            </div>
+                        {% endif %}
+                        
+                        <div class="flex flex-wrap gap-2 mb-4 mt-2">
+                            {% for goal in thesis.sdgGoals|slice(0, 3) %}
+                                <span class="bg-feu-green-50 text-feu-green-800 text-[10px] font-bold px-2 py-1 rounded-full uppercase tracking-widest border border-feu-green-200">SDG {{ goal.goalNumber }}</span>
                             {% endfor %}
                         </div>
 
-                        <h3 class="text-2xl font-bold text-gray-900 mb-4 group-hover:text-green-700 transition">
+                        <h3 class="text-2xl font-bold text-gray-900 mb-4 group-hover:text-feu-green-700 transition font-bebas tracking-wide leading-tight">
                             <a href="#">{{ thesis.title }}</a>
                         </h3>
-                        <p class="text-gray-600 text-sm mb-6 line-clamp-3">{{ thesis.description }}</p>
                         
-                        <div class="flex items-center justify-between border-t border-gray-100 pt-4 mt-auto">
-                            <span class="text-xs text-gray-500 font-medium">By {{ thesis.authors }}</span>
-                            <div class="flex items-center text-xs font-bold text-green-700 gap-1">
-                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path></svg>
-                                {{ thesis.views|number_format }}
+                        <p class="text-gray-800 font-medium text-sm mb-6 line-clamp-3 font-work leading-relaxed">
+                            {{ thesis.description }}
+                        </p>
+                        
+                        <div class="flex flex-col border-t border-gray-200 pt-5 mt-auto font-work gap-4">
+                            
+                            <div class="flex items-center justify-between">
+                                <span class="text-xs text-gray-600 font-bold truncate pr-2">By {{ thesis.authors }}</span>
+                                <div class="flex items-center text-xs font-bold text-feu-green-700 gap-1 shrink-0">
+                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path></svg>
+                                    {{ thesis.views|number_format }}
+                                </div>
                             </div>
+                            
+                            <a href="#" class="inline-flex items-center text-feu-green-700 hover:text-feu-gold-600 font-bold text-sm group w-fit transition-colors">
+                                View study 
+                                <svg class="w-4 h-4 ml-1.5 group-hover:translate-x-1.5 transition-transform duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M14 5l7 7m0 0l-7 7m7-7H3"></path>
+                                </svg>
+                            </a>
+                            
                         </div>
                     </article>
+                {% else %}
+                    <div class="col-span-1 md:col-span-2 lg:col-span-3 p-12 text-center bg-white rounded-2xl border border-dashed border-gray-300">
+                        <p class="text-gray-600 font-bold font-work">No trending studies available yet.</p>
+                    </div>
                 {% endfor %}
             </div>
+
         </div>
     </section>
 {% endblock %}
