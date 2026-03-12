@@ -1,56 +1,68 @@
-{% extends 'base.html.twig' %}
+{% extends 'SDG-Microsite/base.html.twig' %}
 
-{% block title %}Project Library - FEU SDG Microsite{% endblock %}
+{% block title %}Library - FEU SDG Microsite{% endblock %}
 
 {% block body %}
-    <section class="bg-green-900 py-16 px-6 relative overflow-hidden">
-        <div class="relative max-w-7xl mx-auto z-10 text-center md:text-left">
-            <h1 class="text-3xl md:text-5xl font-bold text-white tracking-tight mb-4">SDG Theses Repository</h1>
-            <p class="text-green-100 text-lg max-w-2xl">
-                Browse, search, and discover student-led research and projects dedicated to for the betterment of communities and companies in alignment with the United Nations Sustainable Development Goals.
+    <section class="bg-green-950 py-16 px-6 relative overflow-hidden text-center">
+        <div class="absolute inset-0 z-0 opacity-20 bg-[url('{{ asset('images/hero-1.jpg') }}')] bg-cover bg-center mix-blend-overlay"></div>
+        <div class="relative z-10 max-w-4xl mx-auto">
+            <h1 class="text-4xl md:text-5xl font-bold text-white mb-4 font-bebas tracking-wide">Research Library</h1>
+            <p class="text-lg text-green-100 font-work max-w-2xl mx-auto">
+                Explore student theses and community projects dedicated to sustainable development.
             </p>
         </div>
     </section>
 
     <section class="py-12 px-6 bg-gray-50 min-h-screen">
-        <div class="max-w-7xl mx-auto flex flex-col lg:flex-row gap-8">
+        
+        <div class="max-w-7xl mx-auto flex flex-col lg:flex-row gap-8" data-controller="autosubmit">
             
             <aside class="w-full lg:w-1/4 flex-shrink-0">
                 <div class="bg-white p-6 rounded-xl shadow-sm border border-gray-100 sticky top-28">
                     <h2 class="text-lg font-bold text-green-950 mb-6 border-b pb-2 font-bebas tracking-wide">Filter Research</h2>
                     
-                    <form action="{{ path('app_library') }}" method="GET" class="space-y-6"
-                          data-controller="autosubmit"
+                    <form id="filter-form" action="{{ path('app_library') }}" method="GET" class="space-y-6"
+                          data-autosubmit-target="form"
                           data-action="change->autosubmit#submit input->autosubmit#submit"
                           data-turbo-frame="theses_list">
                         
                         <div>
                             <label for="author" class="block text-sm font-semibold text-gray-700 mb-2 font-work">Search Author</label>
-                            <input type="text" id="author" name="author" value="{{ search_author }}" placeholder="e.g. Dela Cruz" class="w-full rounded-lg border-gray-300 shadow-sm focus:border-green-700 focus:ring-green-700 px-4 py-2 border font-work">
+                            <input type="text" id="author" name="author" value="{{ search_author|default('') }}" placeholder="e.g. Dela Cruz" class="w-full rounded-lg border-gray-300 shadow-sm focus:border-green-700 focus:ring-green-700 px-4 py-2 border font-work">
                         </div>
 
                         <div>
                             <label for="title" class="block text-sm font-semibold text-gray-700 mb-2 font-work">Search Title</label>
-                            <input type="text" id="title" name="title" value="{{ search_title }}" placeholder="Project title..." class="w-full rounded-lg border-gray-300 shadow-sm focus:border-green-700 focus:ring-green-700 px-4 py-2 border font-work">
+                            <input type="text" id="title" name="title" value="{{ search_title|default('') }}" placeholder="Project title..." class="w-full rounded-lg border-gray-300 shadow-sm focus:border-green-700 focus:ring-green-700 px-4 py-2 border font-work">
                         </div>
 
                         <div>
                             <label for="keyword" class="block text-sm font-semibold text-gray-700 mb-2 font-work">Search Abstract</label>
-                            <input type="text" id="keyword" name="keyword" value="{{ search_keyword }}" placeholder="Specific terms..." class="w-full rounded-lg border-gray-300 shadow-sm focus:border-green-700 focus:ring-green-700 px-4 py-2 border font-work">
+                            <input type="text" id="keyword" name="keyword" value="{{ search_keyword|default('') }}" placeholder="Specific terms..." class="w-full rounded-lg border-gray-300 shadow-sm focus:border-green-700 focus:ring-green-700 px-4 py-2 border font-work">
                         </div>
 
                         <div>
                             <label class="block text-sm font-semibold text-gray-700 mb-3 font-work">Filter by SDG</label>
-                            <div class="grid grid-cols-4 gap-2">
+                            
+                            <div class="grid grid-cols-4 gap-2 mb-4">
                                 {% set available_goals = [3, 4, 7, 8, 9, 11, 12, 17] %}
                                 {% for goal in available_goals %}
                                     <label class="cursor-pointer relative block aspect-square rounded-md overflow-hidden shadow-sm hover:shadow-md transition group border border-gray-100 bg-white">
-                                        <input type="checkbox" name="goals[]" value="{{ goal }}" class="peer hidden" {% if goal in selected_goals %}checked{% endif %}>
+                                        <input type="checkbox" name="goals[]" value="{{ goal }}" class="peer hidden" {% if selected_goals is defined and goal in selected_goals %}checked{% endif %}>
                                         <img src="{{ asset('images/sdg-' ~ goal ~ '-inv.jpg') }}" alt="SDG {{ goal }}" class="absolute inset-0 w-full h-full object-cover transition-opacity duration-300 opacity-100 peer-checked:opacity-0 group-hover:opacity-75">
                                         <img src="{{ asset('images/sdg-' ~ goal ~ '.jpg') }}" alt="SDG {{ goal }}" class="absolute inset-0 w-full h-full object-cover transition-opacity duration-300 opacity-0 peer-checked:opacity-100">
                                         <div class="absolute inset-0 border-2 border-green-700 rounded-md opacity-0 peer-checked:opacity-100 transition-opacity pointer-events-none"></div>
                                     </label>
                                 {% endfor %}
+                            </div>
+
+                            <div class="flex items-center bg-gray-50 p-3 rounded-lg border border-gray-200">
+                                <input type="checkbox" id="exclusive" name="exclusive" value="1" 
+                                       class="w-5 h-5 rounded border-gray-300 text-green-700 focus:ring-green-700 cursor-pointer"
+                                       {% if is_exclusive|default(false) %}checked{% endif %}>
+                                <label for="exclusive" class="ml-3 text-sm font-semibold text-gray-700 font-work cursor-pointer select-none">
+                                    Precise Filtering <span class="block text-xs text-gray-500 font-normal">Show only studies with ALL selected SDGs</span>
+                                </label>
                             </div>
                         </div>
 
@@ -65,8 +77,30 @@
                 
                 <turbo-frame id="theses_list">
                     
-                    <div class="flex justify-between items-center mb-6">
-                        <p class="text-gray-600 font-medium font-work">Showing <span class="font-bold text-green-900">{{ theses|length }}</span> studies found.</p>
+                    <div class="flex flex-col sm:flex-row justify-between items-center mb-6 pb-4 border-b border-gray-200 gap-4">
+                        <p class="text-gray-600 font-medium font-work">Showing <span class="font-bold text-green-900">{{ total_count|default(0) }}</span> studies found.</p>
+
+                        <div class="flex items-center gap-2 text-sm font-work text-gray-700 bg-white px-3 py-1.5 rounded-lg border border-gray-200 shadow-sm">
+                            <span class="hidden sm:inline font-medium mr-1">Page</span>
+                            
+                            <button type="button" data-action="click->autosubmit#prevPage" class="p-1 text-gray-400 hover:text-green-700 transition {% if current_page|default(1) <= 1 %}opacity-30 cursor-not-allowed pointer-events-none{% endif %}">
+                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path></svg>
+                            </button>
+                            
+                            <input type="number" name="page" form="filter-form" 
+                                   data-autosubmit-target="page" 
+                                   data-action="change->autosubmit#submit"
+                                   data-max="{{ total_pages|default(1) }}" 
+                                   value="{{ current_page|default(1) }}" 
+                                   min="1" max="{{ total_pages|default(1) }}"
+                                   class="w-14 text-center rounded-md border-gray-200 focus:border-green-700 focus:ring-green-700 py-1 border font-bold text-green-900 bg-gray-50 hide-arrows">
+                            
+                            <button type="button" data-action="click->autosubmit#nextPage" class="p-1 text-gray-400 hover:text-green-700 transition {% if current_page|default(1) >= total_pages|default(1) %}opacity-30 cursor-not-allowed pointer-events-none{% endif %}">
+                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg>
+                            </button>
+                            
+                            <span class="hidden sm:inline font-medium ml-1">of {{ total_pages|default(1) }}</span>
+                        </div>
                     </div>
 
                     <div id="theses-skeleton" class="space-y-6 hidden">
@@ -117,7 +151,7 @@
                             </article>
                         {% else %}
                             <div class="p-12 text-center bg-white rounded-2xl border border-dashed border-gray-300">
-                                <p class="text-gray-500 font-medium font-work">No projects found for the selected SDG filters.</p>
+                                <p class="text-gray-500 font-medium font-work">No projects found for the selected filters.</p>
                             </div>
                         {% endfor %}
                     </div>

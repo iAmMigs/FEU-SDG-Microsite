@@ -15,7 +15,7 @@ final class NewsController extends AbstractController
         // Fetch all activities ordered by event date
         $activities = $activityRepository->findBy([], ['eventDate' => 'DESC']);
 
-        return $this->render('news/index.html.twig', [
+        return $this->render('SDG-Microsite/news/index.html.twig', [
             'activities' => $activities,
         ]);
     }

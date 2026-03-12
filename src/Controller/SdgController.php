@@ -6,13 +6,11 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
 
-final class AboutController extends AbstractController
+final class SdgController extends AbstractController
 {
-    #[Route('/about', name: 'app_about')]
+    #[Route('/sdgs', name: 'app_sdgs')]
     public function index(): Response
     {
-        return $this->render('SDG-Microsite/about/index.html.twig', [
-            'controller_name' => 'AboutController',
-        ]);
+        return $this->render('SDG-Microsite/sdg/index.html.twig');
     }
 }
