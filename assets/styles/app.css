@@ -1,5 +1,67 @@
 @import "tailwindcss";
 
-body {
-    background-color: skyblue;
+/* 1. Bebas Neue */
+@font-face {
+    font-family: 'BebasNeue';
+    src: url('../fonts/bebas_neue/BebasNeue-Regular.otf') format('opentype');
+    font-weight: 400;
+    font-display: swap;
+}
+
+/* 2. Coolvetica */
+@font-face {
+    font-family: 'Coolvetica';
+    src: url('../fonts/coolvetica/Coolvetica Rg.otf') format('opentype');
+    font-weight: 400;
+    font-display: swap;
+}
+
+/* 3. Lemon Milk */
+@font-face {
+    font-family: 'LemonMilk';
+    src: url('../fonts/lemon_milk/LEMONMILK-Regular.otf') format('opentype');
+    font-weight: 400;
+    font-display: swap;
+}
+
+/* 4. Montserrat */
+@font-face {
+    font-family: 'Montserrat';
+    src: url('../fonts/monteserrat/Montserrat-Regular.otf') format('opentype');
+    font-weight: 400;
+    font-display: swap;
+}
+@font-face {
+    font-family: 'Montserrat';
+    src: url('../fonts/monteserrat/Montserrat-Bold.otf') format('opentype');
+    font-weight: 700;
+    font-display: swap;
+}
+
+/* 5. Sans Serif FLF */
+@font-face {
+    font-family: 'SansSerifFLF';
+    src: url('../fonts/sans_serif/SansSerifFLF.otf') format('opentype');
+    font-weight: 400;
+    font-display: swap;
+}
+
+/* 6. Work Sans */
+@font-face {
+    font-family: 'WorkSans';
+    src: url('../fonts/work_sans/WorkSans-Regular.ttf') format('truetype');
+    font-weight: 400;
+    font-display: swap;
+}
+
+/* --- TAILWIND THEME CONFIGURATION --- */
+@theme {
+    /* This overrides the default font-sans to use Montserrat globally */
+    --font-sans: 'Montserrat', ui-sans-serif, system-ui, sans-serif;
+    
+    --font-bebas: 'BebasNeue', sans-serif;
+    --font-coolvetica: 'Coolvetica', sans-serif;
+    --font-lemon: 'LemonMilk', sans-serif;
+    --font-sans-flf: 'SansSerifFLF', sans-serif;
+    --font-work: 'WorkSans', sans-serif;
 }

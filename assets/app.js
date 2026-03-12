@@ -10,3 +10,7 @@ import $ from 'jquery';
 window.$ = window.jQuery = $;
 
 console.log('This log comes from assets/app.js - welcome to AssetMapper! 🎉');
+
+import { initLoader } from './loader.js'; 
+
+initLoader();

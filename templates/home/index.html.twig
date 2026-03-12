@@ -3,22 +3,29 @@
 {% block title %}FEU SDG Microsite - Advancing Sustainability{% endblock %}
 
 {% block body %}
-    <section class="relative bg-green-900 text-white py-24 px-6 md:py-32">
-        <div class="absolute inset-0 overflow-hidden opacity-20">
-            <img src="{{ asset('images/hero-bg.jpg') }}" alt="FEU Campus" class="w-full h-full object-cover">
-        </div>
-        <div class="relative max-w-7xl mx-auto flex flex-col items-center text-center z-10">
-            <h1 class="text-4xl md:text-6xl font-bold tracking-tight mb-6">
-                Driving Sustainable Impact at FEU
-            </h1>
-            <p class="text-lg md:text-xl max-w-3xl mb-10 text-green-50">
-                Explore our research, student theses, and community projects dedicated to solving global challenges through local action.
-            </p>
-            <a href="#goals" class="bg-[#FCC30B] text-green-950 px-8 py-3 rounded-full font-semibold hover:bg-yellow-300 transition duration-300">
-                Explore Our Focus Goals
-            </a>
-        </div>
-    </section>
+    <section class="relative h-screen w-full bg-green-950 text-white overflow-hidden" data-controller="carousel">
+    
+    <div class="absolute inset-0 z-0 pointer-events-none">
+        <img data-carousel-target="slide" src="{{ asset('images/hero-1.jpg') }}" class="absolute inset-0 w-full h-full object-cover transition-opacity duration-1000 opacity-0" alt="FEU Campus 1">
+        <img data-carousel-target="slide" src="{{ asset('images/hero-2.jpg') }}" class="absolute inset-0 w-full h-full object-cover transition-opacity duration-1000 opacity-0" alt="FEU Campus 2">
+        <img data-carousel-target="slide" src="{{ asset('images/hero-3.jpg') }}" class="absolute inset-0 w-full h-full object-cover transition-opacity duration-1000 opacity-0" alt="FEU Campus 3">
+        <img data-carousel-target="slide" src="{{ asset('images/hero-4.jpg') }}" class="absolute inset-0 w-full h-full object-cover transition-opacity duration-1000 opacity-0" alt="FEU Campus 4">
+        
+        <div class="absolute inset-0 bg-green-950/60 mix-blend-multiply"></div>
+    </div>
+
+    <div class="relative h-full max-w-7xl mx-auto flex flex-col items-center justify-center text-center z-10 px-6">
+        <h1 class="text-5xl md:text-7xl font-bold tracking-tight mb-6 font-bebas">
+            Driving Sustainable Impact at FEU
+        </h1>
+        <p class="text-lg md:text-2xl max-w-3xl mb-10 text-green-50 font-work">
+            Explore our research, student theses, and community projects dedicated to solving global challenges through local action.
+        </p>
+        <a href="#goals" class="bg-[#FCC30B] text-green-950 px-10 py-4 rounded-full font-bold text-lg hover:bg-yellow-300 transition duration-300 shadow-xl">
+            Explore Our Focus Goals
+        </a>
+    </div>
+</section>
 
     <section id="goals" class="py-20 px-6 bg-gray-50">
         <div class="max-w-7xl mx-auto">
@@ -29,42 +36,42 @@
 
             <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-6">
                 
-                <a href="#" class="block group relative rounded-xl overflow-hidden shadow-sm hover:shadow-2xl transition-all duration-300 hover:-translate-y-1.5 border border-gray-100 bg-white aspect-square">
+                <a href="{{ path('app_library') }}?goals[]=3" class="block group relative rounded-xl overflow-hidden shadow-sm hover:shadow-2xl transition-all duration-300 hover:-translate-y-1.5 border border-gray-100 bg-white aspect-square">
                     <img src="{{ asset('images/sdg-3.jpg') }}" alt="Goal 3: Good Health and Well-Being" class="absolute inset-0 w-full h-full object-cover transition-opacity duration-300 opacity-100 group-hover:opacity-0">
                     <img src="{{ asset('images/sdg-3-inv.jpg') }}" alt="Goal 3: Good Health and Well-Being" class="absolute inset-0 w-full h-full object-cover transition-opacity duration-300 opacity-0 group-hover:opacity-100">
                 </a>
 
-                <a href="#" class="block group relative rounded-xl overflow-hidden shadow-sm hover:shadow-2xl transition-all duration-300 hover:-translate-y-1.5 border border-gray-100 bg-white aspect-square">
+                <a href="{{ path('app_library') }}?goals[]=4" class="block group relative rounded-xl overflow-hidden shadow-sm hover:shadow-2xl transition-all duration-300 hover:-translate-y-1.5 border border-gray-100 bg-white aspect-square">
                     <img src="{{ asset('images/sdg-4.jpg') }}" alt="Goal 4: Quality Education" class="absolute inset-0 w-full h-full object-cover transition-opacity duration-300 opacity-100 group-hover:opacity-0">
                     <img src="{{ asset('images/sdg-4-inv.jpg') }}" alt="Goal 4: Quality Education" class="absolute inset-0 w-full h-full object-cover transition-opacity duration-300 opacity-0 group-hover:opacity-100">
                 </a>
 
-                <a href="#" class="block group relative rounded-xl overflow-hidden shadow-sm hover:shadow-2xl transition-all duration-300 hover:-translate-y-1.5 border border-gray-100 bg-white aspect-square">
+                <a href="{{ path('app_library') }}?goals[]=7" class="block group relative rounded-xl overflow-hidden shadow-sm hover:shadow-2xl transition-all duration-300 hover:-translate-y-1.5 border border-gray-100 bg-white aspect-square">
                     <img src="{{ asset('images/sdg-7.jpg') }}" alt="Goal 7: Affordable and Clean Energy" class="absolute inset-0 w-full h-full object-cover transition-opacity duration-300 opacity-100 group-hover:opacity-0">
                     <img src="{{ asset('images/sdg-7-inv.jpg') }}" alt="Goal 7: Affordable and Clean Energy" class="absolute inset-0 w-full h-full object-cover transition-opacity duration-300 opacity-0 group-hover:opacity-100">
                 </a>
 
-                <a href="#" class="block group relative rounded-xl overflow-hidden shadow-sm hover:shadow-2xl transition-all duration-300 hover:-translate-y-1.5 border border-gray-100 bg-white aspect-square">
+                <a href="{{ path('app_library') }}?goals[]=8" class="block group relative rounded-xl overflow-hidden shadow-sm hover:shadow-2xl transition-all duration-300 hover:-translate-y-1.5 border border-gray-100 bg-white aspect-square">
                     <img src="{{ asset('images/sdg-8.jpg') }}" alt="Goal 8: Decent Work and Economic Growth" class="absolute inset-0 w-full h-full object-cover transition-opacity duration-300 opacity-100 group-hover:opacity-0">
                     <img src="{{ asset('images/sdg-8-inv.jpg') }}" alt="Goal 8: Decent Work and Economic Growth" class="absolute inset-0 w-full h-full object-cover transition-opacity duration-300 opacity-0 group-hover:opacity-100">
                 </a>
 
-                <a href="#" class="block group relative rounded-xl overflow-hidden shadow-sm hover:shadow-2xl transition-all duration-300 hover:-translate-y-1.5 border border-gray-100 bg-white aspect-square">
+                <a href="{{ path('app_library') }}?goals[]=9" class="block group relative rounded-xl overflow-hidden shadow-sm hover:shadow-2xl transition-all duration-300 hover:-translate-y-1.5 border border-gray-100 bg-white aspect-square">
                     <img src="{{ asset('images/sdg-9.jpg') }}" alt="Goal 9: Industry, Innovation and Infrastructure" class="absolute inset-0 w-full h-full object-cover transition-opacity duration-300 opacity-100 group-hover:opacity-0">
                     <img src="{{ asset('images/sdg-9-inv.jpg') }}" alt="Goal 9: Industry, Innovation and Infrastructure" class="absolute inset-0 w-full h-full object-cover transition-opacity duration-300 opacity-0 group-hover:opacity-100">
                 </a>
 
-                <a href="#" class="block group relative rounded-xl overflow-hidden shadow-sm hover:shadow-2xl transition-all duration-300 hover:-translate-y-1.5 border border-gray-100 bg-white aspect-square">
+                <a href="{{ path('app_library') }}?goals[]=11" class="block group relative rounded-xl overflow-hidden shadow-sm hover:shadow-2xl transition-all duration-300 hover:-translate-y-1.5 border border-gray-100 bg-white aspect-square">
                     <img src="{{ asset('images/sdg-11.jpg') }}" alt="Goal 11: Sustainable Cities and Communities" class="absolute inset-0 w-full h-full object-cover transition-opacity duration-300 opacity-100 group-hover:opacity-0">
                     <img src="{{ asset('images/sdg-11-inv.jpg') }}" alt="Goal 11: Sustainable Cities and Communities" class="absolute inset-0 w-full h-full object-cover transition-opacity duration-300 opacity-0 group-hover:opacity-100">
                 </a>
 
-                <a href="#" class="block group relative rounded-xl overflow-hidden shadow-sm hover:shadow-2xl transition-all duration-300 hover:-translate-y-1.5 border border-gray-100 bg-white aspect-square">
+                <a href="{{ path('app_library') }}?goals[]=12" class="block group relative rounded-xl overflow-hidden shadow-sm hover:shadow-2xl transition-all duration-300 hover:-translate-y-1.5 border border-gray-100 bg-white aspect-square">
                     <img src="{{ asset('images/sdg-12.jpg') }}" alt="Goal 12: Responsible Consumption and Production" class="absolute inset-0 w-full h-full object-cover transition-opacity duration-300 opacity-100 group-hover:opacity-0">
                     <img src="{{ asset('images/sdg-12-inv.jpg') }}" alt="Goal 12: Responsible Consumption and Production" class="absolute inset-0 w-full h-full object-cover transition-opacity duration-300 opacity-0 group-hover:opacity-100">
                 </a>
 
-                <a href="#" class="block group relative rounded-xl overflow-hidden shadow-sm hover:shadow-2xl transition-all duration-300 hover:-translate-y-1.5 border border-gray-100 bg-white aspect-square">
+                <a href="{{ path('app_library') }}?goals[]=17" class="block group relative rounded-xl overflow-hidden shadow-sm hover:shadow-2xl transition-all duration-300 hover:-translate-y-1.5 border border-gray-100 bg-white aspect-square">
                     <img src="{{ asset('images/sdg-17.jpg') }}" alt="Goal 17: Partnerships for the Goals" class="absolute inset-0 w-full h-full object-cover transition-opacity duration-300 opacity-100 group-hover:opacity-0">
                     <img src="{{ asset('images/sdg-17-inv.jpg') }}" alt="Goal 17: Partnerships for the Goals" class="absolute inset-0 w-full h-full object-cover transition-opacity duration-300 opacity-0 group-hover:opacity-100">
                 </a>

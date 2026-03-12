@@ -1,0 +1,41 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}About - FEU SDG Microsite{% endblock %}
+
+{% block body %}
+    <section class="bg-green-900 py-20 px-6">
+        <div class="max-w-7xl mx-auto text-center">
+            <h1 class="text-4xl md:text-5xl font-bold text-white tracking-tight mb-4">Our Commitment to Sustainability</h1>
+            <p class="text-green-100 text-lg max-w-3xl mx-auto">
+                Integrating the United Nations Sustainable Development Goals into education, research, and community extension at Far Eastern University.
+            </p>
+        </div>
+    </section>
+
+    <section class="py-20 px-6 bg-white">
+        <div class="max-w-7xl mx-auto flex flex-col md:flex-row items-center gap-16">
+            <div class="w-full md:w-1/2">
+                <h2 class="text-3xl font-bold text-green-950 mb-6">Empowering Future Innovators</h2>
+                <p class="text-gray-600 leading-relaxed mb-6">
+                    At Far Eastern University, we believe that academic institutions play a critical role in solving global challenges. The FEU SDG Microsite serves as a centralized hub to showcase the impactful research and technological innovations developed by our students and faculty.
+                </p>
+                <p class="text-gray-600 leading-relaxed mb-6">
+                    By focusing heavily on our 8 designated SDGs, we ensure our resources are channeled effectively to create tangible, real-world solutions—from affordable clean energy prototypes to advanced educational technologies.
+                </p>
+                <div class="flex items-center gap-4 mt-8">
+                    <div class="w-12 h-12 bg-green-100 rounded-full flex items-center justify-center">
+                        <span class="text-green-800 font-black text-xl">1</span>
+                    </div>
+                    <div class="text-sm font-semibold text-gray-700">Aligned with global standards</div>
+                </div>
+            </div>
+            
+            <div class="w-full md:w-1/2">
+                <div class="aspect-video bg-gray-200 rounded-2xl overflow-hidden shadow-lg relative">
+                    <img src="{{ asset('images/about-campus.jpg') }}" alt="FEU Campus" class="w-full h-full object-cover">
+                    <div class="absolute inset-0 border-4 border-[#FCC30B] rounded-2xl m-4 pointer-events-none opacity-50"></div>
+                </div>
+            </div>
+        </div>
+    </section>
+{% endblock %}
