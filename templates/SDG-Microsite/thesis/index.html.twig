@@ -134,7 +134,13 @@
                                         {% endfor %}
                                     </div>
                                     <h3 class="text-2xl font-bold text-gray-900 mb-2 hover:text-green-700 transition font-bebas tracking-wide">
-                                        <a href="#">{{ thesis.title }}</a>
+                                        {% if thesis.documentFile %}
+                                            <a href="{{ asset('uploads/theses/documents/' ~ thesis.documentFile) }}" target="_blank">
+                                                {{ thesis.title }}
+                                            </a>
+                                        {% else %}
+                                            <a href="#">{{ thesis.title }}</a>
+                                        {% endif %}
                                     </h3>
                                     <p class="text-gray-600 text-sm leading-relaxed mb-4 line-clamp-3 font-work">
                                         {{ thesis.description }}

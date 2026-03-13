@@ -41,6 +41,13 @@ class ThesisCrudController extends AbstractCrudController
                 ->setUploadDir('public/uploads/theses')
                 ->setUploadedFileNamePattern('[randomhash].[extension]')
                 ->setRequired(false),
+            
+            ImageField::new('documentFile', 'PDF Document')
+                ->setBasePath('uploads/theses/documents')
+                ->setUploadDir('public/uploads/theses/documents')
+                ->setUploadedFileNamePattern('[randomhash].[extension]')
+                ->hideOnIndex() // Hides it on the list view so it doesn't try to render a PDF as an image
+                ->setRequired(false),
         ];
     }
 }
