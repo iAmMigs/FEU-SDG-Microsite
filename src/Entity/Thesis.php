@@ -38,14 +38,14 @@ class Thesis
     private ?\DateTimeImmutable $createdAt = null;
 
     /**
-     * @var Collection<int, SdgGoal>
+     * @var Collection<int, Sdg>
      */
-    #[ORM\ManyToMany(targetEntity: SdgGoal::class, inversedBy: 'theses')]
-    private Collection $sdgGoals;
+    #[ORM\ManyToMany(targetEntity: Sdg::class, inversedBy: 'theses')]
+    private Collection $sdgs;
 
     public function __construct()
     {
-        $this->sdgGoals = new ArrayCollection();
+        $this->sdgs = new ArrayCollection();
         $this->createdAt = new \DateTimeImmutable();
     }
 
@@ -75,20 +75,20 @@ class Thesis
     public function getCreatedAt(): ?\DateTimeImmutable { return $this->createdAt; }
     public function setCreatedAt(\DateTimeImmutable $createdAt): static { $this->createdAt = $createdAt; return $this; }
 
-    /** @return Collection<int, SdgGoal> */
-    public function getSdgGoals(): Collection { return $this->sdgGoals; }
+    /** @return Collection<int, Sdg> */
+    public function getSdgs(): Collection { return $this->sdgs; }
 
-    public function addSdgGoal(SdgGoal $sdgGoal): static
+    public function addSdg(Sdg $sdg): static
     {
-        if (!$this->sdgGoals->contains($sdgGoal)) {
-            $this->sdgGoals->add($sdgGoal);
+        if (!$this->sdgs->contains($sdg)) {
+            $this->sdgs->add($sdg);
         }
         return $this;
     }
 
-    public function removeSdgGoal(SdgGoal $sdgGoal): static
+    public function removeSdg(Sdg $sdg): static
     {
-        $this->sdgGoals->removeElement($sdgGoal);
+        $this->sdgs->removeElement($sdg);
         return $this;
     }
 }

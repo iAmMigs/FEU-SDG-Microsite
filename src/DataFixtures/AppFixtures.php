@@ -3,7 +3,7 @@
 namespace App\DataFixtures;
 
 use App\Entity\Activity;
-use App\Entity\SdgGoal;
+use App\Entity\Sdg;
 use App\Entity\Thesis;
 use Doctrine\Bundle\FixturesBundle\Fixture;
 use Doctrine\Persistence\ObjectManager;
@@ -12,7 +12,7 @@ class AppFixtures extends Fixture
 {
     public function load(ObjectManager $manager): void
     {
-        // 1. Create the 8 official SDG Goals
+        // 1. Create the 8 official SDGs
         $sdgData = [
             3 => 'Good Health and Well-Being',
             4 => 'Quality Education',
@@ -25,12 +25,13 @@ class AppFixtures extends Fixture
         ];
 
         $sdgEntities = [];
-        foreach ($sdgData as $number => $name) {
-            $sdg = new SdgGoal();
-            $sdg->setGoalNumber($number);
+        // Fixed the loop logic here so it safely grabs the ID and Name!
+        foreach ($sdgData as $id => $name) {
+            $sdg = new Sdg();
+            $sdg->setId($id); // Manually setting the Primary Key!
             $sdg->setName($name);
             $manager->persist($sdg);
-            $sdgEntities[$number] = $sdg;
+            $sdgEntities[$id] = $sdg;
         }
 
         // 2. Create Theses
@@ -151,14 +152,14 @@ class AppFixtures extends Fixture
                    ->setDocumentFile('dummy-thesis.pdf')
                    ->setCreatedAt(new \DateTimeImmutable('-' . rand(1, 30) . ' days'));
             
-            // Link the specific SDGs to this thesis
+            // Note: Changed from addSdgGoal to addSdg to match the new relationship!
             foreach ($data['goals'] as $goalNum) {
-                $thesis->addSdgGoal($sdgEntities[$goalNum]);
+                $thesis->addSdg($sdgEntities[$goalNum]);
             }
             $manager->persist($thesis);
         }
 
-        // 3. Create Activities / News (Pulled from FTIC DB Articles)
+        // 3. Create Activities / News
         $activitiesData = [
             [
                 'title' => 'Capacity Building: Patent Search Workshop',
@@ -190,7 +191,6 @@ class AppFixtures extends Fixture
             $manager->persist($activity);
         }
 
-        // Save everything to the database
         $manager->flush();
     }
 }
