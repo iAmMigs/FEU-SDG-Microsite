@@ -124,35 +124,55 @@
 
                     <div id="theses-results" class="space-y-6">
                         {% for thesis in theses %}
-                            <article class="bg-white rounded-2xl p-8 border border-gray-100 shadow-sm hover:shadow-lg transition flex flex-col md:flex-row gap-6">
-                                <div class="flex-grow">
-                                    <div class="flex flex-wrap gap-2 mb-3">
-                                        {% for goal in thesis.sdgGoals %}
-                                            <span class="bg-green-50 text-green-800 text-xs font-bold px-3 py-1 rounded-full border border-green-200 font-work">
-                                                SDG {{ goal.goalNumber }}
-                                            </span>
-                                        {% endfor %}
-                                    </div>
-                                    <h3 class="text-2xl font-bold text-gray-900 mb-2 hover:text-green-700 transition font-bebas tracking-wide">
-                                        {% if thesis.documentFile %}
-                                            <a href="{{ asset('uploads/theses/documents/' ~ thesis.documentFile) }}" target="_blank">
-                                                {{ thesis.title }}
-                                            </a>
-                                        {% else %}
-                                            <a href="#">{{ thesis.title }}</a>
-                                        {% endif %}
-                                    </h3>
-                                    <p class="text-gray-600 text-sm leading-relaxed mb-4 line-clamp-3 font-work">
+                            <article class="bg-white rounded-2xl p-8 border border-gray-100 shadow-sm hover:shadow-lg transition flex flex-col gap-4">
+                                
+                                <div class="flex flex-wrap gap-2 mb-1">
+                                    {% for sdg in thesis.sdgs %}
+                                        <span class="bg-feu-green-50 text-feu-green-800 text-xs font-bold px-3 py-1 rounded-full border border-feu-green-200 font-work uppercase tracking-wider">
+                                            SDG {{ sdg.id }}
+                                        </span>
+                                    {% endfor %}
+                                </div>
+                                
+                                <h3 class="text-2xl font-bold text-gray-900 hover:text-feu-green-700 transition font-bebas tracking-wide">
+                                    <a href="{{ path('app_thesis_show', {id: thesis.id}) }}">{{ thesis.title }}</a>
+                                </h3>
+                                
+                                <div class="relative">
+                                    <p id="abstract-{{ thesis.id }}" class="text-gray-800 font-medium text-sm leading-relaxed line-clamp-3 font-work transition-all duration-300">
                                         {{ thesis.description }}
                                     </p>
-                                    <div class="flex items-center justify-between text-sm text-gray-500 mt-auto font-work">
-                                        <span class="font-medium">By {{ thesis.authors }}</span>
-                                        <div class="flex items-center text-green-700 font-bold gap-1">
+                                </div>
+                                
+                                <div class="flex flex-col xl:flex-row xl:items-center justify-between mt-4 pt-4 border-t border-gray-100 gap-4">
+                                    
+                                    <div class="flex flex-wrap items-center gap-4 text-sm font-work">
+                                        <span class="font-bold text-gray-600">By {{ thesis.authors }}</span>
+                                        <div class="flex items-center text-feu-green-700 font-bold gap-1 bg-feu-green-50 px-2 py-1 rounded-md">
                                             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path></svg>
-                                            {{ thesis.views|number_format }}
+                                            {{ thesis.views|number_format }} Views
                                         </div>
                                     </div>
+                                    
+                                    <div class="flex flex-wrap items-center gap-2">
+                                        <button type="button" onclick="document.getElementById('abstract-{{ thesis.id }}').classList.toggle('line-clamp-3')" class="px-4 py-2.5 bg-gray-100 hover:bg-gray-200 text-gray-800 font-bold rounded-lg transition text-xs flex items-center gap-1.5 border border-gray-200 font-work">
+                                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h7"></path></svg>
+                                            Abstract
+                                        </button>
+
+                                        {% if thesis.documentFile %}
+                                            <a href="{{ asset('uploads/theses/' ~ thesis.documentFile) }}" target="_blank" class="px-4 py-2.5 bg-red-50 hover:bg-red-100 text-red-700 font-bold rounded-lg transition text-xs flex items-center gap-1.5 border border-red-200 font-work">
+                                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z"></path></svg>
+                                                View PDF
+                                            </a>
+                                        {% endif %}
+
+                                        <a href="{{ path('app_thesis_show', {id: thesis.id}) }}" class="px-5 py-2.5 bg-feu-green-900 hover:bg-feu-green-800 text-white font-bold rounded-lg transition text-xs flex items-center gap-1.5 shadow-sm font-work">
+                                            View Article &rarr;
+                                        </a>
+                                    </div>
                                 </div>
+
                             </article>
                         {% else %}
                             <div class="p-12 text-center bg-white rounded-2xl border border-dashed border-gray-300">

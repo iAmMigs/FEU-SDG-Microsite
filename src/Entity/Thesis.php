@@ -37,6 +37,9 @@ class Thesis
     #[ORM\Column(type: Types::DATETIME_IMMUTABLE)]
     private ?\DateTimeImmutable $createdAt = null;
 
+    #[ORM\Column(length: 255, nullable: true)]
+    private ?string $publicationLink = null;
+
     /**
      * @var Collection<int, Sdg>
      */
@@ -74,6 +77,9 @@ class Thesis
 
     public function getCreatedAt(): ?\DateTimeImmutable { return $this->createdAt; }
     public function setCreatedAt(\DateTimeImmutable $createdAt): static { $this->createdAt = $createdAt; return $this; }
+
+    public function getPublicationLink(): ?string { return $this->publicationLink; }
+    public function setPublicationLink(?string $publicationLink): static { $this->publicationLink = $publicationLink; return $this; }
 
     /** @return Collection<int, Sdg> */
     public function getSdgs(): Collection { return $this->sdgs; }

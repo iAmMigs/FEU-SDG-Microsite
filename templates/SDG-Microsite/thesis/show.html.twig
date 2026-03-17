@@ -1,0 +1,59 @@
+{% extends 'SDG-Microsite/base.html.twig' %}
+
+{% block title %}{{ thesis.title }} - FEU SDG Microsite{% endblock %}
+
+{% block body %}
+<section class="bg-gray-50 py-16 px-6 min-h-[80vh]">
+    <div class="max-w-4xl mx-auto bg-white p-8 md:p-14 rounded-2xl shadow-sm border border-gray-200">
+
+        <a href="{{ path('app_library') }}" class="text-feu-green-700 font-bold text-sm mb-8 inline-flex items-center gap-2 hover:text-feu-gold-600 transition font-work">
+            &larr; Back to Library
+        </a>
+
+        <h1 class="text-3xl md:text-5xl font-bold text-gray-900 font-bebas mb-4 tracking-wide leading-tight">{{ thesis.title }}</h1>
+        <p class="text-gray-600 font-bold font-work text-lg mb-6">By {{ thesis.authors }}</p>
+
+        <div class="flex flex-wrap gap-2 mb-8 border-b border-gray-100 pb-8">
+            {% for sdg in thesis.sdgs %}
+                <span class="bg-feu-green-50 text-feu-green-800 text-xs font-bold px-3 py-1 rounded-full border border-feu-green-200 font-work uppercase tracking-wider">
+                    SDG {{ sdg.id }}
+                </span>
+            {% endfor %}
+            <span class="ml-auto text-sm font-bold text-gray-400 font-work flex items-center gap-1.5 mt-2 sm:mt-0">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path></svg>
+                {{ thesis.views|number_format }}
+            </span>
+        </div>
+
+        {% if thesis.publicationLink %}
+        <div class="mb-10">
+            <a href="{{ thesis.publicationLink }}" target="_blank" class="inline-flex items-center justify-center px-6 py-3.5 text-sm font-bold rounded-xl text-feu-green-950 bg-feu-gold-400 hover:bg-feu-gold-500 transition shadow-md gap-2 font-work">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"></path></svg>
+                View Publication
+            </a>
+        </div>
+        {% endif %}
+
+        <div class="mb-12">
+            <h2 class="text-2xl font-bold text-gray-900 font-bebas tracking-wide mb-4 border-l-4 border-feu-gold-400 pl-3">Abstract</h2>
+            <div class="prose max-w-none text-gray-800 font-medium font-work leading-relaxed">
+                {{ thesis.description|nl2br }}
+            </div>
+        </div>
+
+        {% if thesis.documentFile %}
+        <div class="bg-gray-50 p-6 rounded-xl border border-gray-200 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+            <div>
+                <h2 class="text-xl font-bold text-gray-900 font-bebas tracking-wide mb-1">Full Document</h2>
+                <p class="text-sm font-medium text-gray-600 font-work">A PDF copy of this research is available.</p>
+            </div>
+            <a href="{{ asset('uploads/theses/' ~ thesis.documentFile) }}" target="_blank" class="inline-flex items-center px-5 py-3 bg-red-50 hover:bg-red-100 text-red-700 font-bold rounded-lg transition text-sm gap-2 border border-red-200 font-work shrink-0">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z"></path></svg>
+                View PDF File
+            </a>
+        </div>
+        {% endif %}
+
+    </div>
+</section>
+{% endblock %}

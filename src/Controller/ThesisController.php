@@ -8,6 +8,8 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
+use Doctrine\ORM\EntityManagerInterface;
+use App\Entity\Thesis;
 
 final class ThesisController extends AbstractController
 {
@@ -66,6 +68,17 @@ final class ThesisController extends AbstractController
             'current_page' => $page,
             'total_pages' => $totalPages,
             'total_count' => $totalCount,
+        ]);
+    }
+
+    #[Route('/library/article/{id}', name: 'app_thesis_show')]
+    public function show(Thesis $thesis, EntityManagerInterface $em): Response
+    {
+        $thesis->incrementViews();
+        $em->flush();
+
+        return $this->render('SDG-Microsite/thesis/show.html.twig', [
+            'thesis' => $thesis,
         ]);
     }
 }
