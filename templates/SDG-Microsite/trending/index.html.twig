@@ -3,6 +3,12 @@
 {% block title %}Trending Studies - FEU SDG Microsite{% endblock %}
 
 {% block body %}
+    {# Official UN SDG Hex Colors Mapping #}
+    {% set sdg_colors = {
+        3: '#4C9F38', 4: '#C5192D', 7: '#FCC30B', 8: '#A21942',
+        9: '#FD6925', 11: '#FD9D24', 12: '#BF8B2E', 17: '#19486A'
+    } %}
+
     <section class="bg-feu-green-900 py-16 px-6 text-center border-b-4 border-feu-gold-400">
         <div class="max-w-4xl mx-auto">
             <h1 class="text-4xl md:text-5xl font-bold text-white mb-4 font-bebas tracking-wide">Trending Research</h1>
@@ -12,7 +18,13 @@
         </div>
     </section>
 
-    <section class="py-16 px-6 bg-gray-100 min-h-screen">
+    <section class="relative py-16 px-6 bg-feu-green-900 min-h-screen overflow-hidden">
+        
+        <div class="absolute inset-0 z-0 pointer-events-none">
+            <img src="{{ asset('images/library.jpg') }}" alt="Background" class="absolute inset-0 w-full h-full object-cover">
+            <div class="absolute inset-0 bg-feu-green-900/50 mix-blend-multiply"></div>
+        </div>
+
         <div class="max-w-7xl mx-auto">
             
             <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
@@ -26,16 +38,20 @@
                         {% endif %}
                         
                         <div class="flex flex-wrap gap-2 mb-4 mt-2">
-                            {% for goal in thesis.sdgGoals|slice(0, 3) %}
-                                <span class="bg-feu-green-50 text-feu-green-800 text-[10px] font-bold px-2 py-1 rounded-full uppercase tracking-widest border border-feu-green-200">SDG {{ goal.goalNumber }}</span>
+                            {% for goal in thesis.sdgs|slice(0, 3) %}
+                                {# Fixed goalNumber to id, and applied standard colors #}
+                                <span class="text-white text-[10px] font-bold px-2 py-1 rounded-full uppercase tracking-widest shadow-sm" style="background-color: {{ sdg_colors[goal.id]|default('#166534') }}; text-shadow: 0px 1px 2px rgba(0,0,0,0.2);">
+                                    SDG {{ goal.id }}
+                                </span>
                             {% endfor %}
                         </div>
 
                         <h3 class="text-2xl font-bold text-gray-900 mb-4 group-hover:text-feu-green-700 transition font-bebas tracking-wide leading-tight">
-                            <a href="#">{{ thesis.title }}</a>
+                            <a href="{{ path('app_thesis_show', {id: thesis.id}) }}">{{ thesis.title }}</a>
                         </h3>
                         
-                        <p class="text-gray-800 font-medium text-sm mb-6 line-clamp-3 font-work leading-relaxed">
+                        {# Added whitespace-pre-line to format pure text #}
+                        <p class="text-gray-800 font-medium text-sm mb-6 line-clamp-3 font-work leading-relaxed whitespace-pre-line">
                             {{ thesis.description }}
                         </p>
                         
@@ -49,7 +65,7 @@
                                 </div>
                             </div>
                             
-                            <a href="{{ thesis.documentFile ? asset('uploads/theses/documents/' ~ thesis.documentFile) : '#' }}" 
+                            <a href="{{ thesis.documentFile ? asset('uploads/theses/' ~ thesis.documentFile) : '#' }}" 
                             {% if thesis.documentFile %}target="_blank"{% endif %} 
                             class="inline-flex items-center text-feu-green-700 hover:text-feu-gold-600 font-bold text-sm group w-fit transition-colors">
                                 

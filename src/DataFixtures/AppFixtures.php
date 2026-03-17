@@ -12,7 +12,6 @@ class AppFixtures extends Fixture
 {
     public function load(ObjectManager $manager): void
     {
-        // 1. Create the 8 official SDGs
         $sdgData = [
             3 => 'Good Health and Well-Being',
             4 => 'Quality Education',
@@ -25,118 +24,118 @@ class AppFixtures extends Fixture
         ];
 
         $sdgEntities = [];
-        // Fixed the loop logic here so it safely grabs the ID and Name!
         foreach ($sdgData as $id => $name) {
             $sdg = new Sdg();
-            $sdg->setId($id); // Manually setting the Primary Key!
+            $sdg->setId($id);
             $sdg->setName($name);
             $manager->persist($sdg);
             $sdgEntities[$id] = $sdg;
         }
 
-        // 2. Create Theses
+        $loremIpsum = "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.\n\nDuis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.\n\nCurabitur pretium tincidunt lacus. Nulla gravida orci a odio. Nullam varius, turpis et commodo pharetra, est eros bibendum elit, nec luctus magna felis sollicitudin mauris. Integer in mauris eu nibh euismod gravida. Duis ac tellus et risus vulputate vehicula.";
+
         $thesesData = [
             [
                 'title' => 'Incer-Eco Tech: Waste-to-Energy Incinerator',
-                'description' => 'Incer-Eco Tech offers a small-scale waste-to-energy incinerator designed to provide a sustainable solution for rural areas facing challenges with waste management and electrical supply.',
+                'description' => $loremIpsum,
                 'authors' => 'Engr. Jose Florenz Somigao, Rome Arist Mendoza',
                 'views' => 1405,
                 'goals' => [7, 11, 12]
             ],
             [
                 'title' => 'Impact of AI-Assisted Tutoring on Engineering Students',
-                'description' => 'Analyzing the effectiveness of machine learning algorithms in creating personalized tutoring modules for freshman engineering students struggling with advanced calculus.',
+                'description' => $loremIpsum,
                 'authors' => 'Anna Reyes',
                 'views' => 1204,
                 'goals' => [4]
             ],
             [
                 'title' => 'Solar-Powered Water Filtration for Rural Communities',
-                'description' => 'This study explores the feasibility and efficiency of integrating solar panels with portable water filtration units to provide clean drinking water in off-grid rural communities.',
+                'description' => $loremIpsum,
                 'authors' => 'J. Dela Cruz',
                 'views' => 892,
                 'goals' => [3, 7]
             ],
             [
                 'title' => 'Smart Traffic Management using Computer Vision',
-                'description' => 'Developing an edge-computing solution that uses CCTV cameras and computer vision to optimize traffic light timings, reducing carbon emissions from idling vehicles.',
+                'description' => $loremIpsum,
                 'authors' => 'Maria Santos, K. Villanueva',
                 'views' => 2100,
                 'goals' => [9, 11]
             ],
             [
                 'title' => 'Recycled Plastic as Aggregate in Concrete Mixtures',
-                'description' => 'Testing the structural integrity and load-bearing capacity of concrete mixed with shredded PET bottles for affordable housing construction.',
+                'description' => $loremIpsum,
                 'authors' => 'Engr. L. Bautista',
                 'views' => 1750,
                 'goals' => [9, 11, 12]
             ],
             [
                 'title' => 'Predictive Maintenance for Wind Turbines',
-                'description' => 'Using IoT sensors and predictive machine learning models to identify acoustic anomalies in wind turbine blades before structural failure occurs.',
+                'description' => $loremIpsum,
                 'authors' => 'P. Fernandez',
                 'views' => 640,
                 'goals' => [7, 9]
             ],
             [
                 'title' => 'Urban Farming: Automated Aquaponics System',
-                'description' => 'Designing an automated, low-cost aquaponics system for urban apartments, utilizing Arduino controllers to monitor pH and nutrient levels.',
+                'description' => $loremIpsum,
                 'authors' => 'R. Garcia',
                 'views' => 310,
                 'goals' => [3, 11, 12]
             ],
             [
                 'title' => 'Blockchain for Transparent Supply Chains',
-                'description' => 'Implementing a hyperledger blockchain framework to track the sourcing of raw materials for local textile industries to ensure ethical labor practices.',
+                'description' => $loremIpsum,
                 'authors' => 'S. Lim, T. Tan',
                 'views' => 950,
                 'goals' => [8, 12]
             ],
             [
                 'title' => 'Telemedicine Platform for Remote Barangays',
-                'description' => 'A low-bandwidth mobile application designed to connect rural healthcare workers with specialized doctors in Metro Manila for remote consultations.',
+                'description' => $loremIpsum,
                 'authors' => 'Dr. C. Ocampo, Anna Reyes',
                 'views' => 1820,
                 'goals' => [3, 11]
             ],
             [
                 'title' => 'Gamification of STEM Education for Grade Schoolers',
-                'description' => 'Developing an interactive mobile game that teaches basic physics and programming concepts to public school students in the Philippines.',
+                'description' => $loremIpsum,
                 'authors' => 'M. Torres',
                 'views' => 420,
                 'goals' => [4]
             ],
             [
                 'title' => 'Optimization of Jeepney Routes via Genetic Algorithms',
-                'description' => 'A computational study mapping optimal public transportation routes in Metro Manila to reduce fuel consumption and passenger wait times.',
+                'description' => $loremIpsum,
                 'authors' => 'J. Dela Cruz',
                 'views' => 1150,
                 'goals' => [11]
             ],
             [
                 'title' => 'Flood Prediction using River Sensors',
-                'description' => 'Deploying cost-effective ultrasonic water level sensors across the Marikina river basin hooked into a real-time early warning SMS system.',
+                'description' => $loremIpsum,
                 'authors' => 'Engr. Jose Florenz Somigao',
                 'views' => 2500,
                 'goals' => [9, 11]
             ],
             [
                 'title' => 'Biodegradable Packaging from Banana Pseudostem',
-                'description' => 'Extracting cellulose from agricultural waste (banana trees) to create a viable, biodegradable alternative to single-use plastic packaging.',
+                'description' => $loremIpsum,
                 'authors' => 'A. Ramos',
                 'views' => 880,
                 'goals' => [12]
             ],
             [
                 'title' => 'Digital Literacy Workshops for Senior Citizens',
-                'description' => 'A framework and curriculum designed for LGU adoption to teach digital literacy, mobile banking, and scam-prevention to the elderly.',
+                'description' => $loremIpsum,
                 'authors' => 'Maria Santos',
                 'views' => 305,
                 'goals' => [4, 11]
             ],
             [
                 'title' => 'Micro-Hydro Generators for Irrigation Canals',
-                'description' => 'Designing a standardized, drop-in micro-hydroelectric generator suitable for the flow rates of agricultural irrigation canals in Central Luzon.',
+                'description' => $loremIpsum,
                 'authors' => 'Rome Arist Mendoza',
                 'views' => 1670,
                 'goals' => [7, 9]
@@ -152,31 +151,29 @@ class AppFixtures extends Fixture
                    ->setDocumentFile('dummy-thesis.pdf')
                    ->setCreatedAt(new \DateTimeImmutable('-' . rand(1, 30) . ' days'));
             
-            // Note: Changed from addSdgGoal to addSdg to match the new relationship!
             foreach ($data['goals'] as $goalNum) {
                 $thesis->addSdg($sdgEntities[$goalNum]);
             }
             $manager->persist($thesis);
         }
 
-        // 3. Create Activities / News
         $activitiesData = [
             [
                 'title' => 'Capacity Building: Patent Search Workshop',
                 'category' => 'Seminar',
-                'content' => '<p>An in-depth capability building workshop for engineering students to understand patent searches, intellectual property rights, and how to protect their technological innovations.</p>',
+                'content' => "An in-depth capability building workshop for engineering students to understand patent searches, intellectual property rights, and how to protect their technological innovations.\n\nStudents will learn to use international databases.",
                 'date' => '2026-03-04'
             ],
             [
                 'title' => 'TamLabs Demo Day: Celebrating Six Months of Innovation, Grit, and Growth',
                 'category' => 'News',
-                'content' => '<p>The FEU Tech Innovation Center\'s ongoing efforts to create spaces where <strong>technology, creativity, and human-centered innovation</strong> meet. It showcased how Filipino innovators—when equipped with education, mentorship, and opportunity—can build solutions that matter both locally and internationally.</p>',
+                'content' => "The FEU Tech Innovation Center's ongoing efforts to create spaces where technology, creativity, and human-centered innovation meet.\n\nIt showcased how Filipino innovators can build solutions that matter locally and internationally.",
                 'date' => '2025-10-28'
             ],
             [
                 'title' => 'Hustlers: Student Entrepreneurship Program',
                 'category' => 'Workshop',
-                'content' => '<p>Creates opportunities for students to test their ideas, receive customer feedback, and build confidence as business owners. Through Hustlers, FEU Tech nurtures student interest in <strong>sustainability, innovation, and impact-driven careers</strong>, underscoring FTIC’s role in fostering environments where young leaders can grow their skills and lay the groundwork for a greener future.</p>',
+                'content' => "Creates opportunities for students to test their ideas, receive customer feedback, and build confidence as business owners.\n\nThrough Hustlers, FEU Tech nurtures student interest in sustainability, innovation, and impact-driven careers.",
                 'date' => '2024-12-02'
             ]
         ];

@@ -2,14 +2,14 @@
 
 namespace App\Controller;
 
+use App\Entity\Thesis;
 use App\Repository\ThesisRepository;
+use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\Tools\Pagination\Paginator;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
-use Doctrine\ORM\EntityManagerInterface;
-use App\Entity\Thesis;
 
 final class ThesisController extends AbstractController
 {
@@ -20,7 +20,7 @@ final class ThesisController extends AbstractController
         $searchAuthor = $request->query->get('author');
         $searchTitle = $request->query->get('title');
         $searchKeyword = $request->query->get('keyword');
-
+        
         $isExclusive = $request->query->getBoolean('exclusive', false);
         
         $page = max(1, $request->query->getInt('page', 1));
@@ -35,9 +35,20 @@ final class ThesisController extends AbstractController
                ->setParameter('goals', $selectedGoals);
             
             if ($isExclusive) {
+                // Must contain ALL selected goals
                 $qb->groupBy('t.id')
                    ->having('COUNT(DISTINCT s.id) = :goalCount')
                    ->setParameter('goalCount', count($selectedGoals));
+                   
+                // RECISION MATCH: It must NOT contain any goals outside of the selected ones.
+                // We use a sub-query to check if this specific thesis has any goals that aren't in the selected array.
+                $qb->andWhere(
+                    $qb->expr()->not(
+                        $qb->expr()->exists(
+                            'SELECT 1 FROM App\Entity\Thesis t2 JOIN t2.sdgs s2 WHERE t2.id = t.id AND s2.id NOT IN (:goals)'
+                        )
+                    )
+                );
             }
         }
         
@@ -74,6 +85,7 @@ final class ThesisController extends AbstractController
     #[Route('/library/article/{id}', name: 'app_thesis_show')]
     public function show(Thesis $thesis, EntityManagerInterface $em): Response
     {
+        // Automatically increment the view count every time this route is hit
         $thesis->incrementViews();
         $em->flush();
 
