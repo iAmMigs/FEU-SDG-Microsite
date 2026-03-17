@@ -2,17 +2,17 @@
 
 namespace App\Repository;
 
-use App\Entity\SdgGoal;
+use App\Entity\Sdg;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
 
 /**
- * @extends ServiceEntityRepository<SdgGoal>
+ * @extends ServiceEntityRepository<Sdg>
  */
-class SdgGoalRepository extends ServiceEntityRepository
+class SdgRepository extends ServiceEntityRepository
 {
     public function __construct(ManagerRegistry $registry)
     {
-        parent::__construct($registry, SdgGoal::class);
+        parent::__construct($registry, Sdg::class);
     }
 }

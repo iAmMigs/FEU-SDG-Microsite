@@ -37,15 +37,18 @@ class Thesis
     #[ORM\Column(type: Types::DATETIME_IMMUTABLE)]
     private ?\DateTimeImmutable $createdAt = null;
 
+    #[ORM\Column(length: 255, nullable: true)]
+    private ?string $publicationLink = null;
+
     /**
-     * @var Collection<int, SdgGoal>
+     * @var Collection<int, Sdg>
      */
-    #[ORM\ManyToMany(targetEntity: SdgGoal::class, inversedBy: 'theses')]
-    private Collection $sdgGoals;
+    #[ORM\ManyToMany(targetEntity: Sdg::class, inversedBy: 'theses')]
+    private Collection $sdgs;
 
     public function __construct()
     {
-        $this->sdgGoals = new ArrayCollection();
+        $this->sdgs = new ArrayCollection();
         $this->createdAt = new \DateTimeImmutable();
     }
 
@@ -75,20 +78,23 @@ class Thesis
     public function getCreatedAt(): ?\DateTimeImmutable { return $this->createdAt; }
     public function setCreatedAt(\DateTimeImmutable $createdAt): static { $this->createdAt = $createdAt; return $this; }
 
-    /** @return Collection<int, SdgGoal> */
-    public function getSdgGoals(): Collection { return $this->sdgGoals; }
+    public function getPublicationLink(): ?string { return $this->publicationLink; }
+    public function setPublicationLink(?string $publicationLink): static { $this->publicationLink = $publicationLink; return $this; }
 
-    public function addSdgGoal(SdgGoal $sdgGoal): static
+    /** @return Collection<int, Sdg> */
+    public function getSdgs(): Collection { return $this->sdgs; }
+
+    public function addSdg(Sdg $sdg): static
     {
-        if (!$this->sdgGoals->contains($sdgGoal)) {
-            $this->sdgGoals->add($sdgGoal);
+        if (!$this->sdgs->contains($sdg)) {
+            $this->sdgs->add($sdg);
         }
         return $this;
     }
 
-    public function removeSdgGoal(SdgGoal $sdgGoal): static
+    public function removeSdg(Sdg $sdg): static
     {
-        $this->sdgGoals->removeElement($sdgGoal);
+        $this->sdgs->removeElement($sdg);
         return $this;
     }
 }

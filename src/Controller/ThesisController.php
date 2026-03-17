@@ -8,6 +8,8 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
+use Doctrine\ORM\EntityManagerInterface;
+use App\Entity\Thesis;
 
 final class ThesisController extends AbstractController
 {
@@ -18,8 +20,7 @@ final class ThesisController extends AbstractController
         $searchAuthor = $request->query->get('author');
         $searchTitle = $request->query->get('title');
         $searchKeyword = $request->query->get('keyword');
-        
-        // 1. Get the exclusive filter checkbox value (true if checked, false if not)
+
         $isExclusive = $request->query->getBoolean('exclusive', false);
         
         $page = max(1, $request->query->getInt('page', 1));
@@ -28,17 +29,14 @@ final class ThesisController extends AbstractController
         $qb = $thesisRepository->createQueryBuilder('t')
             ->orderBy('t.createdAt', 'DESC');
 
-        // 2. Updated SDG Filter Logic
         if (!empty($selectedGoals)) {
-            $qb->join('t.sdgGoals', 's')
-               ->andWhere('s.goalNumber IN (:goals)')
+            $qb->join('t.sdgs', 's')
+               ->andWhere('s.id IN (:goals)')
                ->setParameter('goals', $selectedGoals);
             
             if ($isExclusive) {
-                // If exclusive is checked, the thesis must have ALL selected goals.
-                // We group by the thesis ID and ensure the count of matched goals equals the total number of goals the user selected.
                 $qb->groupBy('t.id')
-                   ->having('COUNT(DISTINCT s.goalNumber) = :goalCount')
+                   ->having('COUNT(DISTINCT s.id) = :goalCount')
                    ->setParameter('goalCount', count($selectedGoals));
             }
         }
@@ -62,7 +60,7 @@ final class ThesisController extends AbstractController
 
         return $this->render('SDG-Microsite/thesis/index.html.twig', [
             'selected_goals' => $selectedGoals,
-            'is_exclusive' => $isExclusive, // Pass this to Twig so the checkbox stays checked!
+            'is_exclusive' => $isExclusive,
             'theses' => $paginator,
             'search_author' => $searchAuthor,
             'search_title' => $searchTitle,
@@ -70,6 +68,17 @@ final class ThesisController extends AbstractController
             'current_page' => $page,
             'total_pages' => $totalPages,
             'total_count' => $totalCount,
+        ]);
+    }
+
+    #[Route('/library/article/{id}', name: 'app_thesis_show')]
+    public function show(Thesis $thesis, EntityManagerInterface $em): Response
+    {
+        $thesis->incrementViews();
+        $em->flush();
+
+        return $this->render('SDG-Microsite/thesis/show.html.twig', [
+            'thesis' => $thesis,
         ]);
     }
 }
