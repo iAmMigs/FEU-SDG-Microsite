@@ -17,6 +17,14 @@
             Back to Repository
         </a>
 
+        {# 1. THE COVER IMAGE HERO SECTION #}
+        {% if thesis.coverImage %}
+            <div class="w-full h-64 md:h-[28rem] relative rounded-2xl overflow-hidden mb-12 shadow-sm border border-gray-100 bg-gray-100">
+                <img src="{{ asset('uploads/theses/' ~ thesis.coverImage) }}" alt="{{ thesis.title }} Cover" class="absolute inset-0 w-full h-full object-cover">
+                <div class="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent pointer-events-none"></div>
+            </div>
+        {% endif %}
+
         <div class="flex flex-col md:flex-row justify-between items-start md:items-end gap-6 mb-12 border-b border-gray-200 pb-8">
             
             <div class="max-w-4xl">
@@ -50,20 +58,31 @@
                     <p class="whitespace-pre-line">{{ thesis.description }}</p>
                 </div>
 
+                {# 2. TURBO-PROOF CITATION GENERATION #}
+                {% set pubYear = thesis.createdAt|date('Y') %}
+                {% set currentUrl = url('app_thesis_show', {id: thesis.id}) %}
+                
+                {% set cite_apa = thesis.authors ~ ' (' ~ pubYear ~ '). ' ~ thesis.title ~ '. FEU SDG Microsite. ' ~ currentUrl %}
+                {% set cite_ieee = thesis.authors ~ ', "' ~ thesis.title ~ '," FEU SDG Microsite, ' ~ pubYear ~ '. [Online]. Available: ' ~ currentUrl %}
+                {% set cite_mla = thesis.authors ~ '. "' ~ thesis.title ~ '." FEU SDG Microsite, ' ~ pubYear ~ ', ' ~ currentUrl ~ '.' %}
+                {% set cite_chicago = thesis.authors ~ '. "' ~ thesis.title ~ '." FEU SDG Microsite. ' ~ pubYear ~ '. ' ~ currentUrl ~ '.' %}
+
                 <div class="p-8 border border-gray-200 bg-gray-50 rounded-2xl shadow-sm" id="citation-card">
                     <h2 class="text-xl font-bold text-gray-900 font-bebas tracking-wide mb-6">Recommended Citation</h2>
                     
                     <div class="flex items-center gap-1 border-b border-gray-200 mb-6 font-work overflow-x-auto hide-scrollbars">
-                        <button class="px-5 py-2.5 font-bold text-xs bg-white text-feu-green-900 border border-gray-200 border-b-white rounded-t-lg -mb-px citation-tab" id="apa-tab" onclick="switchCitationStyle('apa')">APA</button>
-                        <button class="px-5 py-2.5 font-bold text-xs bg-gray-100 text-gray-500 hover:text-gray-800 hover:bg-white rounded-t-lg border border-transparent citation-tab" id="ieee-tab" onclick="switchCitationStyle('ieee')">IEEE</button>
-                        <button class="px-5 py-2.5 font-bold text-xs bg-gray-100 text-gray-500 hover:text-gray-800 hover:bg-white rounded-t-lg border border-transparent citation-tab" id="mla-tab" onclick="switchCitationStyle('mla')">MLA</button>
+                        <button type="button" onclick="swapCite(this, '{{ cite_apa|e('js') }}')" class="cit-tab px-5 py-2.5 font-bold text-xs bg-white text-feu-green-900 border border-gray-200 border-b-white rounded-t-lg -mb-px">APA</button>
+                        <button type="button" onclick="swapCite(this, '{{ cite_ieee|e('js') }}')" class="cit-tab px-5 py-2.5 font-bold text-xs bg-gray-100 text-gray-500 hover:text-gray-800 hover:bg-white rounded-t-lg border border-transparent">IEEE</button>
+                        <button type="button" onclick="swapCite(this, '{{ cite_mla|e('js') }}')" class="cit-tab px-5 py-2.5 font-bold text-xs bg-gray-100 text-gray-500 hover:text-gray-800 hover:bg-white rounded-t-lg border border-transparent">MLA</button>
+                        <button type="button" onclick="swapCite(this, '{{ cite_chicago|e('js') }}')" class="cit-tab px-5 py-2.5 font-bold text-xs bg-gray-100 text-gray-500 hover:text-gray-800 hover:bg-white rounded-t-lg border border-transparent">Chicago</button>
                     </div>
 
                     <div class="bg-white rounded-xl p-6 border border-gray-200 relative shadow-sm">
                         <p class="text-sm font-medium text-gray-800 font-work leading-relaxed pr-24" id="citation-text">
-                            </p>
+                            {{ cite_apa }}
+                        </p>
                         
-                        <button onclick="copyCitation()" class="absolute top-6 right-6 px-4 py-2 bg-gray-50 hover:bg-gray-100 text-gray-800 font-bold rounded-lg transition text-xs border border-gray-200 font-work cursor-pointer">
+                        <button type="button" onclick="copyCiteBtn(this)" class="absolute top-6 right-6 px-4 py-2 bg-gray-50 hover:bg-gray-100 text-gray-800 font-bold rounded-lg transition text-xs border border-gray-200 font-work cursor-pointer">
                             Copy
                         </button>
                     </div>
@@ -94,7 +113,7 @@
 
                         {% if thesis.documentFile %}
                             <div class="pt-6 border-t border-gray-200">
-                                <a href="{{ asset('uploads/theses/' ~ thesis.documentFile) }}" target="_blank" class="w-full inline-flex justify-center items-center px-5 py-3 bg-red-50 hover:bg-red-100 text-red-700 font-bold rounded-lg transition text-sm gap-2 border border-red-200 font-work">
+                                <a href="{{ asset('uploads/theses/' ~ thesis.documentFile) }}" download="{{ thesis.title|replace({':': ' -', '/': '-', '?': ''}) }}.pdf" target="_blank" class="w-full inline-flex justify-center items-center px-5 py-3 bg-red-50 hover:bg-red-100 text-red-700 font-bold rounded-lg transition text-sm gap-2 border border-red-200 font-work">
                                     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z"></path></svg>
                                     View PDF File
                                 </a>
@@ -111,53 +130,31 @@
 </section>
 
 <script>
-    document.addEventListener('DOMContentLoaded', () => {
-        // Build dynamic citation strings using Twig variables
-        const pubYear = "{{ thesis.createdAt|date('Y') }}";
-        const authors = "{{ thesis.authors|e('js') }}";
-        const title = "{{ thesis.title|e('js') }}";
-        const currentUrl = window.location.href;
-
-        window.citations = {
-            apa: `${authors} (${pubYear}). ${title}. FEU SDG Microsite. ${currentUrl}`,
-            ieee: `${authors}, "${title}," FEU SDG Microsite, ${pubYear}. [Online]. Available: ${currentUrl}`,
-            mla: `${authors}. "${title}." FEU SDG Microsite, ${pubYear}, ${currentUrl}.`
-        };
-
-        // Initialize with APA style
-        switchCitationStyle('apa');
-    });
-
-    function switchCitationStyle(style) {
-        document.getElementById('citation-text').innerText = window.citations[style];
-
-        const tabs = ['apa', 'ieee', 'mla'];
-        tabs.forEach(tabName => {
-            const tab = document.getElementById(`${tabName}-tab`);
-            if (tabName === style) {
-                tab.className = 'px-5 py-2.5 font-bold text-xs bg-white text-feu-green-900 border border-gray-200 border-b-white rounded-t-lg -mb-px citation-tab';
-            } else {
-                tab.className = 'px-5 py-2.5 font-bold text-xs bg-gray-100 text-gray-500 hover:text-gray-800 hover:bg-white rounded-t-lg border border-transparent citation-tab';
-            }
+    function swapCite(btn, text) {
+        // Update the text
+        document.getElementById('citation-text').innerText = text;
+        
+        // Reset all tabs
+        document.querySelectorAll('.cit-tab').forEach(t => {
+            t.className = 'cit-tab px-5 py-2.5 font-bold text-xs bg-gray-100 text-gray-500 hover:text-gray-800 hover:bg-white rounded-t-lg border border-transparent';
         });
+        
+        // Highlight clicked tab
+        btn.className = 'cit-tab px-5 py-2.5 font-bold text-xs bg-white text-feu-green-900 border border-gray-200 border-b-white rounded-t-lg -mb-px';
     }
 
-    async function copyCitation() {
-        const textToCopy = document.getElementById('citation-text').innerText;
+    async function copyCiteBtn(btn) {
+        const text = document.getElementById('citation-text').innerText;
         try {
-            await navigator.clipboard.writeText(textToCopy);
-            
-            const button = document.querySelector('#citation-card button[onclick="copyCitation()"]');
-            button.innerText = 'Copied!';
-            button.classList.add('bg-feu-green-50', 'text-feu-green-900', 'border-feu-green-200');
-            
+            await navigator.clipboard.writeText(text);
+            btn.innerText = 'Copied!';
+            btn.classList.add('bg-feu-green-50', 'text-feu-green-900', 'border-feu-green-200');
             setTimeout(() => {
-                button.innerText = 'Copy';
-                button.classList.remove('bg-feu-green-50', 'text-feu-green-900', 'border-feu-green-200');
+                btn.innerText = 'Copy';
+                btn.classList.remove('bg-feu-green-50', 'text-feu-green-900', 'border-feu-green-200');
             }, 2000);
-        } catch (err) {
-            console.error('Failed to copy citation: ', err);
-            alert('Failed to copy to clipboard.');
+        } catch(e) {
+            alert('Failed to copy text.');
         }
     }
 </script>

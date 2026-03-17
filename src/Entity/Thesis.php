@@ -9,6 +9,8 @@ use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 
 #[ORM\Entity(repositoryClass: ThesisRepository::class)]
+#[ORM\Index(name: 'idx_thesis_search', columns: ['title', 'authors'])]
+#[ORM\Index(name: 'idx_thesis_trending', columns: ['views'])]
 class Thesis
 {
     #[ORM\Id]
@@ -39,6 +41,7 @@ class Thesis
 
     #[ORM\Column(length: 255, nullable: true)]
     private ?string $publicationLink = null;
+
 
     /**
      * @var Collection<int, Sdg>

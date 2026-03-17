@@ -1,0 +1,48 @@
+{% extends 'SDG-Microsite/base.html.twig' %}
+
+{% block title %}{{ activity.title }} - FEU SDG Microsite{% endblock %}
+
+{% block body %}
+<section class="bg-gray-50 py-12 px-6 min-h-screen">
+    <div class="max-w-4xl mx-auto">
+        
+        <a href="{{ path('app_news') }}" class="text-gray-500 hover:text-feu-green-700 font-bold text-sm mb-8 inline-flex items-center gap-2 transition font-work">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path></svg>
+            Back to News & Activities
+        </a>
+
+        <article class="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
+            
+            {# Hero Image Header #}
+            <div class="w-full h-64 md:h-[28rem] relative bg-gray-100 overflow-hidden shrink-0 border-b-4 border-feu-gold-400">
+                {% if activity.image %}
+                    <img src="{{ asset('uploads/activities/' ~ activity.image) }}" alt="{{ activity.title }}" class="absolute inset-0 w-full h-full object-cover">
+                {% else %}
+                    <img src="{{ asset('images/hero-3.jpg') }}" alt="FEU Event" class="absolute inset-0 w-full h-full object-cover opacity-90">
+                {% endif %}
+                <div class="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent"></div>
+            </div>
+
+            <div class="p-8 md:p-12 lg:px-16">
+                {# Metadata #}
+                <div class="flex items-center gap-3 mb-6">
+                    <span class="bg-feu-green-100 text-feu-green-800 text-xs font-bold px-3 py-1 rounded-full uppercase tracking-widest font-work">{{ activity.category }}</span>
+                    <span class="text-gray-500 font-medium font-work text-sm">{{ activity.eventDate|date('F j, Y') }}</span>
+                </div>
+                
+                {# Article Title #}
+                <h1 class="text-4xl md:text-5xl font-bold text-gray-900 mb-8 font-bebas tracking-wide leading-tight">
+                    {{ activity.title }}
+                </h1>
+                
+                {# Article Content #}
+                <div class="text-gray-800 font-work leading-relaxed text-lg whitespace-pre-line">
+                    {{ activity.content }}
+                </div>
+            </div>
+            
+        </article>
+
+    </div>
+</section>
+{% endblock %}

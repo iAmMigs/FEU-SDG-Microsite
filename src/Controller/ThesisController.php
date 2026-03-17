@@ -26,22 +26,23 @@ final class ThesisController extends AbstractController
         $page = max(1, $request->query->getInt('page', 1));
         $limit = 10;
 
+        /* * Pre-fetches the related SDG entities using eager loading.
+         * This eliminates the N+1 query problem during the Twig template rendering phase.
+         */
         $qb = $thesisRepository->createQueryBuilder('t')
+            ->leftJoin('t.sdgs', 's')
+            ->addSelect('s')
             ->orderBy('t.createdAt', 'DESC');
 
         if (!empty($selectedGoals)) {
-            $qb->join('t.sdgs', 's')
-               ->andWhere('s.id IN (:goals)')
+            $qb->andWhere('s.id IN (:goals)')
                ->setParameter('goals', $selectedGoals);
             
             if ($isExclusive) {
-                // Must contain ALL selected goals
                 $qb->groupBy('t.id')
                    ->having('COUNT(DISTINCT s.id) = :goalCount')
                    ->setParameter('goalCount', count($selectedGoals));
                    
-                // RECISION MATCH: It must NOT contain any goals outside of the selected ones.
-                // We use a sub-query to check if this specific thesis has any goals that aren't in the selected array.
                 $qb->andWhere(
                     $qb->expr()->not(
                         $qb->expr()->exists(
@@ -85,7 +86,6 @@ final class ThesisController extends AbstractController
     #[Route('/library/article/{id}', name: 'app_thesis_show')]
     public function show(Thesis $thesis, EntityManagerInterface $em): Response
     {
-        // Automatically increment the view count every time this route is hit
         $thesis->incrementViews();
         $em->flush();
 

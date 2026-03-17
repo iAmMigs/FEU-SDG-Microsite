@@ -27,13 +27,17 @@ class ActivityCrudController extends AbstractCrudController
                 'Workshop' => 'Workshop',
             ]),
             DateTimeField::new('eventDate'),
+
             ImageField::new('image')
                 ->setBasePath('uploads/activities')
                 ->setUploadDir('public/uploads/activities')
                 ->setUploadedFileNamePattern('[randomhash].[extension]')
-                ->setRequired(false),
-                
-            // Changed from TextEditorField to TextareaField!
+                ->setFormTypeOptions([
+                    'attr' => [
+                        'accept' => 'image/jpeg, image/png, image/webp'
+                    ]
+            ]),
+                    // Changed from TextEditorField to TextareaField!
             TextareaField::new('content')
                 ->setNumOfRows(10),
         ];
