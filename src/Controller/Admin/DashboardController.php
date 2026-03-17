@@ -2,58 +2,63 @@
 
 namespace App\Controller\Admin;
 
-use App\Controller\Admin\ActivityCrudController;
-use App\Controller\Admin\SdgCrudController;
-use App\Controller\Admin\ThesisCrudController;
-use App\Entity\Activity;
-use App\Entity\Thesis;
-use Doctrine\ORM\EntityManagerInterface;
+use App\Repository\ActivityRepository;
+use App\Repository\ThesisRepository;
 use EasyCorp\Bundle\EasyAdminBundle\Attribute\AdminDashboard;
+use EasyCorp\Bundle\EasyAdminBundle\Config\Assets;
 use EasyCorp\Bundle\EasyAdminBundle\Config\Dashboard;
 use EasyCorp\Bundle\EasyAdminBundle\Config\MenuItem;
 use EasyCorp\Bundle\EasyAdminBundle\Controller\AbstractDashboardController;
 use Symfony\Component\HttpFoundation\Response;
 
+/**
+ * Main administration dashboard controller.
+ * Configures the global layout, assets, sidebar navigation, and dashboard metrics.
+ */
 #[AdminDashboard(routePath: '/admin', routeName: 'admin')]
 class DashboardController extends AbstractDashboardController
 {
-    // 1. Inject the EntityManager to talk to the database
-    public function __construct(private EntityManagerInterface $entityManager)
-    {
+    public function __construct(
+        private ThesisRepository $thesisRepository,
+        private ActivityRepository $activityRepository
+    ) {
     }
 
     public function index(): Response
     {
-        // 2. Count the total records in your tables
-        $thesesCount = $this->entityManager->getRepository(Thesis::class)->count([]);
-        $activitiesCount = $this->entityManager->getRepository(Activity::class)->count([]);
-
-        // 3. Render a custom template and pass the numbers to it!
-        return $this->render('admin-microsite/dashboard.html.twig', [
-            'theses_count' => $thesesCount,
-            'activities_count' => $activitiesCount,
+        return $this->render('Admin-Microsite/dashboard.html.twig', [
+            'theses_count' => $this->thesisRepository->count([]),
+            'activities_count' => $this->activityRepository->count([]),
         ]);
     }
 
     public function configureDashboard(): Dashboard
     {
         return Dashboard::new()
-            ->setTitle('<img src="/images/Tech_Logo.png" class="h-8 w-auto inline-block mr-2" alt="FEU Logo"> SDG Admin')
-            ->disableDarkMode();
+            ->setTitle('<div class="flex items-center gap-2"><img src="/images/Tech_Logo.png" style="max-height: 28px;"><span style="font-family: \'Montserrat\', sans-serif; font-weight: 700; letter-spacing: -0.5px; color: #166534; font-size: 1.2rem; padding-top: 2px;">Admin Console</span></div>')
+            ->setFaviconPath('/images/Tech_Logo.png');
+    }
+
+    public function configureAssets(): Assets
+    {
+        return Assets::new()
+            ->addCssFile('assets/styles/admin.css');
     }
 
     public function configureMenuItems(): iterable
     {
-        yield MenuItem::linkToDashboard('Dashboard', 'fa fa-home');
-        
-        yield MenuItem::section('Library Management');
-        yield MenuItem::linkTo(ThesisCrudController::class, 'Theses & Projects', 'fas fa-book');
-        yield MenuItem::linkTo(SdgCrudController::class, 'SDG Categories', 'fas fa-globe');
-        
-        yield MenuItem::section('Content Management');
-        yield MenuItem::linkTo(ActivityCrudController::class, 'News & Activities', 'fas fa-newspaper');
-        
-        yield MenuItem::section('Public Site');
-        yield MenuItem::linkToRoute('View Website', 'fas fa-eye', 'app_home');
+        yield MenuItem::linkToDashboard('Dashboard Overview', 'fa fa-chart-pie');
+
+        yield MenuItem::section('Repository Management');
+        yield MenuItem::linkTo(ThesisCrudController::class, 'Theses & Studies', 'fas fa-book-bookmark');
+        yield MenuItem::linkTo(SdgCrudController::class, 'SDG Categories', 'fas fa-bullseye');
+
+        yield MenuItem::section('News & Media');
+        yield MenuItem::linkTo(ActivityCrudController::class, 'Activities & Events', 'fas fa-newspaper');
+
+        yield MenuItem::section('Audiit Logs');
+
+        yield MenuItem::section('Public Portal');
+        yield MenuItem::linkToRoute('View Site', 'fas fa-arrow-right-from-bracket', 'app_home');
     }
 }

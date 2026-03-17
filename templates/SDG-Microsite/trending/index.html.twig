@@ -65,21 +65,16 @@
                                 </div>
                             </div>
                             
-                            <a href="{{ thesis.documentFile ? asset('uploads/theses/' ~ thesis.documentFile) : '#' }}" 
-                            {% if thesis.documentFile %}target="_blank"{% endif %} 
-                            class="inline-flex items-center text-feu-green-700 hover:text-feu-gold-600 font-bold text-sm group w-fit transition-colors">
+                            <a href="{{ path('app_thesis_show', { id: thesis.id }) }}" 
+                            class="inline-flex items-center text-feu-green-700 hover:text-feu-gold-600 font-bold text-sm group w-fit transition-colors font-work">
                                 
-                                {% if thesis.documentFile %}
-                                    View study PDF
-                                {% else %}
-                                    No PDF Available
-                                {% endif %}
+                                Read Article
                                 
                                 <svg class="w-4 h-4 ml-1.5 group-hover:translate-x-1.5 transition-transform duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M14 5l7 7m0 0l-7 7m7-7H3"></path>
                                 </svg>
                             </a>
-                            
+                                                        
                         </div>
                     </article>
                 {% else %}

@@ -65,20 +65,18 @@
                 {% set cite_apa = thesis.authors ~ ' (' ~ pubYear ~ '). ' ~ thesis.title ~ '. FEU SDG Microsite. ' ~ currentUrl %}
                 {% set cite_ieee = thesis.authors ~ ', "' ~ thesis.title ~ '," FEU SDG Microsite, ' ~ pubYear ~ '. [Online]. Available: ' ~ currentUrl %}
                 {% set cite_mla = thesis.authors ~ '. "' ~ thesis.title ~ '." FEU SDG Microsite, ' ~ pubYear ~ ', ' ~ currentUrl ~ '.' %}
-                {% set cite_chicago = thesis.authors ~ '. "' ~ thesis.title ~ '." FEU SDG Microsite. ' ~ pubYear ~ '. ' ~ currentUrl ~ '.' %}
 
                 <div class="p-8 border border-gray-200 bg-gray-50 rounded-2xl shadow-sm" id="citation-card">
                     <h2 class="text-xl font-bold text-gray-900 font-bebas tracking-wide mb-6">Recommended Citation</h2>
                     
-                    <div class="flex items-center gap-1 border-b border-gray-200 mb-6 font-work overflow-x-auto hide-scrollbars">
+                    <div class="flex flex-wrap items-center gap-1 border-b border-gray-200 mb-6 font-work">
                         <button type="button" onclick="swapCite(this, '{{ cite_apa|e('js') }}')" class="cit-tab px-5 py-2.5 font-bold text-xs bg-white text-feu-green-900 border border-gray-200 border-b-white rounded-t-lg -mb-px">APA</button>
                         <button type="button" onclick="swapCite(this, '{{ cite_ieee|e('js') }}')" class="cit-tab px-5 py-2.5 font-bold text-xs bg-gray-100 text-gray-500 hover:text-gray-800 hover:bg-white rounded-t-lg border border-transparent">IEEE</button>
                         <button type="button" onclick="swapCite(this, '{{ cite_mla|e('js') }}')" class="cit-tab px-5 py-2.5 font-bold text-xs bg-gray-100 text-gray-500 hover:text-gray-800 hover:bg-white rounded-t-lg border border-transparent">MLA</button>
-                        <button type="button" onclick="swapCite(this, '{{ cite_chicago|e('js') }}')" class="cit-tab px-5 py-2.5 font-bold text-xs bg-gray-100 text-gray-500 hover:text-gray-800 hover:bg-white rounded-t-lg border border-transparent">Chicago</button>
                     </div>
 
-                    <div class="bg-white rounded-xl p-6 border border-gray-200 relative shadow-sm">
-                        <p class="text-sm font-medium text-gray-800 font-work leading-relaxed pr-24" id="citation-text">
+                    <div class="bg-white rounded-xl p-4 border border-gray-200 relative shadow-sm">
+                        <p class="text-sm font-medium text-gray-800 font-work leading-relaxed pr-24 break-words" id="citation-text">
                             {{ cite_apa }}
                         </p>
                         
@@ -113,7 +111,7 @@
 
                         {% if thesis.documentFile %}
                             <div class="pt-6 border-t border-gray-200">
-                                <a href="{{ asset('uploads/theses/' ~ thesis.documentFile) }}" download="{{ thesis.title|replace({':': ' -', '/': '-', '?': ''}) }}.pdf" target="_blank" class="w-full inline-flex justify-center items-center px-5 py-3 bg-red-50 hover:bg-red-100 text-red-700 font-bold rounded-lg transition text-sm gap-2 border border-red-200 font-work">
+                                <a href="{{ asset('uploads/theses/' ~ thesis.documentFile) }}" target="_blank" class="w-full inline-flex justify-center items-center px-5 py-3 bg-red-50 hover:bg-red-100 text-red-700 font-bold rounded-lg transition text-sm gap-2 border border-red-200 font-work">
                                     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z"></path></svg>
                                     View PDF File
                                 </a>

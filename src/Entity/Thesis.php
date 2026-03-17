@@ -100,4 +100,10 @@ class Thesis
         $this->sdgs->removeElement($sdg);
         return $this;
     }
+
+    public function __toString(): string
+    {
+        return (string) $this->title;
+    }
+
 }
