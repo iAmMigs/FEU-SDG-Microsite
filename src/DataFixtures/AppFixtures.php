@@ -148,6 +148,7 @@ class AppFixtures extends Fixture
                    ->setDescription($data['description'])
                    ->setAuthors($data['authors'])
                    ->setViews($data['views'])
+                   ->setDocumentFile('dummy-thesis.pdf')
                    ->setCreatedAt(new \DateTimeImmutable('-' . rand(1, 30) . ' days'));
             
             // Link the specific SDGs to this thesis

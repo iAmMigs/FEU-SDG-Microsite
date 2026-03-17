@@ -1,5 +1,7 @@
-<header class="bg-white shadow-sm sticky top-0 z-50">
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+{% set current_route = app.request.attributes.get('_route') %}
+
+<header class="bg-white shadow-sm sticky top-0 z-50" data-controller="mobile-menu">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative bg-white z-20">
         <div class="flex justify-between items-center h-20">
             
             <div class="flex-shrink-0 flex items-center">
@@ -12,12 +14,13 @@
                 </a>
             </div>
             
+            {# Desktop Navigation #}
             <nav class="hidden md:flex space-x-8 items-center">
-                <a href="{{ path('app_home') }}" class="text-feu-green-800 font-bold hover:text-feu-gold-600 transition px-2 py-2 text-sm">Home</a>
-                <a href="{{ path('app_sdgs') }}" class="text-gray-900 hover:text-feu-green-700 transition px-2 py-2 text-sm font-semibold">The SDGs</a>
-                <a href="{{ path('app_about') }}" class="text-gray-900 hover:text-feu-green-700 transition px-2 py-2 text-sm font-semibold">About</a>
-                <a href="{{ path('app_trending') }}" class="text-gray-900 hover:text-feu-green-700 transition px-2 py-2 text-sm font-semibold">Trending Studies</a>
-                <a href="{{ path('app_news') }}" class="text-gray-900 hover:text-feu-green-700 transition px-2 py-2 text-sm font-semibold">News & Activities</a>
+                <a href="{{ path('app_home') }}" class="transition px-2 py-2 text-sm {{ current_route == 'app_home' ? 'text-feu-green-800 font-bold hover:text-feu-gold-600' : 'text-gray-900 hover:text-feu-green-700 font-semibold' }}">Home</a>
+                <a href="{{ path('app_sdgs') }}" class="transition px-2 py-2 text-sm {{ current_route == 'app_sdgs' ? 'text-feu-green-800 font-bold hover:text-feu-gold-600' : 'text-gray-900 hover:text-feu-green-700 font-semibold' }}">The SDGs</a>
+                <a href="{{ path('app_about') }}" class="transition px-2 py-2 text-sm {{ current_route == 'app_about' ? 'text-feu-green-800 font-bold hover:text-feu-gold-600' : 'text-gray-900 hover:text-feu-green-700 font-semibold' }}">About</a>
+                <a href="{{ path('app_trending') }}" class="transition px-2 py-2 text-sm {{ current_route == 'app_trending' ? 'text-feu-green-800 font-bold hover:text-feu-gold-600' : 'text-gray-900 hover:text-feu-green-700 font-semibold' }}">Trending Studies</a>
+                <a href="{{ path('app_news') }}" class="transition px-2 py-2 text-sm {{ current_route == 'app_news' ? 'text-feu-green-800 font-bold hover:text-feu-gold-600' : 'text-gray-900 hover:text-feu-green-700 font-semibold' }}">News & Activities</a>
             </nav>
 
             <div class="flex items-center space-x-4">
@@ -26,15 +29,42 @@
                 </a>
                 
                 <div class="flex items-center md:hidden">
-                    <button type="button" class="text-gray-500 hover:text-feu-green-800 focus:outline-none p-2" aria-expanded="false">
+                    {# 2. Attach the click action to the button #}
+                    <button type="button" data-action="click->mobile-menu#toggle" class="text-gray-500 hover:text-feu-green-800 focus:outline-none p-2" aria-expanded="false">
                         <span class="sr-only">Open main menu</span>
-                        <svg class="h-6 w-6" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        
+                        {# 3. Define the Open Icon (Hamburger) #}
+                        <svg data-mobile-menu-target="openIcon" class="h-6 w-6 block" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
+                        </svg>
+                        
+                        {# 4. Define the Close Icon (X) #}
+                        <svg data-mobile-menu-target="closeIcon" class="h-6 w-6 hidden" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
                         </svg>
                     </button>
                 </div>
             </div>
 
+        </div>
+    </div>
+
+    {# 5. The Mobile Menu Dropdown Panel #}
+    <div data-mobile-menu-target="menu" class="md:hidden hidden absolute w-full bg-white border-t border-gray-100 shadow-xl z-10">
+        <div class="px-4 pt-4 pb-6 space-y-2">
+            <a href="{{ path('app_home') }}" class="block px-4 py-3 rounded-lg text-base {{ current_route == 'app_home' ? 'text-feu-green-800 bg-green-50 font-bold' : 'text-gray-900 hover:text-feu-green-700 hover:bg-gray-50 font-medium' }}">Home</a>
+            
+            <a href="{{ path('app_sdgs') }}" class="block px-4 py-3 rounded-lg text-base {{ current_route == 'app_sdgs' ? 'text-feu-green-800 bg-green-50 font-bold' : 'text-gray-900 hover:text-feu-green-700 hover:bg-gray-50 font-medium' }}">The SDGs</a>
+            
+            <a href="{{ path('app_about') }}" class="block px-4 py-3 rounded-lg text-base {{ current_route == 'app_about' ? 'text-feu-green-800 bg-green-50 font-bold' : 'text-gray-900 hover:text-feu-green-700 hover:bg-gray-50 font-medium' }}">About</a>
+            
+            <a href="{{ path('app_trending') }}" class="block px-4 py-3 rounded-lg text-base {{ current_route == 'app_trending' ? 'text-feu-green-800 bg-green-50 font-bold' : 'text-gray-900 hover:text-feu-green-700 hover:bg-gray-50 font-medium' }}">Trending Studies</a>
+            
+            <a href="{{ path('app_news') }}" class="block px-4 py-3 rounded-lg text-base {{ current_route == 'app_news' ? 'text-feu-green-800 bg-green-50 font-bold' : 'text-gray-900 hover:text-feu-green-700 hover:bg-gray-50 font-medium' }}">News & Activities</a>
+            
+            <a href="{{ path('app_library') }}" class="block mt-6 text-center px-5 py-3.5 rounded-full text-base font-bold text-feu-green-900 bg-feu-gold-400 hover:bg-feu-gold-500 transition shadow-sm">
+                Browse the Library
+            </a>
         </div>
     </div>
 </header>

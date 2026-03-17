@@ -60,8 +60,10 @@
                     <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
                 </button>
 
-                <div class="md:w-1/2 h-64 md:h-auto relative bg-gray-100">
-                    <img data-modal-target="image" src="" alt="SDG Cover" class="absolute inset-0 w-full h-full object-cover">
+                {# FIX 1: Changed bg-gray-100 to bg-white #}
+                <div class="md:w-1/2 h-64 md:h-auto relative bg-white">
+                    {# FIX 2: Changed object-cover to object-contain and added p-8 padding #}
+                    <img data-modal-target="image" src="" alt="SDG Cover" class="absolute inset-0 w-full h-full object-contain p-8">
                 </div>
                 
                 <div class="md:w-1/2 p-10 md:p-14 flex flex-col justify-center bg-white">
@@ -76,8 +78,9 @@
                     </p>
                     
                     <div class="mt-10 pt-8 border-t border-gray-100">
-                        <a href="{{ path('app_library') }}" class="text-green-700 font-bold hover:text-green-900 transition flex items-center gap-2 font-work">
-                            View Related Projects <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3"></path></svg>
+                        <a href="{{ path('app_library') }}" data-modal-target="link" class="text-green-700 font-bold hover:text-green-900 transition flex items-center gap-2 font-work">
+                            View Related Projects 
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3"></path></svg>
                         </a>
                     </div>
                 </div>

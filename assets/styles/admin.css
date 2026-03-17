@@ -1,0 +1,12 @@
+/* assets/styles/admin.css */
+
+:root {
+    /* Change the primary color to FEU Green */
+    --ea-color-primary: #006600; /* Replace with exact FEU Green hex */
+    --ea-color-primary-dark: #004d00;
+    --ea-color-primary-light: #338533;
+    
+    /* Change sidebar active colors */
+    --ea-sidebar-menu-active-bg: rgba(0, 102, 0, 0.1);
+    --ea-sidebar-menu-active-color: var(--ea-color-primary);
+}

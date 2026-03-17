@@ -1,21 +1,28 @@
 import { Controller } from '@hotwired/stimulus';
 
 export default class extends Controller {
-    static targets = ['backdrop', 'panel', 'title', 'description', 'image', 'badge'];
+    // 1. Add 'link' to the targets array
+    static targets = ['backdrop', 'panel', 'title', 'description', 'image', 'badge', 'link'];
 
     open(event) {
         const button = event.currentTarget;
+        const goalNum = button.dataset.goal; // Extract the goal number to reuse
         
         // Populate the modal with data from the clicked card
         this.titleTarget.textContent = button.dataset.title;
         this.descriptionTarget.textContent = button.dataset.description;
         this.imageTarget.src = button.dataset.image;
-        this.badgeTarget.textContent = `SDG ${button.dataset.goal}`;
+        this.badgeTarget.textContent = `SDG ${goalNum}`;
 
-        // 1. Unhide the backdrop container
+        // 2. Update the "View Related Projects" link URL dynamically
+        if (this.hasLinkTarget) {
+            this.linkTarget.href = `/library?goals[]=${goalNum}`;
+        }
+
+        // 3. Unhide the backdrop container
         this.backdropTarget.classList.remove('hidden');
         
-        // 2. Small delay to allow the browser to register the 'display: block' before animating
+        // 4. Small delay to allow the browser to register the 'display: block' before animating
         setTimeout(() => {
             // Fade in the background blur
             this.backdropTarget.classList.remove('opacity-0');
