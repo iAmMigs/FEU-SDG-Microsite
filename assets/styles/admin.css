@@ -2,19 +2,13 @@
  * Uses official EasyAdmin (--ea-) variables mapped to the Tailwind FEU palette.
  */
 
-/* 1. Import Montserrat directly for the Admin environment */
+/* 1. Import Montserrat directly for the Admin environment
 @font-face {
     font-family: 'Montserrat';
-    src: url('../fonts/monteserrat/Montserrat-Regular.otf') format('opentype');
+    src: url('../fonts/montserrat/Montserrat-Regular.otf') format('opentype');
     font-weight: 400;
     font-display: swap;
-}
-@font-face {
-    font-family: 'Montserrat';
-    src: url('../fonts/monteserrat/Montserrat-Bold.otf') format('opentype');
-    font-weight: 700;
-    font-display: swap;
-}
+} */
 
 :root {
     /* --- TYPOGRAPHY --- */
