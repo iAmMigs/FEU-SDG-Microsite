@@ -12,6 +12,7 @@ class AppFixtures extends Fixture
 {
     public function load(ObjectManager $manager): void
     {
+        // 1. Define the 8 focused SDGs
         $sdgData = [
             3 => 'Good Health and Well-Being',
             4 => 'Quality Education',
@@ -32,8 +33,9 @@ class AppFixtures extends Fixture
             $sdgEntities[$id] = $sdg;
         }
 
-        $loremIpsum = "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.\n\nDuis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.\n\nCurabitur pretium tincidunt lacus. Nulla gravida orci a odio. Nullam varius, turpis et commodo pharetra, est eros bibendum elit, nec luctus magna felis sollicitudin mauris. Integer in mauris eu nibh euismod gravida. Duis ac tellus et risus vulputate vehicula.";
+        $loremIpsum = "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.\n\nDuis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.";
 
+        // 2. Theses Data
         $thesesData = [
             [
                 'title' => 'Incer-Eco Tech: Waste-to-Energy Incinerator',
@@ -91,55 +93,6 @@ class AppFixtures extends Fixture
                 'views' => 950,
                 'goals' => [8, 12]
             ],
-            [
-                'title' => 'Telemedicine Platform for Remote Barangays',
-                'description' => $loremIpsum,
-                'authors' => 'Dr. C. Ocampo, Anna Reyes',
-                'views' => 1820,
-                'goals' => [3, 11]
-            ],
-            [
-                'title' => 'Gamification of STEM Education for Grade Schoolers',
-                'description' => $loremIpsum,
-                'authors' => 'M. Torres',
-                'views' => 420,
-                'goals' => [4]
-            ],
-            [
-                'title' => 'Optimization of Jeepney Routes via Genetic Algorithms',
-                'description' => $loremIpsum,
-                'authors' => 'J. Dela Cruz',
-                'views' => 1150,
-                'goals' => [11]
-            ],
-            [
-                'title' => 'Flood Prediction using River Sensors',
-                'description' => $loremIpsum,
-                'authors' => 'Engr. Jose Florenz Somigao',
-                'views' => 2500,
-                'goals' => [9, 11]
-            ],
-            [
-                'title' => 'Biodegradable Packaging from Banana Pseudostem',
-                'description' => $loremIpsum,
-                'authors' => 'A. Ramos',
-                'views' => 880,
-                'goals' => [12]
-            ],
-            [
-                'title' => 'Digital Literacy Workshops for Senior Citizens',
-                'description' => $loremIpsum,
-                'authors' => 'Maria Santos',
-                'views' => 305,
-                'goals' => [4, 11]
-            ],
-            [
-                'title' => 'Micro-Hydro Generators for Irrigation Canals',
-                'description' => $loremIpsum,
-                'authors' => 'Rome Arist Mendoza',
-                'views' => 1670,
-                'goals' => [7, 9]
-            ],
         ];
 
         foreach ($thesesData as $data) {
@@ -152,29 +105,38 @@ class AppFixtures extends Fixture
                    ->setCreatedAt(new \DateTimeImmutable('-' . rand(1, 30) . ' days'));
             
             foreach ($data['goals'] as $goalNum) {
-                $thesis->addSdg($sdgEntities[$goalNum]);
+                if (isset($sdgEntities[$goalNum])) {
+                    $thesis->addSdg($sdgEntities[$goalNum]);
+                }
             }
             $manager->persist($thesis);
         }
 
+        // 3. Updated Activities Data
         $activitiesData = [
             [
                 'title' => 'Capacity Building: Patent Search Workshop',
                 'category' => 'Seminar',
-                'content' => "An in-depth capability building workshop for engineering students to understand patent searches, intellectual property rights, and how to protect their technological innovations.\n\nStudents will learn to use international databases.",
-                'date' => '2026-03-04'
+                'content' => "<p>An in-depth capability building workshop for engineering students to understand patent searches, intellectual property rights, and how to protect their technological innovations.</p><p>Students will learn to use international databases to cross-reference their ideas.</p>",
+                'date' => '2026-03-04',
+                'goals' => [4, 9, 17],
+                'isActive' => true
             ],
             [
-                'title' => 'TamLabs Demo Day: Celebrating Six Months of Innovation, Grit, and Growth',
+                'title' => 'TamLabs Demo Day: Celebrating Six Months of Innovation',
                 'category' => 'News',
-                'content' => "The FEU Tech Innovation Center's ongoing efforts to create spaces where technology, creativity, and human-centered innovation meet.\n\nIt showcased how Filipino innovators can build solutions that matter locally and internationally.",
-                'date' => '2025-10-28'
+                'content' => "<p>The FEU Tech Innovation Center's ongoing efforts to create spaces where technology, creativity, and human-centered innovation meet.</p><p>It showcased how Filipino innovators can build solutions that matter locally and internationally.</p>",
+                'date' => '2025-10-28',
+                'goals' => [8, 9, 17],
+                'isActive' => true
             ],
             [
                 'title' => 'Hustlers: Student Entrepreneurship Program',
                 'category' => 'Workshop',
-                'content' => "Creates opportunities for students to test their ideas, receive customer feedback, and build confidence as business owners.\n\nThrough Hustlers, FEU Tech nurtures student interest in sustainability, innovation, and impact-driven careers.",
-                'date' => '2024-12-02'
+                'content' => "<p>Creates opportunities for students to test their ideas, receive customer feedback, and build confidence as business owners.</p><p>Through Hustlers, FEU Tech nurtures student interest in sustainability, innovation, and impact-driven careers.</p>",
+                'date' => '2024-12-02',
+                'goals' => [4, 8, 12],
+                'isActive' => true
             ]
         ];
 
@@ -184,7 +146,17 @@ class AppFixtures extends Fixture
                      ->setCategory($data['category'])
                      ->setContent($data['content'])
                      ->setEventDate(new \DateTime($data['date']))
-                     ->setCreatedAt(new \DateTimeImmutable($data['date']));
+                     ->setCreatedAt(new \DateTimeImmutable($data['date']))
+                     ->setIsActive($data['isActive'])
+                     // Default publishAt to the past so they show up by default
+                     ->setPublishAt(new \DateTime($data['date']));
+
+            foreach ($data['goals'] as $goalNum) {
+                if (isset($sdgEntities[$goalNum])) {
+                    $activity->addSdg($sdgEntities[$goalNum]);
+                }
+            }
+
             $manager->persist($activity);
         }
 

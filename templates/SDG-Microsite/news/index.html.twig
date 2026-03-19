@@ -12,43 +12,112 @@
         </div>
     </section>
 
-    <section class="py-16 px-6 bg-gray-50 min-h-screen">
-        <div class="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-            {% for activity in activities %}
-                <article class="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden flex flex-col hover:shadow-xl transition duration-300 group">
+    <section class="py-12 px-6 bg-gray-50 min-h-screen">
+        <div class="max-w-7xl mx-auto flex flex-col lg:flex-row gap-8" data-controller="autosubmit">
+            
+            {# SIDEBAR FILTER #}
+            <aside class="w-full lg:w-1/4 flex-shrink-0">
+                <div class="bg-white p-6 rounded-xl shadow-sm border border-gray-100 sticky top-28 max-h-[calc(100vh-8rem)] overflow-y-auto">
+                    <h2 class="text-lg font-bold text-feu-green-950 mb-4 border-b pb-2 font-bebas tracking-wide">Filter News</h2>
                     
-                    <div class="h-56 relative bg-gray-100 overflow-hidden shrink-0">
-                        {% if activity.image %}
-                            <img src="{{ asset('uploads/activities/' ~ activity.image) }}" alt="{{ activity.title }}" class="absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition duration-500">
-                        {% else %}
-                            <img src="{{ asset('images/hero-3.jpg') }}" alt="Fallback Event Image" class="absolute inset-0 w-full h-full object-cover opacity-90 group-hover:scale-105 transition duration-500">
-                        {% endif %}
-                    </div>
+                    <form id="filter-form" action="{{ path('app_news') }}" method="GET" class="space-y-4"
+                          data-autosubmit-target="form"
+                          data-action="change->autosubmit#submit input->autosubmit#submit">
+                        
+                        <div>
+                            <label for="title" class="block text-sm font-semibold text-gray-700 mb-2 font-work">Search Title</label>
+                            <input type="text" id="title" name="title" value="{{ search_title|default('') }}" placeholder="Article title..." class="w-full rounded-lg border-gray-300 shadow-sm focus:border-feu-green-700 focus:ring-feu-green-700 px-4 py-2 border font-work">
+                        </div>
 
-                    <div class="p-8 flex flex-col flex-grow">
-                        <div class="flex items-center justify-between mb-4">
-                            <span class="bg-feu-green-100 text-feu-green-800 text-[10px] font-bold px-3 py-1 rounded-full uppercase tracking-widest">{{ activity.category }}</span>
-                            <span class="text-gray-400 text-xs font-medium">{{ activity.eventDate|date('M j, Y') }}</span>
+                        <div>
+                            <label for="category" class="block text-sm font-semibold text-gray-700 mb-2 font-work">Category</label>
+                            <input type="text" id="category" name="category" value="{{ search_category|default('') }}" placeholder="e.g. Seminar, News..." class="w-full rounded-lg border-gray-300 shadow-sm focus:border-feu-green-700 focus:ring-feu-green-700 px-4 py-2 border font-work">
                         </div>
-                        
-                        <h3 class="text-2xl font-bold text-gray-900 mb-3 group-hover:text-feu-green-700 transition font-bebas tracking-wide">
-                            <a href="{{ path('app_news_show', {id: activity.id}) }}">{{ activity.title }}</a>
-                        </h3>
-                        
-                        <div class="text-gray-600 text-sm leading-relaxed mb-6 line-clamp-3 font-work">
-                            <p class="whitespace-pre-line">{{ activity.content }}</p>
+
+                        <div>
+                            <label for="year" class="block text-sm font-semibold text-gray-700 mb-2 font-work">Filter by Year</label>
+                            <select id="year" name="year" class="w-full rounded-lg border-gray-300 shadow-sm focus:border-feu-green-700 focus:ring-feu-green-700 px-4 py-2 border font-work bg-white">
+                                <option value="">All Years</option>
+                                {% set currentYear = date() | date("Y") %}
+                                {% for year in currentYear..2020 %}
+                                    <option value="{{ year }}" {% if search_year|default('') == year %}selected{% endif %}>{{ year }}</option>
+                                {% endfor %}
+                            </select>
                         </div>
-                        
-                        <a href="{{ path('app_news_show', {id: activity.id}) }}" class="text-feu-green-700 font-bold hover:text-feu-green-500 transition flex items-center gap-1 text-sm mt-auto w-max font-work">
-                            Read Full Article &rarr;
-                        </a>
-                    </div>
-                </article>
-            {% else %}
-                <div class="col-span-1 md:col-span-2 lg:col-span-3 p-12 text-center bg-white rounded-2xl border border-dashed border-gray-300">
-                    <p class="text-gray-500 font-medium font-work">No activities have been posted yet.</p>
+
+                        <div>
+                            <label class="block text-sm font-semibold text-gray-700 mb-3 font-work">Filter by SDG</label>
+                            <div class="grid grid-cols-4 gap-2 mb-4">
+                                {% set available_goals = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17] %}
+                                {% for goal in available_goals %}
+                                    {% set formatted_num = '%02d'|format(goal) %}
+                                    <label class="cursor-pointer relative block aspect-square rounded-md overflow-hidden shadow-sm hover:shadow-md transition group border border-gray-100 bg-white">
+                                        <input type="checkbox" name="goals[]" value="{{ goal }}" class="peer hidden" {% if selected_goals is defined and goal in selected_goals %}checked{% endif %}>
+                                        <img src="{{ asset('images/sdg/E Inverted Icons_WEB-' ~ formatted_num ~ '.png') }}" alt="SDG {{ goal }}" class="absolute inset-0 w-full h-full object-cover transition-opacity duration-300 opacity-100 peer-checked:opacity-0 group-hover:opacity-75">
+                                        <img src="{{ asset('images/sdg/E-WEB-Goal-' ~ formatted_num ~ '.png') }}" alt="SDG {{ goal }}" class="absolute inset-0 w-full h-full object-cover transition-opacity duration-300 opacity-0 peer-checked:opacity-100">
+                                        <div class="absolute inset-0 border-2 border-feu-green-700 rounded-md opacity-0 peer-checked:opacity-100 transition-opacity pointer-events-none"></div>
+                                    </label>
+                                {% endfor %}
+                            </div>
+                        </div>
+
+                        <noscript>
+                            <button type="submit" class="w-full bg-feu-green-800 hover:bg-feu-green-700 text-white font-bold py-3 rounded-lg transition shadow-sm">Apply Filters</button>
+                        </noscript>
+                    </form>
                 </div>
-            {% endfor %}
+            </aside>
+
+            {# MAIN CONTENT GRID #}
+            <main class="w-full lg:w-3/4">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    {% for activity in activities %}
+                        <article class="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden flex flex-col hover:shadow-xl transition duration-300 group">
+                            
+                            <div class="h-48 relative bg-gray-100 overflow-hidden shrink-0 border-b border-gray-100">
+                                {% if activity.image %}
+                                    <img src="{{ asset('uploads/activities/' ~ activity.image) }}" alt="{{ activity.title }}" class="absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition duration-500">
+                                {% else %}
+                                    <img src="{{ asset('images/hero-3.jpg') }}" alt="Fallback Event Image" class="absolute inset-0 w-full h-full object-cover opacity-90 group-hover:scale-105 transition duration-500">
+                                {% endif %}
+                                
+                                {# Overlay SDG Badges on the image #}
+                                {% if activity.sdgs|length > 0 %}
+                                <div class="absolute top-3 right-3 flex flex-wrap justify-end gap-1">
+                                    {% for sdg in activity.sdgs|slice(0, 3) %}
+                                        <span class="bg-white/90 backdrop-blur-sm text-feu-green-900 text-[10px] font-bold px-2 py-1 rounded-full shadow-sm">SDG {{ sdg.id }}</span>
+                                    {% endfor %}
+                                </div>
+                                {% endif %}
+                            </div>
+
+                            <div class="p-6 flex flex-col flex-grow">
+                                <div class="flex items-center justify-between mb-3">
+                                    <span class="bg-feu-green-100 text-feu-green-800 text-[10px] font-bold px-3 py-1 rounded-full uppercase tracking-widest">{{ activity.category }}</span>
+                                    <span class="text-gray-400 text-xs font-medium font-work">{{ activity.eventDate|date('M j, Y') }}</span>
+                                </div>
+                                
+                                <h3 class="text-xl font-bold text-gray-900 mb-3 group-hover:text-feu-green-700 transition font-bebas tracking-wide leading-tight">
+                                    <a href="{{ path('app_news_show', {id: activity.id}) }}">{{ activity.title }}</a>
+                                </h3>
+                                
+                                {# Strip tags here since the DB now holds raw HTML from TinyMCE #}
+                                <div class="text-gray-600 text-sm leading-relaxed mb-6 line-clamp-3 font-work">
+                                    <p>{{ activity.content|striptags }}</p>
+                                </div>
+                                
+                                <a href="{{ path('app_news_show', {id: activity.id}) }}" class="text-feu-green-700 font-bold hover:text-feu-green-500 transition flex items-center gap-1 text-sm mt-auto w-max font-work">
+                                    Read Full Article &rarr;
+                                </a>
+                            </div>
+                        </article>
+                    {% else %}
+                        <div class="col-span-1 md:col-span-2 p-12 text-center bg-white rounded-2xl border border-dashed border-gray-300">
+                            <p class="text-gray-500 font-medium font-work">No activities found matching your filters.</p>
+                        </div>
+                    {% endfor %}
+                </div>
+            </main>
         </div>
     </section>
 {% endblock %}
