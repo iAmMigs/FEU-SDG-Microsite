@@ -2,14 +2,14 @@
 
 namespace App\Controller;
 
+use App\Entity\Thesis;
 use App\Repository\ThesisRepository;
+use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\Tools\Pagination\Paginator;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
-use Doctrine\ORM\EntityManagerInterface;
-use App\Entity\Thesis;
 
 final class ThesisController extends AbstractController
 {
@@ -20,24 +20,51 @@ final class ThesisController extends AbstractController
         $searchAuthor = $request->query->get('author');
         $searchTitle = $request->query->get('title');
         $searchKeyword = $request->query->get('keyword');
-
+        
         $isExclusive = $request->query->getBoolean('exclusive', false);
         
         $page = max(1, $request->query->getInt('page', 1));
         $limit = 10;
 
         $qb = $thesisRepository->createQueryBuilder('t')
+            ->leftJoin('t.sdgs', 's')
+            ->addSelect('s')
             ->orderBy('t.createdAt', 'DESC');
 
         if (!empty($selectedGoals)) {
-            $qb->join('t.sdgs', 's')
-               ->andWhere('s.id IN (:goals)')
-               ->setParameter('goals', $selectedGoals);
-            
             if ($isExclusive) {
-                $qb->groupBy('t.id')
-                   ->having('COUNT(DISTINCT s.id) = :goalCount')
+                /* * EXACT MATCH LOGIC (Fixed for Collection Hydration):
+                 * 1. The SIZE() function natively checks that the thesis has the exact 
+                 * amount of tags as the user's selection, bypassing the need for GROUP BY.
+                 */
+                $qb->andWhere('SIZE(t.sdgs) = :goalCount')
                    ->setParameter('goalCount', count($selectedGoals));
+
+                /* * 2. Subquery ensures NO tags exist on this thesis that fall 
+                 * outside of the user's selected goals.
+                 */
+                $qb->andWhere(
+                    $qb->expr()->not(
+                        $qb->expr()->exists(
+                            "SELECT 1 FROM App\Entity\Thesis t2 
+                             JOIN t2.sdgs s2 
+                             WHERE t2.id = t.id AND s2.id NOT IN (:goals)"
+                        )
+                    )
+                )->setParameter('goals', $selectedGoals);
+                
+            } else {
+                /* * INCLUSIVE MATCH LOGIC:
+                 * Subquery ensures we find any thesis connected to at least one selected goal,
+                 * without restricting the main fetch array so all tags still display.
+                 */
+                $qb->andWhere(
+                    $qb->expr()->exists(
+                        "SELECT 1 FROM App\Entity\Thesis t3 
+                         JOIN t3.sdgs s3 
+                         WHERE t3.id = t.id AND s3.id IN (:goals)"
+                    )
+                )->setParameter('goals', $selectedGoals);
             }
         }
         
@@ -54,7 +81,7 @@ final class ThesisController extends AbstractController
         $qb->setFirstResult(($page - 1) * $limit)
            ->setMaxResults($limit);
 
-        $paginator = new Paginator($qb);
+        $paginator = new Paginator($qb, true);
         $totalCount = count($paginator);
         $totalPages = max(1, ceil($totalCount / $limit));
 

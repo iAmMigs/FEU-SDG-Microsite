@@ -1,0 +1,49 @@
+{% extends '@EasyAdmin/page/content.html.twig' %}
+
+{# Fixed block names for EasyAdmin 5 #}
+{% block content_title %}System Overview{% endblock %}
+
+{% block main %}
+    <div class="row">
+        <div class="col-lg-6 col-md-6 col-sm-12 mb-4">
+            <div class="card shadow-sm border-0" style="background-color: #166534; color: white; border-radius: 12px;">
+                <div class="card-body p-4">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <h6 class="text-uppercase mb-2" style="color: #A7F3D0; font-weight: bold; letter-spacing: 1px;">Total Published Theses</h6>
+                            <h2 class="display-4 fw-bold mb-0 text-white">{{ theses_count }}</h2>
+                        </div>
+                        <i class="fas fa-book fa-3x" style="opacity: 0.3;"></i>
+                    </div>
+                </div>
+                <div class="card-footer" style="background-color: rgba(0,0,0,0.15); border-top: none; border-radius: 0 0 12px 12px;">
+                    <a href="{{ ea_url().setController('App\\Controller\\Admin\\ThesisCrudController').generateUrl() }}" class="text-white text-decoration-none d-flex justify-content-between align-items-center stretched-link">
+                        <span style="font-weight: 500;">Manage Projects</span>
+                        <i class="fas fa-arrow-right"></i>
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-lg-6 col-md-6 col-sm-12 mb-4">
+            <div class="card shadow-sm border-0" style="background-color: #FCC30B; color: #1e293b; border-radius: 12px;">
+                <div class="card-body p-4">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <h6 class="text-uppercase mb-2" style="color: #854d0e; font-weight: bold; letter-spacing: 1px;">News & Activities</h6>
+                            <h2 class="display-4 fw-bold mb-0 text-dark">{{ activities_count }}</h2>
+                        </div>
+                        <i class="fas fa-newspaper fa-3x" style="opacity: 0.3;"></i>
+                    </div>
+                </div>
+                <div class="card-footer" style="background-color: rgba(0,0,0,0.05); border-top: none; border-radius: 0 0 12px 12px;">
+                    <a href="{{ ea_url().setController('App\\Controller\\Admin\\ActivityCrudController').generateUrl() }}" class="text-dark text-decoration-none d-flex justify-content-between align-items-center stretched-link">
+                        <span style="font-weight: 600;">Manage Content</span>
+                        <i class="fas fa-arrow-right"></i>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+{% endblock %}

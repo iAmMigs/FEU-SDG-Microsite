@@ -13,42 +13,42 @@
     </section>
 
     <section class="py-16 px-6 bg-gray-50 min-h-screen">
-        <div class="space-y-10 max-w-5xl mx-auto">
-                {% for activity in activities %}
-                    <article class="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden flex flex-col md:flex-row hover:shadow-lg transition">
-                        
-                        <div class="md:w-[35%] h-64 md:h-auto relative bg-gray-100 shrink-0">
-                            {% if activity.image %}
-                                <img src="{{ asset(activity.image) }}" alt="{{ activity.title }}" class="absolute inset-0 w-full h-full object-cover">
-                            {% else %}
-                                <img src="{{ asset('images/hero-2.jpg') }}" alt="FEU Campus" class="absolute inset-0 w-full h-full object-cover opacity-90">
-                            {% endif %}
-                        </div>
-                        
-                        <div class="p-8 md:w-[65%] flex flex-col justify-center">
-                            <div class="flex items-center gap-3 mb-3">
-                                <span class="bg-green-100 text-green-800 text-xs font-bold px-3 py-1 rounded-full uppercase tracking-wide">{{ activity.category }}</span>
-                                <span class="text-gray-400 text-xs font-medium">{{ activity.eventDate|date('F j, Y') }}</span>
-                            </div>
-                            
-                            <h2 class="text-2xl font-bold text-gray-900 mb-4 hover:text-green-700 transition font-bebas tracking-wide">
-                                <a href="#">{{ activity.title }}</a>
-                            </h2>
-                            
-                            <div class="text-gray-600 text-sm leading-relaxed mb-6 line-clamp-3 prose max-w-none font-work">
-                                {{ activity.content|raw }}
-                            </div>
-                            
-                            <a href="#" class="text-green-700 font-bold hover:text-[#FCC30B] transition flex items-center gap-2 text-sm mt-auto w-max font-work">
-                                Read Full Story <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"></path></svg>
-                            </a>
-                        </div>
-                    </article>
-                {% else %}
-                    <div class="p-12 text-center bg-white rounded-2xl border border-dashed border-gray-300">
-                        <p class="text-gray-500 font-medium">No news or activities published yet.</p>
+        <div class="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+            {% for activity in activities %}
+                <article class="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden flex flex-col hover:shadow-xl transition duration-300 group">
+                    
+                    <div class="h-56 relative bg-gray-100 overflow-hidden shrink-0">
+                        {% if activity.image %}
+                            <img src="{{ asset('uploads/activities/' ~ activity.image) }}" alt="{{ activity.title }}" class="absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition duration-500">
+                        {% else %}
+                            <img src="{{ asset('images/hero-3.jpg') }}" alt="Fallback Event Image" class="absolute inset-0 w-full h-full object-cover opacity-90 group-hover:scale-105 transition duration-500">
+                        {% endif %}
                     </div>
-                {% endfor %}
-            </div>
+
+                    <div class="p-8 flex flex-col flex-grow">
+                        <div class="flex items-center justify-between mb-4">
+                            <span class="bg-feu-green-100 text-feu-green-800 text-[10px] font-bold px-3 py-1 rounded-full uppercase tracking-widest">{{ activity.category }}</span>
+                            <span class="text-gray-400 text-xs font-medium">{{ activity.eventDate|date('M j, Y') }}</span>
+                        </div>
+                        
+                        <h3 class="text-2xl font-bold text-gray-900 mb-3 group-hover:text-feu-green-700 transition font-bebas tracking-wide">
+                            <a href="{{ path('app_news_show', {id: activity.id}) }}">{{ activity.title }}</a>
+                        </h3>
+                        
+                        <div class="text-gray-600 text-sm leading-relaxed mb-6 line-clamp-3 font-work">
+                            <p class="whitespace-pre-line">{{ activity.content }}</p>
+                        </div>
+                        
+                        <a href="{{ path('app_news_show', {id: activity.id}) }}" class="text-feu-green-700 font-bold hover:text-feu-green-500 transition flex items-center gap-1 text-sm mt-auto w-max font-work">
+                            Read Full Article &rarr;
+                        </a>
+                    </div>
+                </article>
+            {% else %}
+                <div class="col-span-1 md:col-span-2 lg:col-span-3 p-12 text-center bg-white rounded-2xl border border-dashed border-gray-300">
+                    <p class="text-gray-500 font-medium font-work">No activities have been posted yet.</p>
+                </div>
+            {% endfor %}
+        </div>
     </section>
 {% endblock %}

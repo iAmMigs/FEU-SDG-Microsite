@@ -3,7 +3,7 @@
 /* 1. Bebas Neue */
 @font-face {
     font-family: 'BebasNeue';
-    src: url('../fonts/bebas_neue/BebasNeue-Regular.otf') format('opentype');
+    src: url('/fonts/bebas_neue/BebasNeue-Regular.otf') format('opentype');
     font-weight: 400;
     font-display: swap;
 }
@@ -11,7 +11,7 @@
 /* 2. Coolvetica */
 @font-face {
     font-family: 'Coolvetica';
-    src: url('../fonts/coolvetica/Coolvetica Rg.otf') format('opentype');
+    src: url('/fonts/coolvetica/Coolvetica Rg.otf') format('opentype');
     font-weight: 400;
     font-display: swap;
 }
@@ -19,7 +19,7 @@
 /* 3. Lemon Milk */
 @font-face {
     font-family: 'LemonMilk';
-    src: url('../fonts/lemon_milk/LEMONMILK-Regular.otf') format('opentype');
+    src: url('/fonts/lemon_milk/LEMONMILK-Regular.otf') format('opentype');
     font-weight: 400;
     font-display: swap;
 }
@@ -27,13 +27,13 @@
 /* 4. Montserrat */
 @font-face {
     font-family: 'Montserrat';
-    src: url('../fonts/monteserrat/Montserrat-Regular.otf') format('opentype');
+    src: url('/fonts/monteserrat/Montserrat-Regular.otf') format('opentype');
     font-weight: 400;
     font-display: swap;
 }
 @font-face {
     font-family: 'Montserrat';
-    src: url('../fonts/monteserrat/Montserrat-Bold.otf') format('opentype');
+    src: url('/fonts/monteserrat/Montserrat-Bold.otf') format('opentype');
     font-weight: 700;
     font-display: swap;
 }
@@ -41,7 +41,7 @@
 /* 5. Sans Serif FLF */
 @font-face {
     font-family: 'SansSerifFLF';
-    src: url('../fonts/sans_serif/SansSerifFLF.otf') format('opentype');
+    src: url('/fonts/sans_serif/SansSerifFLF.otf') format('opentype');
     font-weight: 400;
     font-display: swap;
 }
@@ -49,22 +49,31 @@
 /* 6. Work Sans */
 @font-face {
     font-family: 'WorkSans';
-    src: url('../fonts/work_sans/WorkSans-Regular.ttf') format('truetype');
+    src: url('/fonts/work_sans/WorkSans-Regular.ttf') format('truetype');
     font-weight: 400;
     font-display: swap;
 }
 
-/* --- TAILWIND THEME CONFIGURATION --- */
+/* 7. Della Respira */
+@font-face {
+    font-family: 'DellaRespira';
+    src: url('/fonts/della_respira/DellaRespira-Regular.ttf') format('truetype');
+    font-weight: 400;
+    font-display: swap;
+}
+
+/* Tailwind Theme Configuration Settings */
 @theme {
-    /* Fonts */
+    /* Typography Variables */
     --font-sans: 'Montserrat', ui-sans-serif, system-ui, sans-serif;
     --font-bebas: 'BebasNeue', sans-serif;
     --font-coolvetica: 'Coolvetica', sans-serif;
     --font-lemon: 'LemonMilk', sans-serif;
     --font-sans-flf: 'SansSerifFLF', sans-serif;
     --font-work: 'WorkSans', sans-serif;
+    --font-della: 'DellaRespira', serif;
 
-    /* FEU Green Palette */
+    /* FEU Green Color Palette */
     --color-feu-green-50: #f0fdf4;
     --color-feu-green-100: #dcfce7;
     --color-feu-green-200: #bbf7d0;
@@ -76,7 +85,7 @@
     --color-feu-green-800: #166534;
     --color-feu-green-900: #14532d;
 
-    /* FEU Gold Palette */
+    /* FEU Gold Color Palette */
     --color-feu-gold-50: #fefce8;
     --color-feu-gold-100: #fef3c7;
     --color-feu-gold-200: #fde68a;

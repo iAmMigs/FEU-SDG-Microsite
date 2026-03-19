@@ -3,35 +3,35 @@
 {% block title %}FEU SDG Microsite - Advancing Sustainability{% endblock %}
 
 {% block body %}
-    <section class="relative h-screen w-full bg-green-950 text-white overflow-hidden" data-controller="carousel">
+    <section class="relative h-screen w-full bg-feu-green-900 text-white overflow-hidden" data-controller="carousel">
     
-    <div class="absolute inset-0 z-0 pointer-events-none">
-        <img data-carousel-target="slide" src="{{ asset('images/hero-1.jpg') }}" class="absolute inset-0 w-full h-full object-cover transition-opacity duration-1000 opacity-0" alt="FEU Campus 1">
-        <img data-carousel-target="slide" src="{{ asset('images/hero-2.jpg') }}" class="absolute inset-0 w-full h-full object-cover transition-opacity duration-1000 opacity-0" alt="FEU Campus 2">
-        <img data-carousel-target="slide" src="{{ asset('images/hero-3.jpg') }}" class="absolute inset-0 w-full h-full object-cover transition-opacity duration-1000 opacity-0" alt="FEU Campus 3">
-        <img data-carousel-target="slide" src="{{ asset('images/hero-4.jpg') }}" class="absolute inset-0 w-full h-full object-cover transition-opacity duration-1000 opacity-0" alt="FEU Campus 4">
-        
-        <div class="absolute inset-0 bg-green-950/60 mix-blend-multiply"></div>
-    </div>
+        <div class="absolute inset-0 z-0 pointer-events-none">
+            <img data-carousel-target="slide" src="{{ asset('images/hero-1.jpg') }}" class="absolute inset-0 w-full h-full object-cover transition-opacity duration-1000 opacity-0" alt="FEU Campus 1">
+            <img data-carousel-target="slide" src="{{ asset('images/hero-2.jpg') }}" class="absolute inset-0 w-full h-full object-cover transition-opacity duration-1000 opacity-0" alt="FEU Campus 2">
+            <img data-carousel-target="slide" src="{{ asset('images/hero-3.jpg') }}" class="absolute inset-0 w-full h-full object-cover transition-opacity duration-1000 opacity-0" alt="FEU Campus 3">
+            <img data-carousel-target="slide" src="{{ asset('images/hero-4.jpg') }}" class="absolute inset-0 w-full h-full object-cover transition-opacity duration-1000 opacity-0" alt="FEU Campus 4">
+            
+            <div class="absolute inset-0 bg-feu-green-900/70 mix-blend-multiply"></div>
+        </div>
 
-    <div class="relative h-full max-w-7xl mx-auto flex flex-col items-center justify-center text-center z-10 px-6">
-        <h1 class="text-5xl md:text-7xl font-bold tracking-tight mb-6 font-bebas">
-            Driving Sustainable Impact at FEU
-        </h1>
-        <p class="text-lg md:text-2xl max-w-3xl mb-10 text-green-50 font-work">
-            Explore our research, student theses, and community projects dedicated to solving global challenges through local action.
-        </p>
-        <a href="#goals" class="bg-[#FCC30B] text-green-950 px-10 py-4 rounded-full font-bold text-lg hover:bg-yellow-300 transition duration-300 shadow-xl">
-            Explore Our Focus Goals
-        </a>
-    </div>
-</section>
+        <div class="relative h-full max-w-7xl mx-auto flex flex-col items-center justify-center text-center z-10 px-6">
+            <h1 class="text-5xl md:text-7xl font-bold tracking-tight mb-6 font-bebas">
+                Driving Sustainable Impact at FEU
+            </h1>
+            <p class="text-lg md:text-2xl max-w-3xl mb-10 text-feu-green-50 font-work">
+                Explore our research, student theses, and community projects dedicated to solving global challenges through local action.
+            </p>
+            <a href="#goals" class="bg-[#FCC30B] text-feu-green-900 px-10 py-4 rounded-full font-bold text-lg hover:bg-yellow-300 transition duration-300 shadow-xl">
+                Explore Our Focus Goals
+            </a>
+        </div>
+    </section>
 
     <section id="goals" class="py-20 px-6 bg-gray-50">
         <div class="max-w-7xl mx-auto">
             <div class="text-center mb-16">
-                <h2 class="text-3xl font-bold text-gray-900 mb-4">Our SDG Focus Areas</h2>
-                <p class="text-gray-600 max-w-2xl mx-auto">FEU aligns its academic research, student theses, and institutional projects specifically toward these 8 key Sustainable Development Goals.</p>
+                <h2 class="text-3xl font-bold text-gray-900 mb-4 font-bebas tracking-wide">Our SDG Focus Areas</h2>
+                <p class="text-gray-600 max-w-2xl mx-auto font-work">FEU aligns its academic research, student theses, and institutional projects specifically toward these 8 key Sustainable Development Goals.</p>
             </div>
 
             <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-6">
@@ -80,22 +80,58 @@
         </div>
     </section>
 
+    <section class="relative py-24 px-6 overflow-hidden border-y-4 border-feu-gold-400">
+        <div class="absolute inset-0 z-0">
+            <img src="{{ asset('images/hero-2.jpg') }}" alt="FEU Campus" class="w-full h-full object-cover">
+            <div class="absolute inset-0 bg-feu-green-900/80 mix-blend-multiply"></div>
+        </div>
 
-    <section class="py-20 px-6 bg-white border-t border-gray-200">
-        <div class="max-w-7xl mx-auto">
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-8 text-center">
-                <div class="p-8 rounded-2xl bg-green-50">
-                    <div class="text-5xl font-black text-green-700 mb-2">{{ total_theses }}</div>
-                    <div class="text-gray-600 font-medium">Published Theses</div>
+        <div class="relative z-10 max-w-7xl mx-auto">
+            <div class="text-center mb-16">
+                <h2 class="text-4xl md:text-5xl font-bold text-white font-bebas tracking-wide mb-3">Leading Voices in Research</h2>
+                <p class="text-feu-green-50 font-medium text-lg font-work max-w-2xl mx-auto">
+                    Meet the dedicated students and faculty members driving sustainable innovation and impactful solutions at FEU.
+                </p>
+            </div>
+
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
+                
+                <div class="bg-white rounded-2xl p-8 text-center shadow-xl hover:-translate-y-2 transition duration-300 group">
+                    <div class="w-20 h-20 mx-auto bg-feu-green-100 text-feu-green-800 rounded-full flex items-center justify-center text-2xl font-black font-bebas mb-4 border-4 border-feu-green-50 shadow-sm group-hover:bg-feu-gold-400 group-hover:text-feu-green-900 group-hover:border-feu-gold-100 transition">
+                        JS
+                    </div>
+                    <h3 class="text-xl font-bold text-gray-900 font-bebas tracking-wide mb-1">Engr. Jose Somigao</h3>
+                    <p class="text-xs font-bold text-feu-green-700 uppercase tracking-widest mb-3 font-work">Faculty Researcher</p>
+                    <p class="text-sm text-gray-600 font-work leading-relaxed">Focuses on sustainable urban infrastructure and waste-to-energy systems.</p>
                 </div>
-                <div class="p-8 rounded-2xl bg-blue-50">
-                    <div class="text-5xl font-black text-blue-700 mb-2">45</div>
-                    <div class="text-gray-600 font-medium">Community Projects</div>
+
+                <div class="bg-white rounded-2xl p-8 text-center shadow-xl hover:-translate-y-2 transition duration-300 group">
+                    <div class="w-20 h-20 mx-auto bg-feu-green-100 text-feu-green-800 rounded-full flex items-center justify-center text-2xl font-black font-bebas mb-4 border-4 border-feu-green-50 shadow-sm group-hover:bg-feu-gold-400 group-hover:text-feu-green-900 group-hover:border-feu-gold-100 transition">
+                        AR
+                    </div>
+                    <h3 class="text-xl font-bold text-gray-900 font-bebas tracking-wide mb-1">Anna Reyes</h3>
+                    <p class="text-xs font-bold text-feu-green-700 uppercase tracking-widest mb-3 font-work">Student Innovator</p>
+                    <p class="text-sm text-gray-600 font-work leading-relaxed">Developing AI-assisted modules for accessible engineering education.</p>
                 </div>
-                <div class="p-8 rounded-2xl bg-yellow-50">
-                    <div class="text-5xl font-black text-yellow-600 mb-2">8</div>
-                    <div class="text-gray-600 font-medium">Active Partnerships</div>
+
+                <div class="bg-white rounded-2xl p-8 text-center shadow-xl hover:-translate-y-2 transition duration-300 group">
+                    <div class="w-20 h-20 mx-auto bg-feu-green-100 text-feu-green-800 rounded-full flex items-center justify-center text-2xl font-black font-bebas mb-4 border-4 border-feu-green-50 shadow-sm group-hover:bg-feu-gold-400 group-hover:text-feu-green-900 group-hover:border-feu-gold-100 transition">
+                        JD
+                    </div>
+                    <h3 class="text-xl font-bold text-gray-900 font-bebas tracking-wide mb-1">J. Dela Cruz</h3>
+                    <p class="text-xs font-bold text-feu-green-700 uppercase tracking-widest mb-3 font-work">Lead Researcher</p>
+                    <p class="text-sm text-gray-600 font-work leading-relaxed">Pioneering genetic algorithms for optimizing Metro Manila transit.</p>
                 </div>
+
+                <div class="bg-white rounded-2xl p-8 text-center shadow-xl hover:-translate-y-2 transition duration-300 group">
+                    <div class="w-20 h-20 mx-auto bg-feu-green-100 text-feu-green-800 rounded-full flex items-center justify-center text-2xl font-black font-bebas mb-4 border-4 border-feu-green-50 shadow-sm group-hover:bg-feu-gold-400 group-hover:text-feu-green-900 group-hover:border-feu-gold-100 transition">
+                        MS
+                    </div>
+                    <h3 class="text-xl font-bold text-gray-900 font-bebas tracking-wide mb-1">Maria Santos</h3>
+                    <p class="text-xs font-bold text-feu-green-700 uppercase tracking-widest mb-3 font-work">Community Lead</p>
+                    <p class="text-sm text-gray-600 font-work leading-relaxed">Bridging the digital divide with tech literacy programs for LGUs.</p>
+                </div>
+
             </div>
         </div>
     </section>
@@ -108,7 +144,7 @@
                     <h2 class="text-4xl md:text-5xl font-bold text-gray-900 font-bebas tracking-wide mb-3">Latest Updates</h2>
                     <p class="text-lg text-gray-600 font-work">Stay informed with our newest research, seminars, and community events.</p>
                 </div>
-                <a href="{{ path('app_news') }}" class="hidden md:flex items-center gap-2 text-green-700 font-bold hover:text-[#FCC30B] transition font-work">
+                <a href="{{ path('app_news') }}" class="hidden md:flex items-center gap-2 text-feu-green-700 font-bold hover:text-[#FCC30B] transition font-work">
                     View All News <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"></path></svg>
                 </a>
             </div>
@@ -119,28 +155,32 @@
                         
                         <div class="h-56 relative bg-gray-100 overflow-hidden shrink-0">
                             {% if activity.image %}
-                                <img src="{{ asset(activity.image) }}" alt="{{ activity.title }}" class="absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition duration-500">
+                                <img src="{{ asset('uploads/activities/' ~ activity.image) }}" alt="{{ activity.title }}" class="absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition duration-500">
                             {% else %}
                                 <img src="{{ asset('images/hero-3.jpg') }}" alt="FEU Event" class="absolute inset-0 w-full h-full object-cover opacity-90 group-hover:scale-105 transition duration-500">
                             {% endif %}
                         </div>
-                        
+
                         <div class="p-8 flex flex-col flex-grow">
                             <div class="flex items-center gap-3 mb-4">
-                                <span class="bg-green-100 text-green-800 text-[10px] font-bold px-3 py-1 rounded-full uppercase tracking-widest">{{ activity.category }}</span>
+                                <span class="bg-feu-green-100 text-feu-green-800 text-[10px] font-bold px-3 py-1 rounded-full uppercase tracking-widest">{{ activity.category }}</span>
                                 <span class="text-gray-400 text-xs font-medium">{{ activity.eventDate|date('M j, Y') }}</span>
                             </div>
                             
-                            <h3 class="text-2xl font-bold text-gray-900 mb-3 group-hover:text-green-700 transition font-bebas tracking-wide">
+                            <h3 class="text-2xl font-bold text-gray-900 mb-3 group-hover:text-feu-green-700 transition font-bebas tracking-wide">
                                 <a href="#">{{ activity.title }}</a>
                             </h3>
                             
-                            <div class="text-gray-600 text-sm leading-relaxed mb-6 line-clamp-2 font-work prose max-w-none">
-                                {{ activity.content|raw }}
+                            <div class="text-gray-600 text-sm leading-relaxed mb-6 line-clamp-2 font-work max-w-none">
+                                <p class="whitespace-pre-line">{{ activity.content }}</p>
                             </div>
                             
-                            <a href="#" class="text-green-700 font-bold hover:text-[#FCC30B] transition flex items-center gap-1 text-sm mt-auto w-max font-work">
-                                Read Article &rarr;
+                            <a href="{{ path('app_news_show', { id: activity.id }) }}" 
+                            class="text-feu-green-800 hover:text-feu-gold-600 font-bold text-sm transition-colors flex items-center gap-1 group font-work">
+                                View Article
+                                <svg class="w-4 h-4 group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M14 5l7 7m0 0l-7 7m7-7H3"></path>
+                                </svg>
                             </a>
                         </div>
                     </article>
@@ -152,7 +192,7 @@
             </div>
             
             <div class="mt-8 text-center md:hidden">
-                <a href="{{ path('app_news') }}" class="inline-block bg-green-800 text-white px-8 py-3 rounded-full font-bold font-work shadow-md">
+                <a href="{{ path('app_news') }}" class="inline-block bg-feu-green-800 text-white px-8 py-3 rounded-full font-bold font-work shadow-md">
                     View All News
                 </a>
             </div>
