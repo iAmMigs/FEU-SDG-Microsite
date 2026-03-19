@@ -2,18 +2,16 @@
 
 <header class="bg-white shadow-sm sticky top-0 z-50" data-controller="mobile-menu">
     <div class="max-w-7xl mx-auto px-6 sm:px-8 lg:px-12 relative bg-white z-20">
-        {# Restored original h-20 height #}
         <div class="flex justify-between items-center h-20">
             
             <div class="flex-shrink-0 flex items-center">
-                <a href="{{ path('app_home') }}" class="flex items-center gap-4 group">
-                    {# Restored original h-12 logo height #}
+                <a href="{{ path('app_home') }}" class="flex items-center gap-3 group">
                     <img class="h-12 w-auto" src="{{ asset('images/Tech_Logo.png') }}" alt="FEU Logo"> 
-                    <div class="flex flex-col gap-0.5">
-                        <span style="font-family: 'DellaRespira', serif;" class="font-bold tracking-wide uppercase text-xl text-feu-green-800 leading-tight group-hover:text-feu-green-600 transition">
-                            FEU INSTITUTE OF TECHNOLOGY
-                        </span>
-                        <span class="text-[0.65rem] text-gray-500 font-bold tracking-widest uppercase">
+                    <div class="flex flex-col">
+                        <img src="{{ asset('images/Tech_Text.png') }}" 
+                             alt="FEU Institute of Technology" 
+                             class="h-7 w-auto transition-opacity duration-300 group-hover:opacity-80">
+                        <span class="text-[0.65rem] text-gray-500 font-bold tracking-widest uppercase mt-0.5">
                             SDG Microsite
                         </span>
                     </div>
