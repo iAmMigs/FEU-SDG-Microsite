@@ -1,42 +1,50 @@
 {% set current_route = app.request.attributes.get('_route') %}
 
-<header class="bg-white shadow-sm sticky top-0 z-50" data-controller="mobile-menu">
-    <div class="max-w-7xl mx-auto px-6 sm:px-8 lg:px-12 relative bg-white z-20">
+<header class="bg-white shadow-sm sticky top-0 z-50 transition-all duration-300" data-controller="mobile-menu">
+    {# 1. WIDENED CONTAINER: Changed max-w-7xl to max-w-[1440px] to push items closer to the edges #}
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-10 relative bg-white z-20">
         <div class="flex justify-between items-center h-20">
             
+            {# LOGO BRANDING AREA #}
             <div class="flex-shrink-0 flex items-center">
-                <a href="{{ path('app_home') }}" class="flex items-center gap-3 group">
-                    <img class="h-12 w-auto" src="{{ asset('images/Tech_Logo.png') }}" alt="FEU Logo"> 
-                    <div class="flex flex-col">
-                        <img src="{{ asset('images/Tech_Text.png') }}" 
+                <a href="{{ path('app_home') }}" class="flex items-center gap-2 group">
+                    <img class="h-10 sm:h-12 w-auto transition-transform duration-300 group-hover:scale-105" 
+                         src="{{ asset('images/Tech_Logo.png') }}" 
+                         alt="FEU Logo"
+                         style="height: 48px; width: auto; object-fit: contain;"> 
+                    
+                    <div class="flex flex-col justify-center">
+                        <img src="{{ asset('images/Tech_text.png') }}" 
                              alt="FEU Institute of Technology" 
-                             class="h-7 w-auto transition-opacity duration-300 group-hover:opacity-80">
+                             class="h-6 sm:h-8 w-auto transition-opacity duration-300 group-hover:opacity-80"
+                             style="height: 32px; width: auto; object-fit: contain;">
+                        <span class="text-[0.60rem] sm:text-[0.65rem] text-gray-500 font-bold tracking-[0.2em] uppercase mt-0.5 ml-0.5">SDG Microsite</span>
                     </div>
                 </a>
             </div>
             
-            <nav class="hidden md:flex space-x-14 items-center">
-                <a href="{{ path('app_home') }}" class="transition px-2 py-2 text-sm {{ current_route == 'app_home' ? 'text-feu-green-800 font-bold hover:text-feu-gold-600' : 'text-gray-900 hover:text-feu-green-700 font-semibold' }}">Home</a>
-                <a href="{{ path('app_sdgs') }}" class="transition px-2 py-2 text-sm {{ current_route == 'app_sdgs' ? 'text-feu-green-800 font-bold hover:text-feu-gold-600' : 'text-gray-900 hover:text-feu-green-700 font-semibold' }}">The SDGs</a>
-                <a href="{{ path('app_about') }}" class="transition px-2 py-2 text-sm {{ current_route == 'app_about' ? 'text-feu-green-800 font-bold hover:text-feu-gold-600' : 'text-gray-900 hover:text-feu-green-700 font-semibold' }}">About</a>
-                <a href="{{ path('app_trending') }}" class="transition px-2 py-2 text-sm {{ current_route == 'app_trending' ? 'text-feu-green-800 font-bold hover:text-feu-gold-600' : 'text-gray-900 hover:text-feu-green-700 font-semibold' }}">Trending Studies</a>
-                <a href="{{ path('app_news') }}" class="transition px-2 py-2 text-sm {{ current_route == 'app_news' ? 'text-feu-green-800 font-bold hover:text-feu-gold-600' : 'text-gray-900 hover:text-feu-green-700 font-semibold' }}">News & Activities</a>
+            {# 2. DESKTOP NAVIGATION #}
+            {# Added flex-nowrap and flex-shrink-0 to absolutely prevent text squishing #}
+            <nav class="hidden md:flex flex-nowrap gap-3 lg:gap-6 xl:gap-8 items-center flex-shrink-0">
+                <a href="{{ path('app_home') }}" class="whitespace-nowrap transition px-2 py-2 text-[15px] lg:text-base font-work {{ current_route == 'app_home' ? 'text-feu-green-800 font-bold border-b-2 border-feu-gold-500' : 'text-gray-600 hover:text-feu-green-700 font-medium' }}">Home</a>
+                <a href="{{ path('app_sdgs') }}" class="whitespace-nowrap transition px-2 py-2 text-[15px] lg:text-base font-work {{ current_route == 'app_sdgs' ? 'text-feu-green-800 font-bold border-b-2 border-feu-gold-500' : 'text-gray-600 hover:text-feu-green-700 font-medium' }}">The SDGs</a>
+                <a href="{{ path('app_about') }}" class="whitespace-nowrap transition px-2 py-2 text-[15px] lg:text-base font-work {{ current_route == 'app_about' ? 'text-feu-green-800 font-bold border-b-2 border-feu-gold-500' : 'text-gray-600 hover:text-feu-green-700 font-medium' }}">About</a>
+                <a href="{{ path('app_trending') }}" class="whitespace-nowrap transition px-2 py-2 text-[15px] lg:text-base font-work {{ current_route == 'app_trending' ? 'text-feu-green-800 font-bold border-b-2 border-feu-gold-500' : 'text-gray-600 hover:text-feu-green-700 font-medium' }}">Trending Studies</a>
+                <a href="{{ path('app_news') }}" class="whitespace-nowrap transition px-2 py-2 text-[15px] lg:text-base font-work {{ current_route == 'app_news' ? 'text-feu-green-800 font-bold border-b-2 border-feu-gold-500' : 'text-gray-600 hover:text-feu-green-700 font-medium' }}">News & Activities</a>
             </nav>
 
-            <div class="flex items-center space-x-6">
-                {# Restored original py-2.5 vertical padding #}
-                <a href="{{ path('app_library') }}" class="hidden md:inline-flex items-center justify-center px-6 py-2.5 text-sm font-bold rounded-full text-feu-green-900 bg-feu-gold-400 hover:bg-feu-gold-500 transition shadow-sm">
+            {# 3. CTA BUTTON & MOBILE TOGGLE #}
+            <div class="flex items-center space-x-4 ml-2 lg:ml-4 flex-shrink-0">
+                <a href="{{ path('app_library') }}" class="hidden md:inline-flex whitespace-nowrap items-center justify-center px-5 lg:px-7 py-2.5 text-sm lg:text-base font-bold rounded-full text-feu-green-950 bg-feu-gold-400 hover:bg-feu-gold-500 hover:shadow-md transition-all duration-300 font-work flex-shrink-0">
                     Browse the Library
                 </a>
                 
                 <div class="flex items-center md:hidden">
-                    <button type="button" data-action="click->mobile-menu#toggle" class="text-gray-500 hover:text-feu-green-800 focus:outline-none p-2" aria-expanded="false">
+                    <button type="button" data-action="click->mobile-menu#toggle" class="text-gray-500 hover:text-feu-green-800 focus:outline-none p-2 transition-colors rounded-md bg-gray-50 hover:bg-gray-100" aria-expanded="false">
                         <span class="sr-only">Open main menu</span>
-                        
                         <svg data-mobile-menu-target="openIcon" class="h-6 w-6 block" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
                         </svg>
-                        
                         <svg data-mobile-menu-target="closeIcon" class="h-6 w-6 hidden" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
                         </svg>
@@ -47,19 +55,16 @@
         </div>
     </div>
 
+    {# 4. MOBILE MENU DROPDOWN PANEL #}
     <div data-mobile-menu-target="menu" class="md:hidden hidden absolute w-full bg-white border-t border-gray-100 shadow-xl z-10">
         <div class="px-4 pt-4 pb-6 space-y-2">
-            <a href="{{ path('app_home') }}" class="block px-4 py-3 rounded-lg text-base {{ current_route == 'app_home' ? 'text-feu-green-800 bg-green-50 font-bold' : 'text-gray-900 hover:text-feu-green-700 hover:bg-gray-50 font-medium' }}">Home</a>
+            <a href="{{ path('app_home') }}" class="block px-4 py-3 rounded-lg text-base font-work {{ current_route == 'app_home' ? 'text-feu-green-900 bg-feu-green-50 font-bold' : 'text-gray-700 hover:text-feu-green-800 hover:bg-gray-50 font-medium' }}">Home</a>
+            <a href="{{ path('app_sdgs') }}" class="block px-4 py-3 rounded-lg text-base font-work {{ current_route == 'app_sdgs' ? 'text-feu-green-900 bg-feu-green-50 font-bold' : 'text-gray-700 hover:text-feu-green-800 hover:bg-gray-50 font-medium' }}">The SDGs</a>
+            <a href="{{ path('app_about') }}" class="block px-4 py-3 rounded-lg text-base font-work {{ current_route == 'app_about' ? 'text-feu-green-900 bg-feu-green-50 font-bold' : 'text-gray-700 hover:text-feu-green-800 hover:bg-gray-50 font-medium' }}">About</a>
+            <a href="{{ path('app_trending') }}" class="block px-4 py-3 rounded-lg text-base font-work {{ current_route == 'app_trending' ? 'text-feu-green-900 bg-feu-green-50 font-bold' : 'text-gray-700 hover:text-feu-green-800 hover:bg-gray-50 font-medium' }}">Trending Studies</a>
+            <a href="{{ path('app_news') }}" class="block px-4 py-3 rounded-lg text-base font-work {{ current_route == 'app_news' ? 'text-feu-green-900 bg-feu-green-50 font-bold' : 'text-gray-700 hover:text-feu-green-800 hover:bg-gray-50 font-medium' }}">News & Activities</a>
             
-            <a href="{{ path('app_sdgs') }}" class="block px-4 py-3 rounded-lg text-base {{ current_route == 'app_sdgs' ? 'text-feu-green-800 bg-green-50 font-bold' : 'text-gray-900 hover:text-feu-green-700 hover:bg-gray-50 font-medium' }}">The SDGs</a>
-            
-            <a href="{{ path('app_about') }}" class="block px-4 py-3 rounded-lg text-base {{ current_route == 'app_about' ? 'text-feu-green-800 bg-green-50 font-bold' : 'text-gray-900 hover:text-feu-green-700 hover:bg-gray-50 font-medium' }}">About</a>
-            
-            <a href="{{ path('app_trending') }}" class="block px-4 py-3 rounded-lg text-base {{ current_route == 'app_trending' ? 'text-feu-green-800 bg-green-50 font-bold' : 'text-gray-900 hover:text-feu-green-700 hover:bg-gray-50 font-medium' }}">Trending Studies</a>
-            
-            <a href="{{ path('app_news') }}" class="block px-4 py-3 rounded-lg text-base {{ current_route == 'app_news' ? 'text-feu-green-800 bg-green-50 font-bold' : 'text-gray-900 hover:text-feu-green-700 hover:bg-gray-50 font-medium' }}">News & Activities</a>
-            
-            <a href="{{ path('app_library') }}" class="block mt-6 text-center px-5 py-3.5 rounded-full text-base font-bold text-feu-green-900 bg-feu-gold-400 hover:bg-feu-gold-500 transition shadow-sm">
+            <a href="{{ path('app_library') }}" class="block mt-6 text-center px-5 py-3.5 rounded-full text-base font-bold text-feu-green-950 bg-feu-gold-400 hover:bg-feu-gold-500 transition shadow-sm font-work">
                 Browse the Library
             </a>
         </div>

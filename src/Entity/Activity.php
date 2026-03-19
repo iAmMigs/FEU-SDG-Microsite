@@ -3,6 +3,8 @@
 namespace App\Entity;
 
 use App\Repository\ActivityRepository;
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 
@@ -33,9 +35,22 @@ class Activity
     #[ORM\Column(type: Types::DATETIME_IMMUTABLE)]
     private ?\DateTimeImmutable $createdAt = null;
 
+    /**
+     * @var Collection<int, Sdg>
+     */
+    #[ORM\ManyToMany(targetEntity: Sdg::class, inversedBy: 'activities')]
+    private Collection $sdgs;
+
+    #[ORM\Column]
+    private ?bool $isActive = null;
+
+    #[ORM\Column(nullable: true)]
+    private ?\DateTime $publishAt = null;
+
     public function __construct()
     {
         $this->createdAt = new \DateTimeImmutable();
+        $this->sdgs = new ArrayCollection();
     }
 
     // --- GETTERS & SETTERS ---
@@ -59,4 +74,52 @@ class Activity
 
     public function getCreatedAt(): ?\DateTimeImmutable { return $this->createdAt; }
     public function setCreatedAt(\DateTimeImmutable $createdAt): static { $this->createdAt = $createdAt; return $this; }
+
+    /**
+     * @return Collection<int, Sdg>
+     */
+    public function getSdgs(): Collection
+    {
+        return $this->sdgs;
+    }
+
+    public function addSdg(Sdg $sdg): static
+    {
+        if (!$this->sdgs->contains($sdg)) {
+            $this->sdgs->add($sdg);
+        }
+
+        return $this;
+    }
+
+    public function removeSdg(Sdg $sdg): static
+    {
+        $this->sdgs->removeElement($sdg);
+
+        return $this;
+    }
+
+    public function isActive(): ?bool
+    {
+        return $this->isActive;
+    }
+
+    public function setIsActive(bool $isActive): static
+    {
+        $this->isActive = $isActive;
+
+        return $this;
+    }
+
+    public function getPublishAt(): ?\DateTime
+    {
+        return $this->publishAt;
+    }
+
+    public function setPublishAt(?\DateTime $publishAt): static
+    {
+        $this->publishAt = $publishAt;
+
+        return $this;
+    }
 }

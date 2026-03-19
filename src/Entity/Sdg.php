@@ -23,9 +23,16 @@ class Sdg
     #[ORM\ManyToMany(targetEntity: Thesis::class, mappedBy: 'sdgs')]
     private Collection $theses;
 
+    /**
+     * @var Collection<int, Activity>
+     */
+    #[ORM\ManyToMany(targetEntity: Activity::class, mappedBy: 'sdgs')]
+    private Collection $activities;
+
     public function __construct()
     {
         $this->theses = new ArrayCollection();
+        $this->activities = new ArrayCollection();
     }
 
     public function __toString(): string
@@ -56,6 +63,33 @@ class Sdg
         if ($this->theses->removeElement($thesis)) {
             $thesis->removeSdg($this);
         }
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, Activity>
+     */
+    public function getActivities(): Collection
+    {
+        return $this->activities;
+    }
+
+    public function addActivity(Activity $activity): static
+    {
+        if (!$this->activities->contains($activity)) {
+            $this->activities->add($activity);
+            $activity->addSdg($this);
+        }
+
+        return $this;
+    }
+
+    public function removeActivity(Activity $activity): static
+    {
+        if ($this->activities->removeElement($activity)) {
+            $activity->removeSdg($this);
+        }
+
         return $this;
     }
 }
