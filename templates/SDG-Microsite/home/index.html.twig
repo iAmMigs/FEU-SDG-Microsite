@@ -175,8 +175,12 @@
                                 <p class="whitespace-pre-line">{{ activity.content }}</p>
                             </div>
                             
-                            <a href="#" class="text-feu-green-700 font-bold hover:text-[#FCC30B] transition flex items-center gap-1 text-sm mt-auto w-max font-work">
-                                Read Article &rarr;
+                            <a href="{{ path('app_news_show', { id: activity.id }) }}" 
+                            class="text-feu-green-800 hover:text-feu-gold-600 font-bold text-sm transition-colors flex items-center gap-1 group font-work">
+                                View Article
+                                <svg class="w-4 h-4 group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M14 5l7 7m0 0l-7 7m7-7H3"></path>
+                                </svg>
                             </a>
                         </div>
                     </article>

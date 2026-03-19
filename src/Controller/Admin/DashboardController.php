@@ -35,7 +35,7 @@ class DashboardController extends AbstractDashboardController
     public function configureDashboard(): Dashboard
     {
         return Dashboard::new()
-            ->setTitle('<div class="flex items-center gap-2"><img src="/images/Tech_Logo.png" style="max-height: 28px;"><span style="font-family: \'Montserrat\', sans-serif; font-weight: 700; letter-spacing: -0.5px; color: #166534; font-size: 1.2rem; padding-top: 2px;">Admin Console</span></div>')
+            ->setTitle('<div class="flex items-center gap-2"><img src="/images/Tech_Logo.png" style="max-height: 28px;"><span style="font-family: \'Montserrat\', sans-serif; font-weight: 700; letter-spacing: -0.5px; color: #166534; font-size: 1.2rem; padding-top: 2px;"> Admin Console</span></div>')
             ->setFaviconPath('/images/Tech_Logo.png');
     }
 
@@ -49,7 +49,7 @@ class DashboardController extends AbstractDashboardController
     {
         yield MenuItem::linkToDashboard('Dashboard Overview', 'fa fa-chart-pie');
 
-        yield MenuItem::section('Repository Management');
+        yield MenuItem::section('Thesis Library Management');
         yield MenuItem::linkTo(ThesisCrudController::class, 'Theses & Studies', 'fas fa-book-bookmark');
         yield MenuItem::linkTo(SdgCrudController::class, 'SDG Categories', 'fas fa-bullseye');
 
