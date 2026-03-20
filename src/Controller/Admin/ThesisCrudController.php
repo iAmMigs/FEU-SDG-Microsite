@@ -16,6 +16,7 @@ use EasyCorp\Bundle\EasyAdminBundle\Field\TextField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\UrlField;
 use EasyCorp\Bundle\EasyAdminBundle\Form\Type\FileUploadType;
 use Symfony\Component\Form\FormBuilderInterface;
+use Doctrine\ORM\QueryBuilder;
 
 class ThesisCrudController extends AbstractCrudController
 {
@@ -55,9 +56,12 @@ class ThesisCrudController extends AbstractCrudController
             TextField::new('authors', 'Authors'),
             TextareaField::new('description', 'Abstract')->hideOnIndex(),
             
-            AssociationField::new('sdgs', 'SDG Tags')
-                ->setFormTypeOptions(['by_reference' => false]),
-            
+            AssociationField::new('sdgs', 'Focus SDGs')
+                ->setQueryBuilder(function (QueryBuilder $qb) {
+                    return $qb->andWhere('entity.isActive = :active')
+                            ->setParameter('active', true);
+                })
+                ->setHelp('Only active SDGs currently focused by the University are available for selection.'),
             UrlField::new('publicationLink', 'External Publication Link')->setRequired(false),
             
             /*

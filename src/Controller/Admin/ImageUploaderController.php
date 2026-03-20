@@ -8,7 +8,8 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\String\Slugger\SluggerInterface;
 
-class ImageUploadController extends AbstractController
+// THE FIX: Added the "er" so it perfectly matches your filename!
+class ImageUploaderController extends AbstractController
 {
     #[Route('/admin/upload-image', name: 'admin_upload_image', methods: ['POST'])]
     public function upload(Request $request, SluggerInterface $slugger): JsonResponse
