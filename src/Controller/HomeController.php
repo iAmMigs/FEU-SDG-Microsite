@@ -17,15 +17,15 @@ final class HomeController extends AbstractController
         $latestActivities = $activityRepository->findBy([], ['eventDate' => 'DESC'], 3);
         $totalTheses = $thesisRepository->count([]);
         
-        // Fetch active SDG IDs from the database
-        $activeSdgs = $sdgRepository->findAll();
+        // CRITICAL FIX: Only fetch the active SDGs to pass their IDs to the template
+        $activeSdgs = $sdgRepository->findBy(['isActive' => true]);
         $activeSdgIds = array_map(fn($sdg) => $sdg->getId(), $activeSdgs);
 
         return $this->render('SDG-Microsite/home/index.html.twig', [
             'latest_activities' => $latestActivities,
             'total_theses' => $totalTheses,
             'active_sdg_ids' => $activeSdgIds,
-            'all_sdgs' => $this->getAllSdgsData(), // Helper method below
+            'all_sdgs' => $this->getAllSdgsData(), 
         ]);
     }
 

@@ -12,7 +12,8 @@ final class SdgController extends AbstractController
     #[Route('/sdgs', name: 'app_sdgs')]
     public function index(SdgRepository $sdgRepository): Response
     {
-        $activeSdgs = $sdgRepository->findAll();
+        // CRITICAL FIX: Only fetch the active SDGs to pass their IDs to the template
+        $activeSdgs = $sdgRepository->findBy(['isActive' => true]);
         $activeSdgIds = array_map(fn($sdg) => $sdg->getId(), $activeSdgs);
 
         return $this->render('SDG-Microsite/sdg/index.html.twig', [
@@ -20,7 +21,8 @@ final class SdgController extends AbstractController
             'all_sdgs' => $this->getAllSdgsData(), 
         ]);
     }
-private function getAllSdgsData(): array
+
+    private function getAllSdgsData(): array
     {
         return [
             ['num' => 1, 'title' => 'No Poverty', 'desc' => 'End poverty in all its forms everywhere.'],

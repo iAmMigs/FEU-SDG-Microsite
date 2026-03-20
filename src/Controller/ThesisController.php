@@ -16,20 +16,18 @@ final class ThesisController extends AbstractController
     #[Route('/library', name: 'app_library')]
     public function index(Request $request, ThesisRepository $thesisRepository, SdgRepository $sdgRepository): Response
     {
-        // 1. Get search parameters
         $searchAuthor = $request->query->get('author', '');
         $searchTitle = $request->query->get('title', '');
         $searchKeyword = $request->query->get('keyword', '');
         $selectedSdgs = $request->query->all('goals');
         $isExclusive = $request->query->getBoolean('exclusive', false);
         
-        // 2. Pagination setup
-        $page = $request->query->getInt('page', 1);
+        $page = max(1, $request->query->getInt('page', 1));
         $limit = 10;
 
-        // 3. Base Query
+        // BUG FIX: Changed 'publicationDate' to 'createdAt' to match your Entity
         $qb = $thesisRepository->createQueryBuilder('t')
-            ->orderBy('t.publicationDate', 'DESC');
+            ->orderBy('t.createdAt', 'DESC');
 
         if ($searchAuthor) {
             $qb->andWhere('t.authors LIKE :author')
@@ -48,7 +46,6 @@ final class ThesisController extends AbstractController
 
         if (!empty($selectedSdgs)) {
             if ($isExclusive) {
-                // Precision search: Must have ALL selected SDGs
                 $qb->join('t.sdgs', 's')
                    ->groupBy('t.id')
                    ->having('COUNT(s.id) = :count')
@@ -56,24 +53,22 @@ final class ThesisController extends AbstractController
                    ->setParameter('sdgs', $selectedSdgs)
                    ->setParameter('count', count($selectedSdgs));
             } else {
-                // Normal search: Has ANY of the selected SDGs
                 $qb->join('t.sdgs', 's')
                    ->andWhere('s.id IN (:sdgs)')
                    ->setParameter('sdgs', $selectedSdgs);
             }
         }
 
-        // 4. Execute Pagination
         $paginator = new Paginator($qb);
         $totalCount = count($paginator);
-        $totalPages = ceil($totalCount / $limit) ?: 1;
+        $totalPages = max(1, ceil($totalCount / $limit));
 
         $qb->setFirstResult(($page - 1) * $limit)
            ->setMaxResults($limit);
 
         $theses = $qb->getQuery()->getResult();
 
-        // 5. FETCH ONLY ACTIVE SDGs FOR THE SIDEBAR FILTER
+        // Fetches ONLY the SDGs that are toggled on in the database for the Library filter
         $activeSdgs = $sdgRepository->findBy(['isActive' => true], ['id' => 'ASC']);
 
         return $this->render('SDG-Microsite/library/index.html.twig', [
@@ -86,7 +81,7 @@ final class ThesisController extends AbstractController
             'current_page' => $page,
             'total_pages' => $totalPages,
             'total_count' => $totalCount,
-            'active_sdgs' => $activeSdgs, // Sent to template
+            'active_sdgs' => $activeSdgs,
         ]);
     }
 

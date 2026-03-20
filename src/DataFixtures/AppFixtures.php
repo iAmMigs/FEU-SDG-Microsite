@@ -12,23 +12,39 @@ class AppFixtures extends Fixture
 {
     public function load(ObjectManager $manager): void
     {
-        // 1. Define the 8 focused SDGs
+        // 1. Define ALL 17 SDGs
         $sdgData = [
+            1 => 'No Poverty',
+            2 => 'Zero Hunger',
             3 => 'Good Health and Well-Being',
             4 => 'Quality Education',
+            5 => 'Gender Equality',
+            6 => 'Clean Water and Sanitation',
             7 => 'Affordable and Clean Energy',
             8 => 'Decent Work and Economic Growth',
             9 => 'Industry, Innovation and Infrastructure',
+            10 => 'Reduced Inequalities',
             11 => 'Sustainable Cities and Communities',
             12 => 'Responsible Consumption and Production',
+            13 => 'Climate Action',
+            14 => 'Life Below Water',
+            15 => 'Life on Land',
+            16 => 'Peace, Justice and Strong Institutions',
             17 => 'Partnerships for the Goals',
         ];
+
+        // Define which SDGs are toggled "ON" by default
+        $activeSdgIds = [3, 4, 7, 8, 9, 11, 12, 17];
 
         $sdgEntities = [];
         foreach ($sdgData as $id => $name) {
             $sdg = new Sdg();
             $sdg->setId($id);
             $sdg->setName($name);
+            
+            // If the ID is in our active list, set it to true. Otherwise, false.
+            $sdg->setIsActive(in_array($id, $activeSdgIds));
+            
             $manager->persist($sdg);
             $sdgEntities[$id] = $sdg;
         }
@@ -148,7 +164,6 @@ class AppFixtures extends Fixture
                      ->setEventDate(new \DateTime($data['date']))
                      ->setCreatedAt(new \DateTimeImmutable($data['date']))
                      ->setIsActive($data['isActive'])
-                     // Default publishAt to the past so they show up by default
                      ->setPublishAt(new \DateTime($data['date']));
 
             foreach ($data['goals'] as $goalNum) {

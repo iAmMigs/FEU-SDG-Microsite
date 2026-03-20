@@ -1,7 +1,6 @@
 {# templates/SDG-Microsite/news/index.html.twig #}
 {% extends 'SDG-Microsite/base.html.twig' %}
 
-{# ADDED: Turbo Cache Control from Library #}
 {% block head %}
     {{ parent() }}
     <meta name="turbo-cache-control" content="no-cache">
@@ -19,24 +18,20 @@
         </div>
     </section>
 
-    <section class="py-12 bg-gray-50 min-h-screen">
+    {# The controller is placed here to encompass both the form and the results grid #}
+    <section class="py-12 bg-gray-50 min-h-screen" data-controller="autosubmit">
         <div class="max-w-7xl mx-auto px-8 md:px-16 lg:px-24">
             
+            {# Horizontal Filter Bar #}
             <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 mb-10 z-10 relative">
-                
-                {# 
-                   LIBRARY LOGIC APPLIED:
-                   1. data-turbo-frame="news_list"
-                   2. data-action="change->autosubmit#submit input->autosubmit#submit"
-                #}
                 <form id="filter-form" action="{{ path('app_news') }}" method="GET" 
-                      data-controller="autosubmit" 
                       data-autosubmit-target="form"
                       data-action="change->autosubmit#submit input->autosubmit#submit"
                       data-turbo-frame="news_list"
                       autocomplete="off">
                     
-                    <input type="hidden" name="page" data-autosubmit-target="page" value="{{ current_page|default(1) }}">
+                    {# Hidden page input for pagination logic #}
+                    <input type="hidden" name="page" data-autosubmit-target="page" value="{{ current_page|default(1) }}" data-max="{{ total_pages|default(1) }}">
 
                     <div class="flex flex-col lg:flex-row gap-8 items-start lg:items-center">
                         <div class="w-full lg:w-1/4 shrink-0">
@@ -52,17 +47,15 @@
                         <div class="w-full lg:w-3/4">
                             <label class="block text-xs font-bold text-gray-400 mb-2 font-work uppercase tracking-widest">Filter by Goal</label>
                             <div class="flex flex-wrap gap-3">
-                                {# LOOP THROUGH THE DATABASE ENTITIES INSTEAD OF HARDCODED ARRAY #}
                                 {% for sdg in all_sdgs %}
                                     {% set formatted_num = '%02d'|format(sdg.id) %}
                                     
-                                    <label class="cursor-pointer relative block w-14 h-14 rounded-md overflow-hidden shadow-sm hover:shadow-md transition group border border-gray-100 bg-white shrink-0">
-                                        
-                                        <input type="checkbox" name="goals[]" value="{{ sdg.id }}" class="peer sr-only" 
-                                            {% if selected_goals is defined and sdg.id ~ '' in selected_goals %}checked{% endif %}>
+                                    {# Library Style Filter: Inverted vs Normal Images #}
+                                    <label for="sdg-filter-{{ sdg.id }}" class="cursor-pointer relative block w-14 h-14 rounded-md overflow-hidden shadow-sm hover:shadow-md transition group border border-gray-100 bg-white shrink-0">
+                                        <input type="checkbox" id="sdg-filter-{{ sdg.id }}" name="goals[]" value="{{ sdg.id }}" class="peer sr-only" 
+                                               {% if selected_goals is defined and sdg.id ~ '' in selected_goals %}checked{% endif %}>
                                         
                                         <img src="{{ asset('images/sdg/E Inverted Icons_WEB-' ~ formatted_num ~ '.png') }}" alt="Goal {{ sdg.id }}" class="absolute inset-0 w-full h-full object-cover transition-opacity duration-300 opacity-100 peer-checked:opacity-0 group-hover:opacity-75">
-                                        
                                         <img src="{{ asset('images/sdg/E-WEB-Goal-' ~ formatted_num ~ '.png') }}" alt="Goal {{ sdg.id }}" class="absolute inset-0 w-full h-full object-cover transition-opacity duration-300 opacity-0 peer-checked:opacity-100">
                                         
                                         <div class="absolute inset-0 border-2 border-feu-green-700 rounded-md opacity-0 peer-checked:opacity-100 transition-opacity pointer-events-none"></div>
@@ -74,31 +67,58 @@
                 </form>
             </div>
 
-            <turbo-frame id="news_list">
+            {# We keep the frame ID distinct for routing #}
+            <turbo-frame id="news_list" class="group/frame">
                 
-                {# LIBRARY LOGIC: The Skeleton Loader #}
+                <div class="flex flex-col sm:flex-row justify-between items-center mb-8 pb-4 border-b border-gray-200 gap-4">
+                    <p class="text-gray-600 font-medium font-work">Showing <span class="font-bold text-feu-green-900">{{ total_count|default(0) }}</span> activities found.</p>
+
+                    {% if total_pages > 1 %}
+                    <div class="flex items-center gap-2 text-sm font-work text-gray-700 bg-white px-3 py-1.5 rounded-xl border border-gray-200 shadow-sm">
+                        <button type="button" data-action="click->autosubmit#prevPage" class="p-1 text-gray-400 hover:text-feu-green-700 transition {% if current_page <= 1 %}opacity-30 cursor-not-allowed pointer-events-none{% endif %}">
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path></svg>
+                        </button>
+                        <span class="font-bold text-feu-green-900 mx-2">Page {{ current_page }} of {{ total_pages }}</span>
+                        <button type="button" data-action="click->autosubmit#nextPage" class="p-1 text-gray-400 hover:text-feu-green-700 transition {% if current_page >= total_pages %}opacity-30 cursor-not-allowed pointer-events-none{% endif %}">
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg>
+                        </button>
+                    </div>
+                    {% endif %}
+                </div>
+
+                {# 
+                   THE FIX: We use inline styles to mimic exactly what your app.css does for the Library.
+                   When the turbo-frame gets the 'busy' attribute (which Turbo applies automatically during a fetch), 
+                   it forces the skeleton to display and hides the results! 
+                #}
+                <style>
+                    turbo-frame[busy] #news-skeleton { display: flex !important; }
+                    turbo-frame[busy] #news-results { display: none !important; }
+                </style>
+
+                {# SKELETON LOADER (Hidden by default, shown by the CSS above when busy) #}
                 <div id="news-skeleton" class="hidden flex-wrap justify-center gap-8 mb-8">
                     {% for i in 1..3 %}
-                        <article class="w-full sm:w-[calc(50%-1rem)] lg:w-[calc(33.333%-1.34rem)] bg-white rounded-3xl shadow-sm border border-gray-100 overflow-hidden flex flex-col max-w-md h-[28rem] animate-pulse">
-                            <div class="h-64 bg-gray-200 shrink-0"></div>
-                            <div class="p-8 flex flex-col flex-grow gap-4">
+                        <article class="w-full sm:w-[calc(50%-1rem)] lg:w-[calc(33.333%-1.34rem)] bg-white rounded-3xl shadow-sm border border-gray-100 overflow-hidden flex flex-col max-w-md animate-pulse">
+                            <div class="h-64 bg-gray-200"></div>
+                            <div class="p-8 flex flex-col gap-4">
                                 <div class="flex gap-2">
-                                    <div class="h-5 bg-gray-200 rounded-full w-16"></div>
-                                    <div class="h-5 bg-gray-200 rounded w-16"></div>
+                                    <div class="h-4 bg-gray-200 rounded w-16"></div>
+                                    <div class="h-4 bg-gray-200 rounded w-12"></div>
                                 </div>
-                                <div class="h-6 bg-gray-200 rounded w-full mt-2"></div>
-                                <div class="h-6 bg-gray-200 rounded w-3/4"></div>
-                                <div class="h-10 bg-gray-200 rounded w-full mt-auto"></div>
+                                <div class="h-6 bg-gray-200 rounded w-full"></div>
+                                <div class="h-4 bg-gray-200 rounded w-5/6"></div>
+                                <div class="h-4 bg-gray-200 rounded w-4/6"></div>
+                                <div class="h-10 bg-gray-200 rounded w-full mt-4"></div>
                             </div>
                         </article>
                     {% endfor %}
                 </div>
 
-                {# LIBRARY LOGIC: The Dynamic Results #}
+                {# RESULTS GRID (Shown by default, hidden by the CSS above when busy) #}
                 <div id="news-results" class="flex flex-wrap justify-center gap-8">
                     {% for activity in activities %}
                         <article class="w-full sm:w-[calc(50%-1rem)] lg:w-[calc(33.333%-1.34rem)] bg-white rounded-3xl shadow-sm border border-gray-100 overflow-hidden flex flex-col hover:shadow-xl hover:-translate-y-1 transition-all duration-300 group max-w-md">
-                            
                             <div class="h-64 relative bg-gray-100 overflow-hidden shrink-0">
                                 {% if activity.image %}
                                     <img src="{{ asset('uploads/activities/' ~ activity.image) }}" alt="{{ activity.title }}" class="absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition-transform duration-700">
@@ -112,7 +132,6 @@
                                     <span class="bg-feu-green-900 text-white text-[10px] font-bold px-3 py-1 rounded-full uppercase tracking-widest shadow-sm">
                                         {{ activity.category }}
                                     </span>
-                                    
                                     {% for sdg in activity.sdgs %}
                                         <span class="bg-gray-100 text-gray-600 text-[10px] font-bold px-2 py-1 rounded-md border border-gray-200 font-work uppercase">
                                             SDG {{ sdg.id }}
@@ -146,6 +165,7 @@
                         </div>
                     {% endfor %}
                 </div>
+
             </turbo-frame>
         </div>
     </section>
