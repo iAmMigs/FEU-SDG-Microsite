@@ -115,7 +115,7 @@ class ActivityCrudController extends AbstractCrudController
                 ->hideOnIndex(),
             DateTimeField::new('eventDate', 'Event Date')->setFormat('yyyy-MM-dd HH:mm'),
             AssociationField::new('sdgs', 'Tag SDGs')->setFormTypeOptions(['by_reference' => false]),
-            BooleanField::new('isActive', 'Live on Website?'),
+            BooleanField::new('isActive', 'Active'),
             DateTimeField::new('publishAt', 'Schedule Release')
                 ->hideOnIndex()
                 ->setHelp('Leave blank to publish now. Set a future date to auto-release later.'),

@@ -32,7 +32,6 @@ class ImageUploadController extends AbstractController
             return new JsonResponse(['error' => 'Failed to save file'], 500);
         }
 
-        // getBasePath() prevents 404 errors if the app is hosted in a sub-directory
         $basePath = $request->getBasePath();
         
         return new JsonResponse([

@@ -58,7 +58,7 @@
             <div data-modal-target="backdrop" class="fixed inset-0 z-[100] hidden opacity-0 transition-opacity duration-300 flex items-center justify-center p-4 md:p-6">
                 <div class="absolute inset-0 bg-black/60 backdrop-blur-md cursor-pointer" data-action="click->modal#close"></div>
                 
-                <div data-modal-target="panel" class="relative bg-white rounded-3xl overflow-hidden shadow-2xl w-full max-w-4xl flex flex-col md:flex-row transform opacity-0 scale-95 translate-y-4 transition-all duration-300 ease-out z-10">
+                <div data-modal-target="panel" class="relative bg-white rounded-3xl overflow-hidden shadow-2xl w-full max-w-4xl flex flex-col md:flex-row transform opacity-0 scale-95 translate-y-4 transition-all duration-300 ease-out z-10 mt-20">
                     <button type="button" data-action="click->modal#close" class="absolute top-4 right-4 z-20 bg-white/50 hover:bg-white backdrop-blur-sm text-gray-900 p-2 rounded-full transition duration-200 shadow-sm focus:outline-none cursor-pointer">
                         <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
                     </button>
@@ -81,14 +81,17 @@
                         <div class="mt-10 pt-8 border-t border-gray-100 flex flex-col gap-3 text-center">
                             <h4 data-modal-target="actionPrompt" class="text-sm font-bold text-gray-400 uppercase tracking-widest font-work mb-4">Which would you like to visit?</h4>
                             
-                            <div data-modal-target="buttonsContainer" class="flex flex-col gap-3">
-                                <a href="#" data-modal-target="libraryBtn" class="block w-full text-center bg-feu-green-900 text-white font-bold px-6 py-4 rounded-xl hover:bg-feu-green-800 transition duration-300 font-work shadow-md">
-                                    SDG Related Research Library
-                                </a>
-                                <a href="#" data-modal-target="activityBtn" class="block w-full text-center bg-feu-gold-400 text-feu-green-900 font-bold px-6 py-4 rounded-xl hover:bg-feu-gold-500 transition duration-300 font-work shadow-md">
-                                    SDG Related Activities
-                                </a>
-                            </div>
+                            {# templates/SDG-Microsite/sdg/index.html.twig #}
+
+                        <div data-modal-target="buttonsContainer" class="flex flex-col gap-3">
+                            <a href="#" data-modal-target="libraryBtn" class="block w-full text-center bg-feu-gold-400 text-feu-green-900 font-bold px-6 py-4 rounded-xl hover:bg-feu-gold-500 transition duration-300 font-work shadow-md">
+                                SDG Related Research Library
+                            </a>
+
+                            <a href="#" data-modal-target="activityBtn" class="block w-full text-center bg-feu-green-900 text-white font-bold px-6 py-4 rounded-xl hover:bg-feu-green-800 transition duration-300 font-work shadow-md">
+                                SDG Related Activities
+                            </a>
+                        </div>
                         </div>
                     </div>
                 </div>

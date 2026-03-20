@@ -19,17 +19,18 @@ export default class extends Controller {
         this.imageTarget.src = button.dataset.image;
         this.imageTarget.alt = `SDG ${goalNum} Web Goal`;
 
-        // 3. Handle Active vs Inactive State using robust inline styles
+        // 3. Handle Active vs Inactive State
         if (isActive) {
-            // Show prompt and buttons
             this.actionPromptTarget.textContent = 'Which would you like to visit?';
             this.buttonsContainerTarget.style.display = 'flex';
             
-            // Link setup (Ready for functionality)
-            this.libraryBtnTarget.href = `/library?goals[]=${goalNum}`;
+            // --- THE REDIRECT LOGIC ---
+            // If your library route is /library or /thesis, make sure this matches
+            this.libraryBtnTarget.href = `/library?goals[]=${goalNum}`; 
+            
+            // This safely directs to the News Controller and applies the checkbox filter
             this.activityBtnTarget.href = `/news?goals[]=${goalNum}`;
         } else {
-            // Change text and forcefully hide the buttons container
             this.actionPromptTarget.textContent = 'SDG is currently not actively focused.';
             this.buttonsContainerTarget.style.display = 'none';
         }

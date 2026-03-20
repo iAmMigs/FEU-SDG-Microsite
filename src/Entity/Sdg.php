@@ -29,6 +29,9 @@ class Sdg
     #[ORM\ManyToMany(targetEntity: Activity::class, mappedBy: 'sdgs')]
     private Collection $activities;
 
+    #[ORM\Column(type: 'boolean')]
+    private ?bool $isActive = false;
+
     public function __construct()
     {
         $this->theses = new ArrayCollection();
@@ -89,6 +92,18 @@ class Sdg
         if ($this->activities->removeElement($activity)) {
             $activity->removeSdg($this);
         }
+
+        return $this;
+    }
+
+    public function isActive(): ?bool
+    {
+        return $this->isActive;
+    }
+
+    public function setIsActive(bool $isActive): static
+    {
+        $this->isActive = $isActive;
 
         return $this;
     }
