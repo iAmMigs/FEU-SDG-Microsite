@@ -69,7 +69,7 @@ class ActivityCrudController extends AbstractCrudController
                                 menubar: false, statusbar: true, branding: false, promotion: false,
                                 skin: (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'oxide-dark' : 'oxide'),
                                 content_css: (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'default'),
-                                image_class_list: [{title: 'Responsive', value: 'w-full h-auto rounded-2xl shadow-lg my-10 block mx-auto'}],
+                                image_class_list: [{title: 'Responsive', value: 'max-w-full h-auto rounded-2xl shadow-lg my-4'}],
                                 setup: function (editor) {
                                     editor.on('change keyup', function () { editor.save(); });
                                 }

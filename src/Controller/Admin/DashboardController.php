@@ -122,6 +122,7 @@ class DashboardController extends AbstractDashboardController
         yield MenuItem::linkTo(ThesisCrudController::class, 'Theses & Studies', 'fas fa-book-bookmark');
         yield MenuItem::linkTo(SdgCrudController::class, 'SDG Categories', 'fas fa-bullseye');
         yield MenuItem::linkTo(ActivityCrudController::class, 'Activities & Events', 'fas fa-newspaper');
+        yield MenuItem::linkTo(LeadingVoiceCrudController::class, 'Leading Voices', 'fas fa-users');
 
         yield MenuItem::section('Audiit Logs');
 

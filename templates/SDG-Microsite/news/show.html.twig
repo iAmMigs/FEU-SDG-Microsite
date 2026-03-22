@@ -71,14 +71,37 @@
                     {{ activity.title }}
                 </h1>
                 
-                {# Article Content Workspace #}
-                <div class="prose prose-lg lg:prose-xl max-w-none text-gray-800 font-work leading-relaxed
-                            prose-headings:font-bebas prose-headings:tracking-wide prose-headings:text-feu-green-950
-                            prose-img:rounded-3xl prose-img:shadow-2xl prose-img:border prose-img:border-gray-100 prose-img:my-12
-                            prose-a:text-feu-green-700 prose-a:no-underline hover:prose-a:underline prose-strong:text-black">
+                <style>
+                    /* Explicit overrides to restore TinyMCE HTML tags stripped by Tailwind */
+                    .article-content h1 { font-size: 2.5rem; font-weight: 700; margin-top: 2.5rem; margin-bottom: 1rem; font-family: 'Bebas Neue', sans-serif; color: #022c22; line-height: 1.1; letter-spacing: 0.025em; }
+                    .article-content h2 { font-size: 2rem; font-weight: 700; margin-top: 2rem; margin-bottom: 1rem; font-family: 'Bebas Neue', sans-serif; color: #022c22; line-height: 1.2; letter-spacing: 0.025em; }
+                    .article-content h3 { font-size: 1.75rem; font-weight: 700; margin-top: 1.75rem; margin-bottom: 1rem; font-family: 'Bebas Neue', sans-serif; color: #022c22; line-height: 1.3; }
+                    .article-content h4 { font-size: 1.5rem; font-weight: 700; margin-top: 1.5rem; margin-bottom: 1rem; font-family: 'Bebas Neue', sans-serif; color: #022c22; }
+                    .article-content h5 { font-size: 1.25rem; font-weight: 700; margin-top: 1rem; margin-bottom: 0.5rem; }
+                    .article-content ul { list-style-type: disc; padding-left: 1.5rem; margin-bottom: 1.5rem; }
+                    .article-content ol { list-style-type: decimal; padding-left: 1.5rem; margin-bottom: 1.5rem; }
+                    .article-content li { margin-bottom: 0.5rem; }
+                    .article-content p { margin-bottom: 1.5rem; }
+                    .article-content strong { color: #000; font-weight: 700; }
+                    .article-content a { color: #16a34a; text-decoration: underline; transition: color 0.2s; }
+                    .article-content a:hover { color: #15803d; }
+                    .article-content blockquote { border-left: 4px solid #166534; padding: 1.25rem; font-style: italic; color: #4b5563; margin: 2rem 0; background: #f0fdf4; border-radius: 0 0.5rem 0.5rem 0; }
                     
+                    /* Image Resizing Fix: max-w-full prevents overflow, while inline height:auto respects TinyMCE dimensions */
+                    .article-content img { 
+                        max-width: 100%; 
+                        height: auto !important; 
+                        border-radius: 1.5rem; 
+                        box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04); 
+                        border: 1px solid #f3f4f6; 
+                        margin-top: 2rem; 
+                        margin-bottom: 2rem; 
+                        display: inline-block; 
+                    }
+                </style>
+
+                <div class="article-content text-lg lg:text-xl text-gray-800 font-work leading-relaxed">
                     {{ activity.content|raw }}
-                    
                 </div>
             </div>
             
