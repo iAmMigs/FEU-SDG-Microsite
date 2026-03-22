@@ -41,19 +41,18 @@ class DashboardController extends AbstractDashboardController
 
     public function configureAssets(): Assets
     {
+        // THE FIX: Removed the "assets/" prefix so AssetMapper can correctly locate it.
         return Assets::new()
-            ->addCssFile('assets/styles/admin.css');
+            ->addCssFile('styles/admin.css');
     }
 
     public function configureMenuItems(): iterable
     {
         yield MenuItem::linkToDashboard('Dashboard Overview', 'fa fa-chart-pie');
 
-        yield MenuItem::section('Thesis Library Management');
+        yield MenuItem::section('Data Management');
         yield MenuItem::linkTo(ThesisCrudController::class, 'Theses & Studies', 'fas fa-book-bookmark');
         yield MenuItem::linkTo(SdgCrudController::class, 'SDG Categories', 'fas fa-bullseye');
-
-        yield MenuItem::section('News & Media');
         yield MenuItem::linkTo(ActivityCrudController::class, 'Activities & Events', 'fas fa-newspaper');
 
         yield MenuItem::section('Audiit Logs');
