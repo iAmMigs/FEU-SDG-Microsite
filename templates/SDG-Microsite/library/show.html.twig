@@ -60,7 +60,7 @@
 
                 {# 2. TURBO-PROOF CITATION GENERATION #}
                 {% set pubYear = thesis.createdAt|date('Y') %}
-                {% set currentUrl = url('app_thesis_show', {id: thesis.id}) %}
+                {% set currentUrl = url('app_library_show', {id: thesis.id}) %}
                 
                 {% set cite_apa = thesis.authors ~ ' (' ~ pubYear ~ '). ' ~ thesis.title ~ '. FEU SDG Microsite. ' ~ currentUrl %}
                 {% set cite_ieee = thesis.authors ~ ', "' ~ thesis.title ~ '," FEU SDG Microsite, ' ~ pubYear ~ '. [Online]. Available: ' ~ currentUrl %}

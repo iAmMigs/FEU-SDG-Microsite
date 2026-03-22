@@ -31,7 +31,7 @@
             <p class="text-gray-600 max-w-2xl mx-auto font-work">FEU aligns its academic research, student theses, and institutional projects specifically toward these key Sustainable Development Goals.</p>
         </div>
 
-        <div data-controller="modal" class="max-w-7xl mx-auto relative z-10">
+        <div data-controller="modal" class="max-w-7xl mx-auto">
             
             <div class="flex justify-center mb-10">
                 <div class="bg-gray-200 p-1 rounded-full flex gap-1 shadow-inner relative z-20">
@@ -119,7 +119,6 @@
                     const btnFocused = document.getElementById('btn-focused-sdgs');
                     const cards = document.querySelectorAll('.sdg-card');
 
-                    // Adjust button styling to show active selection
                     if (mode === 'all') {
                         btnAll.className = "px-6 py-2 rounded-full text-sm font-bold font-work transition-all duration-300 bg-feu-green-900 text-white shadow-md cursor-pointer";
                         btnFocused.className = "px-6 py-2 rounded-full text-sm font-bold font-work transition-all duration-300 bg-gray-200 text-gray-600 hover:bg-gray-300 cursor-pointer";
@@ -128,7 +127,6 @@
                         btnAll.className = "px-6 py-2 rounded-full text-sm font-bold font-work transition-all duration-300 bg-gray-200 text-gray-600 hover:bg-gray-300 cursor-pointer";
                     }
 
-                    // Process display and smooth transition properties
                     cards.forEach(card => {
                         const isActive = card.dataset.active === 'true';
                         const shouldShow = mode === 'all' || isActive;
@@ -207,7 +205,11 @@
                 </a>
             </div>
             <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
-                {% for activity in latest_activities %}
+                
+                {# 
+                 * Limits the loop to a maximum of 3 items using the slice filter.
+                 #}
+                {% for activity in latest_activities|slice(0, 3) %}
                     <article class="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden flex flex-col hover:shadow-xl transition duration-300 group">
                         <div class="h-56 relative bg-gray-100 overflow-hidden shrink-0">
                             {% if activity.image %}
@@ -216,21 +218,30 @@
                                 <img src="{{ asset('images/hero-3.jpg') }}" alt="FEU Event" class="absolute inset-0 w-full h-full object-cover opacity-90 group-hover:scale-105 transition duration-500">
                             {% endif %}
                         </div>
+  
                         <div class="p-8 flex flex-col flex-grow">
                             <div class="flex items-center gap-3 mb-4">
                                 <span class="bg-feu-green-100 text-feu-green-800 text-[10px] font-bold px-3 py-1 rounded-full uppercase tracking-widest">{{ activity.category }}</span>
                                 <span class="text-gray-400 text-xs font-medium">{{ activity.eventDate|date('M j, Y') }}</span>
                             </div>
-                            <h3 class="text-2xl font-bold text-gray-900 mb-3 group-hover:text-feu-green-700 transition font-bebas tracking-wide">
+                            
+                            {# Added line-clamp-2 here to prevent extra-long titles from breaking the card layout #}
+                            <h3 class="text-2xl font-bold text-gray-900 mb-3 group-hover:text-feu-green-700 transition font-bebas tracking-wide line-clamp-2">
                                 <a href="#">{{ activity.title }}</a>
                             </h3>
+                            
                             <div class="text-gray-600 text-sm leading-relaxed mb-6 line-clamp-2 font-work max-w-none">
-                                <p class="whitespace-pre-line">{{ activity.content }}</p>
+                                <p class="whitespace-pre-line">{{ activity.content|striptags }}</p>
                             </div>
-                            <a href="{{ path('app_news_show', { id: activity.id }) }}" class="text-feu-green-800 hover:text-feu-gold-600 font-bold text-sm transition-colors flex items-center gap-1 group font-work">
+                            
+                            {# 
+                             * Added mt-auto here. It forces the link to dynamically align 
+                             * at the very bottom of the flex container, fixing the unequal button placement.
+                             #}
+                            <a href="{{ path('app_news_show', { id: activity.id }) }}" class="mt-auto text-feu-green-800 hover:text-feu-gold-600 font-bold text-sm transition-colors flex items-center gap-1 group font-work">
                                 View Article
                                 <svg class="w-4 h-4 group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M14 5l7 7m0 0l-7 7m7-7H3"></path></svg>
-                            </a>
+                             </a>
                         </div>
                     </article>
                 {% else %}

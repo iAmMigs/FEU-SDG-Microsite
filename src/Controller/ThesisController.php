@@ -5,6 +5,7 @@ namespace App\Controller;
 use App\Entity\Thesis;
 use App\Repository\ThesisRepository;
 use App\Repository\SdgRepository;
+use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\Tools\Pagination\Paginator;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
@@ -25,32 +26,34 @@ final class ThesisController extends AbstractController
         $page = max(1, $request->query->getInt('page', 1));
         $limit = 10;
 
-        // BUG FIX: Changed 'publicationDate' to 'createdAt' to match your Entity
+        // ONLY FETCH ACTIVE THESES
         $qb = $thesisRepository->createQueryBuilder('t')
+            ->where('t.isActive = :active')
+            ->setParameter('active', true)
             ->orderBy('t.createdAt', 'DESC');
 
         if ($searchAuthor) {
             $qb->andWhere('t.authors LIKE :author')
                ->setParameter('author', '%' . $searchAuthor . '%');
         }
-
         if ($searchTitle) {
             $qb->andWhere('t.title LIKE :title')
                ->setParameter('title', '%' . $searchTitle . '%');
         }
-
         if ($searchKeyword) {
-            $qb->andWhere('t.description LIKE :keyword')
+            $qb->andWhere('t.description LIKE :keyword OR t.title LIKE :keyword OR t.authors LIKE :keyword')
                ->setParameter('keyword', '%' . $searchKeyword . '%');
         }
 
         if (!empty($selectedSdgs)) {
             if ($isExclusive) {
-                $qb->join('t.sdgs', 's')
-                   ->groupBy('t.id')
-                   ->having('COUNT(s.id) = :count')
-                   ->andWhere('s.id IN (:sdgs)')
-                   ->setParameter('sdgs', $selectedSdgs)
+                foreach ($selectedSdgs as $index => $sdgId) {
+                    $alias = 's' . $index;
+                    $qb->join('t.sdgs', $alias)
+                       ->andWhere($alias . '.id = :sdg' . $index)
+                       ->setParameter('sdg' . $index, $sdgId);
+                }
+                $qb->andWhere('SIZE(t.sdgs) = :count')
                    ->setParameter('count', count($selectedSdgs));
             } else {
                 $qb->join('t.sdgs', 's')
@@ -85,9 +88,18 @@ final class ThesisController extends AbstractController
         ]);
     }
 
-    #[Route('/library/thesis/{id}', name: 'app_thesis_show')]
-    public function show(Thesis $thesis): Response
+    #[Route('/library/thesis/{id}', name: 'app_library_show')]
+    public function show(Thesis $thesis, EntityManagerInterface $em): Response
     {
+        // Block direct URL access if the thesis is hidden
+        if (!$thesis->isActive()) {
+            throw $this->createNotFoundException('This thesis is no longer available.');
+        }
+
+        // Increment the view counter directly
+        $thesis->incrementViews();
+        $em->flush();
+
         return $this->render('SDG-Microsite/library/show.html.twig', [
             'thesis' => $thesis,
         ]);

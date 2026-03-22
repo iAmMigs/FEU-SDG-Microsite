@@ -1,23 +1,22 @@
 {% extends '@EasyAdmin/page/content.html.twig' %}
 
-{# Fixed block names for EasyAdmin 5 #}
 {% block content_title %}System Overview{% endblock %}
 
 {% block main %}
     <div class="row">
         <div class="col-lg-6 col-md-6 col-sm-12 mb-4">
-            <div class="card shadow-sm border-0" style="background-color: #166534; color: white; border-radius: 12px;">
+            <div class="card shadow-sm border-0 stat-card-primary" style="border-radius: 12px;">
                 <div class="card-body p-4">
                     <div class="d-flex justify-content-between align-items-center">
                         <div>
-                            <h6 class="text-uppercase mb-2" style="color: #A7F3D0; font-weight: bold; letter-spacing: 1px;">Total Published Theses</h6>
-                            <h2 class="display-4 fw-bold mb-0 text-white">{{ theses_count }}</h2>
+                            <h6 class="text-uppercase mb-2 stat-title" style="font-weight: bold; letter-spacing: 1px;">Total Published Theses</h6>
+                            <h2 class="display-4 fw-bold mb-0 stat-value">{{ theses_count }}</h2>
                         </div>
                         <i class="fas fa-book fa-3x" style="opacity: 0.3;"></i>
                     </div>
                 </div>
-                <div class="card-footer" style="background-color: rgba(0,0,0,0.15); border-top: none; border-radius: 0 0 12px 12px;">
-                    <a href="{{ ea_url().setController('App\\Controller\\Admin\\ThesisCrudController').generateUrl() }}" class="text-white text-decoration-none d-flex justify-content-between align-items-center stretched-link">
+                <div class="card-footer stat-footer" style="border-top: none; border-radius: 0 0 12px 12px;">
+                    <a href="{{ ea_url().setController('App\\Controller\\Admin\\ThesisCrudController').generateUrl() }}" class="text-decoration-none d-flex justify-content-between align-items-center stretched-link stat-link">
                         <span style="font-weight: 500;">Manage Projects</span>
                         <i class="fas fa-arrow-right"></i>
                     </a>
@@ -26,18 +25,18 @@
         </div>
 
         <div class="col-lg-6 col-md-6 col-sm-12 mb-4">
-            <div class="card shadow-sm border-0" style="background-color: #FCC30B; color: #1e293b; border-radius: 12px;">
+            <div class="card shadow-sm border-0 stat-card-warning" style="border-radius: 12px;">
                 <div class="card-body p-4">
                     <div class="d-flex justify-content-between align-items-center">
                         <div>
-                            <h6 class="text-uppercase mb-2" style="color: #854d0e; font-weight: bold; letter-spacing: 1px;">News & Activities</h6>
-                            <h2 class="display-4 fw-bold mb-0 text-dark">{{ activities_count }}</h2>
+                            <h6 class="text-uppercase mb-2 stat-title" style="font-weight: bold; letter-spacing: 1px;">News & Activities</h6>
+                            <h2 class="display-4 fw-bold mb-0 stat-value">{{ activities_count }}</h2>
                         </div>
                         <i class="fas fa-newspaper fa-3x" style="opacity: 0.3;"></i>
                     </div>
                 </div>
-                <div class="card-footer" style="background-color: rgba(0,0,0,0.05); border-top: none; border-radius: 0 0 12px 12px;">
-                    <a href="{{ ea_url().setController('App\\Controller\\Admin\\ActivityCrudController').generateUrl() }}" class="text-dark text-decoration-none d-flex justify-content-between align-items-center stretched-link">
+                <div class="card-footer stat-footer" style="border-top: none; border-radius: 0 0 12px 12px;">
+                    <a href="{{ ea_url().setController('App\\Controller\\Admin\\ActivityCrudController').generateUrl() }}" class="text-decoration-none d-flex justify-content-between align-items-center stretched-link stat-link">
                         <span style="font-weight: 600;">Manage Content</span>
                         <i class="fas fa-arrow-right"></i>
                     </a>
@@ -46,4 +45,136 @@
         </div>
     </div>
 
+    <div class="row mt-2">
+        
+        <div class="col-lg-6 mb-4">
+            <div class="card shadow-sm border-0 h-100" style="border-radius: 12px;">
+                <div class="card-header bg-transparent border-0 pt-4 pb-0">
+                    <h6 class="fw-bold mb-0 text-secondary text-uppercase" style="letter-spacing: 1px;">Thesis Submissions (Last 6 Months)</h6>
+                </div>
+                <div class="card-body">
+                    <div style="height: 300px;">
+                        <canvas id="submissionsChart"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-lg-6 mb-4">
+            <div class="card shadow-sm border-0 h-100" style="border-radius: 12px;">
+                <div class="card-header bg-transparent border-0 pt-4 pb-0 d-flex justify-content-between align-items-center flex-wrap gap-2">
+                    <h6 class="fw-bold mb-0 text-secondary text-uppercase" style="letter-spacing: 1px;">Top 10 Most Viewed</h6>
+                    
+                    <select class="form-select form-select-sm w-auto shadow-sm" onchange="window.location.href='?sdg=' + this.value" style="min-width: 150px; cursor: pointer;">
+                        <option value="">All SDGs</option>
+                        {% for sdg in sdgs %}
+                            <option value="{{ sdg.id }}" {% if selected_sdg == sdg.id %}selected{% endif %}>
+                                SDG {{ sdg.id }}: {{ sdg.name }}
+                            </option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="card-body">
+                    <div style="height: 300px;">
+                        <canvas id="viewsChart"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            
+            // Set global fonts to match the dashboard
+            Chart.defaults.font.family = "'Montserrat', sans-serif";
+            // Uses a slate-400 color that is perfectly readable in both Light and Dark modes
+            Chart.defaults.color = '#94a3b8'; 
+
+            // -------------------------------------------------------------
+            // 1. Line Chart: Submissions
+            // -------------------------------------------------------------
+            const ctxSubmissions = document.getElementById('submissionsChart').getContext('2d');
+            new Chart(ctxSubmissions, {
+                type: 'line',
+                data: {
+                    labels: {{ chart_months_labels|raw }},
+                    datasets: [{
+                        label: 'Submitted Theses',
+                        data: {{ chart_months_data|raw }},
+                        borderColor: '#10b981',       // Softer Green for visibility
+                        backgroundColor: 'rgba(16, 185, 129, 0.1)',
+                        borderWidth: 3,
+                        pointBackgroundColor: '#fbbf24', // Softer Gold
+                        pointBorderColor: '#fff',
+                        pointHoverBackgroundColor: '#fff',
+                        pointHoverBorderColor: '#fbbf24',
+                        pointRadius: 5,
+                        pointHoverRadius: 7,
+                        fill: true,
+                        tension: 0.3
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { display: false }
+                    },
+                    scales: {
+                        x: {
+                            grid: { color: 'rgba(148, 163, 184, 0.1)' }
+                        },
+                        y: {
+                            beginAtZero: true,
+                            ticks: { precision: 0 },
+                            grid: { color: 'rgba(148, 163, 184, 0.1)' }
+                        }
+                    }
+                }
+            });
+
+            // -------------------------------------------------------------
+            // 2. Bar Chart: Top Views
+            // -------------------------------------------------------------
+            const ctxViews = document.getElementById('viewsChart').getContext('2d');
+            new Chart(ctxViews, {
+                type: 'bar',
+                data: {
+                    labels: {{ chart_top_labels|raw }},
+                    datasets: [{
+                        label: 'Total Views',
+                        data: {{ chart_top_data|raw }},
+                        backgroundColor: '#fbbf24', // Softer Gold
+                        borderRadius: 4,
+                        hoverBackgroundColor: '#f59e0b'
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    indexAxis: 'y',
+                    plugins: {
+                        legend: { display: false }
+                    },
+                    scales: {
+                        x: {
+                            beginAtZero: true,
+                            ticks: { precision: 0 },
+                            grid: { color: 'rgba(148, 163, 184, 0.1)' }
+                        },
+                        y: {
+                            grid: { display: false },
+                            ticks: {
+                                font: { size: 11 }
+                            }
+                        }
+                    }
+                }
+            });
+
+        });
+    </script>
 {% endblock %}

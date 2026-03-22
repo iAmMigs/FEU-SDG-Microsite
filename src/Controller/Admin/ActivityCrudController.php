@@ -4,6 +4,7 @@ namespace App\Controller\Admin;
 
 use App\Entity\Activity;
 use EasyCorp\Bundle\EasyAdminBundle\Config\Assets;
+use EasyCorp\Bundle\EasyAdminBundle\Config\Crud;
 use EasyCorp\Bundle\EasyAdminBundle\Controller\AbstractCrudController;
 use EasyCorp\Bundle\EasyAdminBundle\Field\AssociationField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\BooleanField;
@@ -20,6 +21,13 @@ class ActivityCrudController extends AbstractCrudController
     public static function getEntityFqcn(): string
     {
         return Activity::class;
+    }
+
+    public function configureCrud(Crud $crud): Crud
+    {
+        return $crud
+            ->setPaginatorPageSize(20)
+            ->setDefaultSort(['createdAt' => 'DESC']);
     }
 
     public function configureAssets(Assets $assets): Assets

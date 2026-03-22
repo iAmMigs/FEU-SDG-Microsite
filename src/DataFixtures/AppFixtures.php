@@ -41,107 +41,132 @@ class AppFixtures extends Fixture
             $sdg = new Sdg();
             $sdg->setId($id);
             $sdg->setName($name);
-            
-            // If the ID is in our active list, set it to true. Otherwise, false.
             $sdg->setIsActive(in_array($id, $activeSdgIds));
             
             $manager->persist($sdg);
             $sdgEntities[$id] = $sdg;
         }
 
-        $loremIpsum = "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.\n\nDuis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.";
+        // We only use active SDGs to attach to our dummy data
+        $sdgs = array_values(array_filter($sdgEntities, fn($s) => $s->isActive()));
 
-        // 2. Theses Data
-        $thesesData = [
-            [
-                'title' => 'Incer-Eco Tech: Waste-to-Energy Incinerator',
-                'description' => $loremIpsum,
-                'authors' => 'Engr. Jose Florenz Somigao, Rome Arist Mendoza',
-                'views' => 1405,
-                'goals' => [7, 11, 12]
-            ],
-            [
-                'title' => 'Impact of AI-Assisted Tutoring on Engineering Students',
-                'description' => $loremIpsum,
-                'authors' => 'Anna Reyes',
-                'views' => 1204,
-                'goals' => [4]
-            ],
-            [
-                'title' => 'Solar-Powered Water Filtration for Rural Communities',
-                'description' => $loremIpsum,
-                'authors' => 'J. Dela Cruz',
-                'views' => 892,
-                'goals' => [3, 7]
-            ],
-            [
-                'title' => 'Smart Traffic Management using Computer Vision',
-                'description' => $loremIpsum,
-                'authors' => 'Maria Santos, K. Villanueva',
-                'views' => 2100,
-                'goals' => [9, 11]
-            ],
-            [
-                'title' => 'Recycled Plastic as Aggregate in Concrete Mixtures',
-                'description' => $loremIpsum,
-                'authors' => 'Engr. L. Bautista',
-                'views' => 1750,
-                'goals' => [9, 11, 12]
-            ],
-            [
-                'title' => 'Predictive Maintenance for Wind Turbines',
-                'description' => $loremIpsum,
-                'authors' => 'P. Fernandez',
-                'views' => 640,
-                'goals' => [7, 9]
-            ],
-            [
-                'title' => 'Urban Farming: Automated Aquaponics System',
-                'description' => $loremIpsum,
-                'authors' => 'R. Garcia',
-                'views' => 310,
-                'goals' => [3, 11, 12]
-            ],
-            [
-                'title' => 'Blockchain for Transparent Supply Chains',
-                'description' => $loremIpsum,
-                'authors' => 'S. Lim, T. Tan',
-                'views' => 950,
-                'goals' => [8, 12]
-            ],
+        // Native PHP Dummy Data arrays
+        $dummyTitles = ['Sustainable Urban Development', 'AI in Agriculture', 'Renewable Energy Systems', 'Water Purification Models', 'Smart City Traffic Optimization', 'Waste Management Automation'];
+        $dummyLocations = ['Metro Manila', 'Cebu', 'Davao', 'Rural Philippines', 'Coastal Communities'];
+        $dummyAuthors = ['Juan Dela Cruz', 'Maria Santos', 'Jose Rizal', 'Ana Reyes', 'Pedro Penduko'];
+        $dummyDescriptions = [
+            "This study explores various methodologies for improving local infrastructure while maintaining ecological balance. The findings suggest a strong correlation between community engagement and long-term sustainability.",
+            "An in-depth analysis of current systems utilizing machine learning to optimize resource allocation. We propose a novel algorithm that reduces waste by 15% in simulated environments.",
+            "By implementing low-cost, open-source hardware, this research demonstrates a scalable solution for off-grid communities. Extensive field testing validates the durability of the proposed prototypes.",
+            "A comprehensive review of existing policies and their impact on technological adoption. The paper argues for a revised framework that incentivizes green innovation in the private sector."
         ];
 
-        foreach ($thesesData as $data) {
+        // 2. Create Theses (Library)
+        for ($i = 0; $i < 20; $i++) {
             $thesis = new Thesis();
-            $thesis->setTitle($data['title'])
-                   ->setDescription($data['description'])
-                   ->setAuthors($data['authors'])
-                   ->setViews($data['views'])
-                   ->setDocumentFile('dummy-thesis.pdf')
-                   ->setCreatedAt(new \DateTimeImmutable('-' . rand(1, 30) . ' days'));
             
-            foreach ($data['goals'] as $goalNum) {
-                if (isset($sdgEntities[$goalNum])) {
-                    $thesis->addSdg($sdgEntities[$goalNum]);
-                }
+            // Generate Random Content natively
+            $title = $dummyTitles[array_rand($dummyTitles)] . ' in the context of ' . $dummyLocations[array_rand($dummyLocations)];
+            $authorStr = $dummyAuthors[array_rand($dummyAuthors)] . ', ' . $dummyAuthors[array_rand($dummyAuthors)];
+            $desc = $dummyDescriptions[array_rand($dummyDescriptions)];
+            
+            $thesis->setTitle($title);
+            $thesis->setDescription($desc);
+            $thesis->setAuthors($authorStr);
+            
+            // Explicitly ensure the cover image is NULL
+            $thesis->setCoverImage(null);
+
+            // Pick 1 to 3 random SDGs
+            $numSdgs = rand(1, 3);
+            $randomSdgKeys = (array) array_rand($sdgs, $numSdgs);
+            foreach ($randomSdgKeys as $key) {
+                $thesis->addSdg($sdgs[$key]);
             }
+
+            $thesis->setViews(rand(0, 1500));
+            
+            // Generate a random date within the last year
+            $randomTimestamp = mt_rand(strtotime('-1 year'), time());
+            $randomDate = new \DateTimeImmutable('@' . $randomTimestamp);
+            $thesis->setCreatedAt($randomDate);
+            
+            // Randomly set ~85% of theses as active
+            $thesis->setIsActive(rand(1, 100) <= 85);
+
             $manager->persist($thesis);
         }
 
-        // 3. Updated Activities Data
+        // 3. Create Specific Activities (News/Events)
         $activitiesData = [
             [
-                'title' => 'Capacity Building: Patent Search Workshop',
+                'title' => 'Tech Summit 2025: Innovating for a Sustainable Future',
                 'category' => 'Seminar',
-                'content' => "<p>An in-depth capability building workshop for engineering students to understand patent searches, intellectual property rights, and how to protect their technological innovations.</p><p>Students will learn to use international databases to cross-reference their ideas.</p>",
-                'date' => '2026-03-04',
-                'goals' => [4, 9, 17],
+                'content' => "<p>FEU Tech recently hosted the annual Tech Summit, gathering industry leaders, students, and faculty to discuss the intersection of technology and sustainability.</p><p>Keynotes focused on AI-driven energy management, sustainable infrastructure, and the role of academic institutions in achieving global goals.</p>",
+                'date' => '2025-05-15',
+                'goals' => [9, 11, 4],
                 'isActive' => true
             ],
             [
-                'title' => 'TamLabs Demo Day: Celebrating Six Months of Innovation',
-                'category' => 'News',
-                'content' => "<p>The FEU Tech Innovation Center's ongoing efforts to create spaces where technology, creativity, and human-centered innovation meet.</p><p>It showcased how Filipino innovators can build solutions that matter locally and internationally.</p>",
+                'title' => 'Community Outreach: Project Clean Water Initiative',
+                'category' => 'Community',
+                'content' => "<p>Student volunteers from the Civil Engineering department partnered with local NGOs to install low-cost water filtration systems in underserved communities.</p><p>This initiative not only provides clean drinking water but also educates locals on proper sanitation and system maintenance.</p>",
+                'date' => '2025-04-22',
+                'goals' => [6, 3, 17],
+                'isActive' => true
+            ],
+            [
+                'title' => 'Student Research Highlights: Renewable Energy Prototypes',
+                'category' => 'Research',
+                'content' => "<p>A team of graduating Electrical Engineering students successfully tested their prototype for a high-efficiency solar inverter.</p><p>Their research aims to make solar energy more affordable and accessible for residential use in the Philippines.</p>",
+                'date' => '2025-06-10',
+                'goals' => [7, 13, 9],
+                'isActive' => true
+            ],
+            [
+                'title' => 'Green Campus: FEU Commits to Zero Waste by 2030',
+                'category' => 'Initiative',
+                'content' => "<p>FEU has officially announced its comprehensive 'Zero Waste 2030' policy. The initiative includes a campus-wide ban on single-use plastics, enhanced recycling programs, and on-site composting facilities.</p>",
+                'date' => '2025-01-10',
+                'goals' => [12, 11, 13],
+                'isActive' => true
+            ],
+            [
+                'title' => 'Women in STEM: Breaking Barriers, Building the Future',
+                'category' => 'Seminar',
+                'content' => "<p>A panel discussion featuring prominent women engineers and technologists. The event highlighted the importance of gender equality in technical fields and provided mentorship opportunities for female students.</p>",
+                'date' => '2025-03-08',
+                'goals' => [5, 4, 10],
+                'isActive' => true
+            ],
+            [
+                'title' => 'Smart City Urban Planning Hackathon',
+                'category' => 'Event',
+                'content' => "<p>Students from various disciplines collaborated in a 48-hour hackathon to design tech-driven solutions for urban challenges in Metro Manila, focusing on traffic optimization and disaster resilience.</p>",
+                'date' => '2025-08-14',
+                'goals' => [11, 9, 13],
+                'isActive' => true
+            ],
+            [
+                'title' => 'Bridging the Digital Divide: Tech Literacy in Rural Schools',
+                'category' => 'Community',
+                'content' => "<p>The IT department organized a weekend boot camp in rural provinces, teaching basic coding and computer literacy to elementary students to promote quality education for all.</p>",
+                'date' => '2025-07-20',
+                'goals' => [4, 10, 1],
+                'isActive' => true
+            ],
+            [
+                'title' => 'Sustainable Agriculture: AI for Crop Monitoring',
+                'category' => 'Research',
+                'content' => "<p>Computer Science students presented their thesis on using drone imagery and AI to help local farmers detect crop diseases early, contributing to food security.</p>",
+                'date' => '2025-09-05',
+                'goals' => [2, 12, 15],
+                'isActive' => true
+            ],
+            [
+                'title' => 'Tech for Good: Partnership with the UN Development Programme',
+                'category' => 'Initiative',
+                'content' => "<p>FEU Tech has formally partnered with the UNDP to align its engineering curriculum with the Sustainable Development Goals, ensuring graduates are equipped to tackle global challenges.</p>",
                 'date' => '2025-10-28',
                 'goals' => [8, 9, 17],
                 'isActive' => true

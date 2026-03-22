@@ -7,6 +7,13 @@
 {% set word_count = activity.content|striptags|split(' ')|length %}
 {% set reading_time = (word_count / 200)|round(0, 'ceil') %}
 
+{# Define SDG Colors for the tags #}
+{% set sdg_colors = {
+    1: '#E5243B', 2: '#DDA63A', 3: '#4C9F38', 4: '#C5192D', 5: '#FF3A21', 6: '#26BDE2',
+    7: '#FCC30B', 8: '#A21942', 9: '#FD6925', 10: '#DD1367', 11: '#FD9D24', 12: '#BF8B2E',
+    13: '#3F7E44', 14: '#0A97D9', 15: '#56C02B', 16: '#00689D', 17: '#19486A'
+} %}
+
 <section class="bg-gray-50 py-12 px-6 min-h-screen">
     <div class="max-w-4xl mx-auto">
         
@@ -31,12 +38,20 @@
 
             <div class="p-8 md:p-12 lg:p-16">
                 {# Metadata & SDG Tags #}
-                <div class="flex flex-wrap items-center gap-4 mb-8">
-                    <span class="bg-feu-green-900 text-white text-xs font-bold px-4 py-1.5 rounded-full uppercase tracking-widest font-work shadow-sm">
+                <div class="flex flex-wrap items-center gap-3 mb-8">
+                    {# Category Tag #}
+                    <span class="bg-feu-green-900 text-white text-[10px] font-bold px-3 py-1.5 rounded-full uppercase tracking-widest font-work shadow-sm">
                         {{ activity.category }}
                     </span>
                     
-                    <div class="h-4 w-px bg-gray-300 hidden sm:block"></div>
+                    {# The Colored SDG Tags right next to the category #}
+                    {% for sdg in activity.sdgs %}
+                        <span class="text-white text-[10px] font-bold px-3 py-1.5 rounded-full font-work uppercase tracking-wider shadow-sm" style="background-color: {{ sdg_colors[sdg.id]|default('#166534') }}; text-shadow: 0px 1px 2px rgba(0,0,0,0.2);">
+                            SDG {{ sdg.id }}
+                        </span>
+                    {% endfor %}
+                    
+                    <div class="h-4 w-px bg-gray-300 hidden sm:block ml-1"></div>
                     
                     <span class="text-gray-500 font-bold font-work text-sm flex items-center gap-1.5">
                         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>
@@ -52,21 +67,9 @@
                 </div>
                 
                 {# Article Title #}
-                <h1 class="text-4xl md:text-6xl font-bold text-gray-950 mb-10 font-bebas tracking-wide leading-[1.1]">
+                <h1 class="text-4xl md:text-6xl font-bold text-gray-950 mb-10 font-bebas tracking-wide leading-[1.1] pb-8 border-b border-gray-100">
                     {{ activity.title }}
                 </h1>
-
-                {# SDG Badges Section #}
-                {% if activity.sdgs|length > 0 %}
-                    <div class="flex flex-wrap gap-2 mb-12 pb-8 border-b border-gray-100">
-                        {% for sdg in activity.sdgs %}
-                            <a href="{{ path('app_news', {'goals': [sdg.id]}) }}" class="inline-flex items-center gap-2 bg-gray-50 hover:bg-feu-green-50 border border-gray-200 hover:border-feu-green-200 px-3 py-1.5 rounded-lg transition group">
-                                <img src="{{ asset('images/sdg/E-WEB-Goal-' ~ '%02d'|format(sdg.id) ~ '.png') }}" alt="SDG {{ sdg.id }}" class="w-6 h-6 rounded-sm">
-                                <span class="text-xs font-bold text-gray-700 group-hover:text-feu-green-800 font-work">SDG {{ sdg.id }}</span>
-                            </a>
-                        {% endfor %}
-                    </div>
-                {% endif %}
                 
                 {# Article Content Workspace #}
                 <div class="prose prose-lg lg:prose-xl max-w-none text-gray-800 font-work leading-relaxed

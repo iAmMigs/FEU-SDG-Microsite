@@ -28,7 +28,6 @@
             
             <aside class="w-full lg:w-1/4 flex-shrink-0">
                 <div class="bg-white p-6 rounded-xl shadow-sm border border-gray-100 sticky top-28 max-h-[calc(100vh-8rem)] overflow-y-auto">
-                    
                     <h2 class="text-lg font-bold text-feu-green-950 mb-4 border-b pb-2 font-bebas tracking-wide">Filter Research</h2>
                     
                     <form id="filter-form" action="{{ path('app_library') }}" method="GET" class="space-y-4"
@@ -59,7 +58,7 @@
                                     {% set formatted_num = '%02d'|format(sdg.id) %}
                                     <label class="cursor-pointer relative block aspect-square rounded-md overflow-hidden shadow-sm hover:shadow-md transition group border border-gray-100 bg-white">
                                         <input type="checkbox" name="goals[]" value="{{ sdg.id }}" class="peer hidden" 
-                                            {% if selected_goals is defined and sdg.id ~ '' in selected_goals %}checked{% endif %}>
+                                               {% if selected_goals is defined and sdg.id ~ '' in selected_goals %}checked{% endif %}>
                                         
                                         <img src="{{ asset('images/sdg/E Inverted Icons_WEB-' ~ formatted_num ~ '.png') }}" alt="Goal {{ sdg.id }}" class="absolute inset-0 w-full h-full object-cover transition-opacity duration-300 opacity-100 peer-checked:opacity-0 group-hover:opacity-75">
                                         <img src="{{ asset('images/sdg/E-WEB-Goal-' ~ formatted_num ~ '.png') }}" alt="Goal {{ sdg.id }}" class="absolute inset-0 w-full h-full object-cover transition-opacity duration-300 opacity-0 peer-checked:opacity-100">
@@ -138,7 +137,8 @@
                                 </div>
                                 
                                 <h3 class="text-2xl font-bold text-gray-900 hover:text-feu-green-700 transition font-bebas tracking-wide">
-                                    <a href="{{ path('app_thesis_show', {id: thesis.id}) }}" data-turbo-frame="_top">{{ thesis.title }}</a>
+                                    {# FIXED ROUTE NAME HERE #}
+                                    <a href="{{ path('app_library_show', {id: thesis.id}) }}" data-turbo-frame="_top">{{ thesis.title }}</a>
                                 </h3>
                                 
                                 <div class="mt-2 relative">
@@ -173,7 +173,8 @@
                                             </a>
                                         {% endif %}
 
-                                        <a href="{{ path('app_thesis_show', {id: thesis.id}) }}" data-turbo-frame="_top" class="px-5 py-2.5 bg-feu-green-900 hover:bg-feu-green-800 text-white font-bold rounded-lg transition text-xs flex items-center gap-1.5 shadow-sm font-work">
+                                        {# FIXED ROUTE NAME HERE #}
+                                        <a href="{{ path('app_library_show', {id: thesis.id}) }}" data-turbo-frame="_top" class="px-5 py-2.5 bg-feu-green-900 hover:bg-feu-green-800 text-white font-bold rounded-lg transition text-xs flex items-center gap-1.5 shadow-sm font-work">
                                             View Article &rarr;
                                         </a>
                                     </div>
@@ -203,7 +204,7 @@
             
             const allWrappers = document.querySelectorAll('.thesis-abstract-wrapper');
             const allFades = document.querySelectorAll('.thesis-abstract-fade');
-            
+
             allWrappers.forEach(wrapper => {
                 if (wrapper.id === targetWrapperId) {
                     wrapper.classList.toggle('max-h-[4.25rem]');
@@ -213,7 +214,7 @@
                     wrapper.classList.remove('max-h-[100rem]');
                 }
             });
-            
+
             allFades.forEach(fade => {
                 if (fade.id === targetFadeId) {
                     fade.classList.toggle('opacity-0');

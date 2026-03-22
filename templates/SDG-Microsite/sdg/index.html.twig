@@ -43,11 +43,11 @@
                             data-action="click->modal#open"
                             data-goal="{{ sdg.num }}"
                             data-title="{{ sdg.title }}"
-                            data-description="{{ sdg.desc }}"
+                            data-description="{{ sdg.long_desc }}"
                             data-active="{{ is_active ? 'true' : 'false' }}"
                             data-image="{{ asset('images/sdg/E-WEB-Goal-' ~ formatted_num ~ '.png') }}"
                             style="{{ is_active ? 'display: block; opacity: 1; transform: scale(1);' : 'display: none; opacity: 0; transform: scale(0.95);' }}"
-                            class="sdg-card block group relative rounded-2xl overflow-hidden shadow-md hover:shadow-2xl transition-all duration-300 hover:-translate-y-2 border border-gray-100 bg-white aspect-square text-left focus:outline-none focus:ring-4 focus:ring-green-700/30 cursor-pointer">
+                            class="sdg-card mt-6 block group relative rounded-2xl overflow-hidden shadow-md hover:shadow-2xl transition-all duration-300 hover:-translate-y-2 border border-gray-100 bg-white aspect-square text-left focus:outline-none focus:ring-4 focus:ring-green-700/30 cursor-pointer">
                         
                         <img src="{{ asset('images/sdg/E-WEB-Goal-' ~ formatted_num ~ '.png') }}" alt="Goal {{ sdg.num }}" class="absolute inset-0 w-full h-full object-cover transition-opacity duration-300 opacity-100 group-hover:opacity-0">
                         <img src="{{ asset('images/sdg/E Inverted Icons_WEB-' ~ formatted_num ~ '.png') }}" alt="Goal {{ sdg.num }}" class="absolute inset-0 w-full h-full object-cover transition-opacity duration-300 opacity-0 group-hover:opacity-100">
@@ -81,17 +81,15 @@
                         <div class="mt-10 pt-8 border-t border-gray-100 flex flex-col gap-3 text-center">
                             <h4 data-modal-target="actionPrompt" class="text-sm font-bold text-gray-400 uppercase tracking-widest font-work mb-4">Which would you like to visit?</h4>
                             
-                            {# templates/SDG-Microsite/sdg/index.html.twig #}
+                            <div data-modal-target="buttonsContainer" class="flex flex-col gap-3">
+                                <a href="#" data-modal-target="libraryBtn" class="block w-full text-center bg-feu-gold-400 text-feu-green-900 font-bold px-6 py-4 rounded-xl hover:bg-feu-gold-500 transition duration-300 font-work shadow-md">
+                                    SDG Related Research Library
+                                </a>
 
-                        <div data-modal-target="buttonsContainer" class="flex flex-col gap-3">
-                            <a href="#" data-modal-target="libraryBtn" class="block w-full text-center bg-feu-gold-400 text-feu-green-900 font-bold px-6 py-4 rounded-xl hover:bg-feu-gold-500 transition duration-300 font-work shadow-md">
-                                SDG Related Research Library
-                            </a>
-
-                            <a href="#" data-modal-target="activityBtn" class="block w-full text-center bg-feu-green-900 text-white font-bold px-6 py-4 rounded-xl hover:bg-feu-green-800 transition duration-300 font-work shadow-md">
-                                SDG Related Activities
-                            </a>
-                        </div>
+                                <a href="#" data-modal-target="activityBtn" class="block w-full text-center bg-feu-green-900 text-white font-bold px-6 py-4 rounded-xl hover:bg-feu-green-800 transition duration-300 font-work shadow-md">
+                                    SDG Related Activities
+                                </a>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -99,7 +97,7 @@
             
             <script>
                 let currentMode = 'focused';
-
+                
                 function filterSdgs(mode) {
                     if (currentMode === mode) return;
                     currentMode = mode;
@@ -108,7 +106,10 @@
                     const btnFocused = document.getElementById('btn-focused-sdgs');
                     const cards = document.querySelectorAll('.sdg-card');
 
-                    // Adjust button styling to show active selection
+                    /*
+                     * Toggles visual indicators for the active filter state
+                     * based on user selection.
+                     */
                     if (mode === 'all') {
                         btnAll.className = "px-6 py-2 rounded-full text-sm font-bold font-work transition-all duration-300 bg-feu-green-900 text-white shadow-md cursor-pointer";
                         btnFocused.className = "px-6 py-2 rounded-full text-sm font-bold font-work transition-all duration-300 bg-gray-200 text-gray-600 hover:bg-gray-300 cursor-pointer";
@@ -117,7 +118,10 @@
                         btnAll.className = "px-6 py-2 rounded-full text-sm font-bold font-work transition-all duration-300 bg-gray-200 text-gray-600 hover:bg-gray-300 cursor-pointer";
                     }
 
-                    // Process display and smooth transition properties
+                    /*
+                     * Triggers enter/exit animations on SDG cards ensuring
+                     * transitions correspond with the selected filtering mode.
+                     */
                     cards.forEach(card => {
                         const isActive = card.dataset.active === 'true';
                         const shouldShow = mode === 'all' || isActive;

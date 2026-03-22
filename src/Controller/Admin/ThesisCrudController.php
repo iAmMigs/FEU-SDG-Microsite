@@ -3,12 +3,15 @@
 namespace App\Controller\Admin;
 
 use App\Entity\Thesis;
+use EasyCorp\Bundle\EasyAdminBundle\Config\Crud;
 use EasyCorp\Bundle\EasyAdminBundle\Controller\AbstractCrudController;
+use EasyCorp\Bundle\EasyAdminBundle\Field\BooleanField;
 use EasyCorp\Bundle\EasyAdminBundle\Config\KeyValueStore;
 use EasyCorp\Bundle\EasyAdminBundle\Context\AdminContext;
 use EasyCorp\Bundle\EasyAdminBundle\Dto\EntityDto;
 use EasyCorp\Bundle\EasyAdminBundle\Field\AssociationField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\DateTimeField;
+use EasyCorp\Bundle\EasyAdminBundle\Field\IdField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\ImageField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\IntegerField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\TextareaField;
@@ -25,49 +28,65 @@ class ThesisCrudController extends AbstractCrudController
         return Thesis::class;
     }
 
-    /*
-     * Intercepts the form builder process to verify the physical existence 
-     * of media and document files before rendering the EasyAdmin edit interface.
-     * Prevents fatal FileNotFound exceptions if assets are manually removed from the server.
-     */
+    public function configureCrud(Crud $crud): Crud
+    {
+        return $crud
+            ->setPaginatorPageSize(20)
+            ->setDefaultSort(['createdAt' => 'DESC']);
+    }
+
     public function createEditFormBuilder(EntityDto $entityDto, KeyValueStore $formOptions, AdminContext $context): FormBuilderInterface
     {
+        $formBuilder = parent::createEditFormBuilder($entityDto, $formOptions, $context);
         $thesis = $entityDto->getInstance();
-        
-        if ($thesis instanceof Thesis) {
-            $publicDir = __DIR__ . '/../../../public/uploads/theses/';
-            
-            if ($thesis->getDocumentFile() && !file_exists($publicDir . $thesis->getDocumentFile())) {
-                $thesis->setDocumentFile(null);
-            }
-            
-            if ($thesis->getCoverImage() && !file_exists($publicDir . $thesis->getCoverImage())) {
+
+        $projectDir = $this->getParameter('kernel.project_dir');
+
+        // Check and clean Cover Image mapping
+        if ($thesis->getCoverImage()) {
+            $imagePath = $projectDir . '/public/uploads/theses/' . $thesis->getCoverImage();
+            if (!file_exists($imagePath)) {
                 $thesis->setCoverImage(null);
             }
         }
 
-        return parent::createEditFormBuilder($entityDto, $formOptions, $context);
+        // Check and clean Document File mapping
+        if ($thesis->getDocumentFile()) {
+            $docPath = $projectDir . '/public/uploads/theses/' . $thesis->getDocumentFile();
+            if (!file_exists($docPath)) {
+                $thesis->setDocumentFile(null);
+            }
+        }
+
+        return $formBuilder;
     }
 
     public function configureFields(string $pageName): iterable
     {
         return [
+            IdField::new('id')->hideOnForm(),
+            
+            BooleanField::new('isActive', 'Active'),
+
             TextField::new('title', 'Thesis Title'),
             TextField::new('authors', 'Authors'),
-            TextareaField::new('description', 'Abstract')->hideOnIndex(),
+            TextareaField::new('description', 'Abstract / Description')
+                ->setNumOfRows(6)
+                ->hideOnIndex(),
             
-            AssociationField::new('sdgs', 'Focus SDGs')
-                ->setQueryBuilder(function (QueryBuilder $qb) {
-                    return $qb->andWhere('entity.isActive = :active')
-                            ->setParameter('active', true);
+            AssociationField::new('sdgs', 'Targeted SDGs')
+                ->setFormTypeOptions([
+                    'by_reference' => false,
+                ])
+                ->setQueryBuilder(function (QueryBuilder $queryBuilder) {
+                    return $queryBuilder->orderBy('entity.id', 'ASC');
                 })
-                ->setHelp('Only active SDGs currently focused by the University are available for selection.'),
-            UrlField::new('publicationLink', 'External Publication Link')->setRequired(false),
+                ->autocomplete(),
+
+            UrlField::new('publicationLink', 'External Publication Link')
+                ->setHelp('Optional URL to an external journal or publication')
+                ->setRequired(false),
             
-            /*
-             * Form configuration for the PDF Document field.
-             * Utilizes FileUploadType to handle raw file transfers without image validation constraints.
-             */
             TextField::new('documentFile', 'PDF Document')
                 ->setFormType(FileUploadType::class)
                 ->setFormTypeOptions([
@@ -79,10 +98,6 @@ class ThesisCrudController extends AbstractCrudController
                 ])
                 ->hideOnIndex(),
             
-            /*
-             * Form configuration for the Cover Image field.
-             * Restricts acceptable file MIME types strictly to standard web image formats.
-             */
             ImageField::new('coverImage', 'Cover Image')
                 ->setBasePath('uploads/theses')
                 ->setUploadDir('public/uploads/theses')

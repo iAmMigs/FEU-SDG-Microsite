@@ -42,6 +42,8 @@ class Thesis
     #[ORM\Column(length: 255, nullable: true)]
     private ?string $publicationLink = null;
 
+    #[ORM\Column(type: 'boolean', options: ['default' => true])]
+    private ?bool $isActive = true;
 
     /**
      * @var Collection<int, Sdg>
@@ -74,6 +76,18 @@ class Thesis
 
     public function getCoverImage(): ?string { return $this->coverImage; }
     public function setCoverImage(?string $coverImage): static { $this->coverImage = $coverImage; return $this; }
+
+    public function isActive(): ?bool
+    {
+        return $this->isActive;
+    }
+
+    public function setIsActive(bool $isActive): static
+    {
+        $this->isActive = $isActive;
+
+        return $this;
+    }
 
     public function getDocumentFile(): ?string { return $this->documentFile; }
     public function setDocumentFile(?string $documentFile): static { $this->documentFile = $documentFile; return $this; }
