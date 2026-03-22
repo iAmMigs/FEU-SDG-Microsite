@@ -5,6 +5,7 @@ namespace App\DataFixtures;
 use App\Entity\Activity;
 use App\Entity\Sdg;
 use App\Entity\Thesis;
+use App\Entity\LeadingVoice;
 use Doctrine\Bundle\FixturesBundle\Fixture;
 use Doctrine\Persistence\ObjectManager;
 
@@ -198,6 +199,38 @@ class AppFixtures extends Fixture
             }
 
             $manager->persist($activity);
+        }
+
+
+        $voicesData = [
+            [
+                'name' => 'Engr. Jose Somigao',
+                'title' => 'Faculty Researcher',
+                'description' => 'Focuses on sustainable urban infrastructure and waste-to-energy systems.'
+            ],
+            [
+                'name' => 'Anna Reyes',
+                'title' => 'Student Innovator',
+                'description' => 'Developing AI-assisted modules for accessible engineering education.'
+            ],
+            [
+                'name' => 'J. Dela Cruz',
+                'title' => 'Lead Researcher',
+                'description' => 'Pioneering genetic algorithms for optimizing Metro Manila transit.'
+            ],
+            [
+                'name' => 'Maria Santos',
+                'title' => 'Community Lead',
+                'description' => 'Bridging the digital divide with tech literacy programs for LGUs.'
+            ]
+        ];
+
+        foreach ($voicesData as $data) {
+            $voice = new LeadingVoice();
+            $voice->setName($data['name'])
+                  ->setTitle($data['title'])
+                  ->setDescription($data['description']);
+            $manager->persist($voice);
         }
 
         $manager->flush();

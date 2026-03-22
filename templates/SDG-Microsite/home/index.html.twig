@@ -164,32 +164,47 @@
                     Meet the dedicated students and faculty members driving sustainable innovation and impactful solutions at FEU.
                 </p>
             </div>
-            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
-                <div class="bg-white rounded-2xl p-8 text-center shadow-xl hover:-translate-y-2 transition duration-300 group">
-                    <div class="w-20 h-20 mx-auto bg-feu-green-100 text-feu-green-800 rounded-full flex items-center justify-center text-2xl font-black font-bebas mb-4 border-4 border-feu-green-50 shadow-sm group-hover:bg-feu-gold-400 group-hover:text-feu-green-900 group-hover:border-feu-gold-100 transition">JS</div>
-                    <h3 class="text-xl font-bold text-gray-900 font-bebas tracking-wide mb-1">Engr. Jose Somigao</h3>
-                    <p class="text-xs font-bold text-feu-green-700 uppercase tracking-widest mb-3 font-work">Faculty Researcher</p>
-                    <p class="text-sm text-gray-600 font-work leading-relaxed">Focuses on sustainable urban infrastructure and waste-to-energy systems.</p>
+            
+            {% if leading_voices|length > 0 %}
+                {# Dynamic Grid sizing based on how many voices exist (Max 4) #}
+                {% set grid_class = 'lg:grid-cols-4' %}
+                {% if leading_voices|length == 3 %}
+                    {% set grid_class = 'lg:grid-cols-3 max-w-5xl mx-auto' %}
+                {% elseif leading_voices|length == 2 %}
+                    {% set grid_class = 'lg:grid-cols-2 max-w-3xl mx-auto' %}
+                {% elseif leading_voices|length == 1 %}
+                    {% set grid_class = 'lg:grid-cols-1 max-w-sm mx-auto' %}
+                {% endif %}
+
+                <div class="grid grid-cols-1 sm:grid-cols-2 {{ grid_class }} gap-8">
+                    {% for voice in leading_voices %}
+                        <div class="bg-white rounded-2xl p-8 text-center shadow-xl hover:-translate-y-2 transition duration-300 group">
+                            
+                            {# Image / Initials Fallback #}
+                            {% if voice.image %}
+                                {# UPDATED: Changed border color to #FCC30B (FEU Gold) #}
+                                <img src="{{ asset('uploads/voices/' ~ voice.image) }}" alt="{{ voice.name }}" class="w-20 h-20 mx-auto rounded-full object-cover mb-4 border-4 border-[#FCC30B] shadow-sm transition group-hover:scale-110">
+                            {% else %}
+                                {% set name_parts = voice.name|split(' ') %}
+                                {% set initials = (name_parts|first|slice(0,1) ~ name_parts|last|slice(0,1))|upper %}
+                                
+                                {# UPDATED: Changed border color to #FCC30B (FEU Gold) #}
+                                <div class="w-20 h-20 mx-auto bg-feu-green-100 text-feu-green-800 rounded-full flex items-center justify-center text-2xl font-black font-bebas mb-4 border-4 border-[#FCC30B] shadow-sm group-hover:bg-[#FCC30B] group-hover:text-feu-green-900 transition group-hover:scale-110">
+                                    {{ initials }}
+                                </div>
+                            {% endif %}
+                            
+                            <h3 class="text-xl font-bold text-gray-900 font-bebas tracking-wide mb-1">{{ voice.name }}</h3>
+                            <p class="text-xs font-bold text-feu-green-700 uppercase tracking-widest mb-3 font-work">{{ voice.title }}</p>
+                            <p class="text-sm text-gray-600 font-work leading-relaxed">{{ voice.description }}</p>
+                        </div>
+                    {% endfor %}
                 </div>
-                <div class="bg-white rounded-2xl p-8 text-center shadow-xl hover:-translate-y-2 transition duration-300 group">
-                    <div class="w-20 h-20 mx-auto bg-feu-green-100 text-feu-green-800 rounded-full flex items-center justify-center text-2xl font-black font-bebas mb-4 border-4 border-feu-green-50 shadow-sm group-hover:bg-feu-gold-400 group-hover:text-feu-green-900 group-hover:border-feu-gold-100 transition">AR</div>
-                    <h3 class="text-xl font-bold text-gray-900 font-bebas tracking-wide mb-1">Anna Reyes</h3>
-                    <p class="text-xs font-bold text-feu-green-700 uppercase tracking-widest mb-3 font-work">Student Innovator</p>
-                    <p class="text-sm text-gray-600 font-work leading-relaxed">Developing AI-assisted modules for accessible engineering education.</p>
+            {% else %}
+                <div class="text-center p-12 bg-white/10 backdrop-blur-md rounded-2xl border border-white/20">
+                    <p class="text-feu-green-50 font-medium font-work">Voices will appear here once added in the dashboard.</p>
                 </div>
-                <div class="bg-white rounded-2xl p-8 text-center shadow-xl hover:-translate-y-2 transition duration-300 group">
-                    <div class="w-20 h-20 mx-auto bg-feu-green-100 text-feu-green-800 rounded-full flex items-center justify-center text-2xl font-black font-bebas mb-4 border-4 border-feu-green-50 shadow-sm group-hover:bg-feu-gold-400 group-hover:text-feu-green-900 group-hover:border-feu-gold-100 transition">JD</div>
-                    <h3 class="text-xl font-bold text-gray-900 font-bebas tracking-wide mb-1">J. Dela Cruz</h3>
-                    <p class="text-xs font-bold text-feu-green-700 uppercase tracking-widest mb-3 font-work">Lead Researcher</p>
-                    <p class="text-sm text-gray-600 font-work leading-relaxed">Pioneering genetic algorithms for optimizing Metro Manila transit.</p>
-                </div>
-                <div class="bg-white rounded-2xl p-8 text-center shadow-xl hover:-translate-y-2 transition duration-300 group">
-                    <div class="w-20 h-20 mx-auto bg-feu-green-100 text-feu-green-800 rounded-full flex items-center justify-center text-2xl font-black font-bebas mb-4 border-4 border-feu-green-50 shadow-sm group-hover:bg-feu-gold-400 group-hover:text-feu-green-900 group-hover:border-feu-gold-100 transition">MS</div>
-                    <h3 class="text-xl font-bold text-gray-900 font-bebas tracking-wide mb-1">Maria Santos</h3>
-                    <p class="text-xs font-bold text-feu-green-700 uppercase tracking-widest mb-3 font-work">Community Lead</p>
-                    <p class="text-sm text-gray-600 font-work leading-relaxed">Bridging the digital divide with tech literacy programs for LGUs.</p>
-                </div>
-            </div>
+            {% endif %}
         </div>
     </section>
 

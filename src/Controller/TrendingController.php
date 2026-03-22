@@ -12,7 +12,8 @@ final class TrendingController extends AbstractController
     #[Route('/trending', name: 'app_trending')]
     public function index(ThesisRepository $thesisRepository): Response
     {
-        $trendingTheses = $thesisRepository->findBy([], ['views' => 'DESC'], 6);
+        // Added ['isActive' => true] to the search criteria
+        $trendingTheses = $thesisRepository->findBy(['isActive' => true], ['views' => 'DESC'], 6);
 
         return $this->render('SDG-Microsite/trending/index.html.twig', [
             'theses' => $trendingTheses,

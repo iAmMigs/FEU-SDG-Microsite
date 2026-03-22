@@ -5,6 +5,7 @@ namespace App\Controller;
 use App\Repository\ActivityRepository;
 use App\Repository\SdgRepository;
 use App\Repository\ThesisRepository;
+use App\Repository\LeadingVoiceRepository;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
@@ -12,7 +13,7 @@ use Symfony\Component\Routing\Attribute\Route;
 final class HomeController extends AbstractController
 {
     #[Route('/', name: 'app_home')]
-    public function index(ActivityRepository $activityRepository, ThesisRepository $thesisRepository, SdgRepository $sdgRepository): Response
+    public function index(ActivityRepository $activityRepository, ThesisRepository $thesisRepository, SdgRepository $sdgRepository, LeadingVoiceRepository $leadingVoiceRepository): Response
     {
         $latestActivities = $activityRepository->findBy([], ['eventDate' => 'DESC'], 3);
         $totalTheses = $thesisRepository->count([]);
@@ -20,12 +21,14 @@ final class HomeController extends AbstractController
         // CRITICAL FIX: Only fetch the active SDGs to pass their IDs to the template
         $activeSdgs = $sdgRepository->findBy(['isActive' => true]);
         $activeSdgIds = array_map(fn($sdg) => $sdg->getId(), $activeSdgs);
+        $leadingVoices = $leadingVoiceRepository->findBy([], null, 4);
 
         return $this->render('SDG-Microsite/home/index.html.twig', [
             'latest_activities' => $latestActivities,
             'total_theses' => $totalTheses,
             'active_sdg_ids' => $activeSdgIds,
             'all_sdgs' => $this->getAllSdgsData(), 
+            'leading_voices' => $leadingVoices,
         ]);
     }
 

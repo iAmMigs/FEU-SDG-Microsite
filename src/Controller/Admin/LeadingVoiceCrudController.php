@@ -25,7 +25,11 @@ class LeadingVoiceCrudController extends AbstractCrudController
                 ->setBasePath('uploads/voices')
                 ->setUploadDir('public/uploads/voices')
                 ->setUploadedFileNamePattern('[randomhash].[extension]')
-                ->setRequired(false)
+                ->setRequired(false)->setFormTypeOptions([
+                    'attr' => [
+                        'accept' => 'image/jpeg, image/png, image/webp'
+                    ]
+                ])
                 ->setHelp('Upload a square 2x2 image. Will be automatically rounded on the frontend.'),
                 
             TextField::new('name', 'Full Name'),

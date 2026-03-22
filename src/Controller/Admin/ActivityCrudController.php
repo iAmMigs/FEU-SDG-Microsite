@@ -118,7 +118,12 @@ class ActivityCrudController extends AbstractCrudController
                 ->setUploadDir('public/uploads/activities/')
                 ->setUploadedFileNamePattern('[randomhash].[extension]')
                 ->setRequired(false)
-                ->hideOnIndex(),
+                ->hideOnIndex()
+                ->setFormTypeOptions([
+                    'attr' => [
+                        'accept' => 'image/jpeg, image/png, image/webp, image/gif' 
+                    ]
+                ]),
             DateTimeField::new('eventDate', 'Event Date')->setFormat('yyyy-MM-dd HH:mm'),
             AssociationField::new('sdgs', 'Focus SDGs')
                 ->setQueryBuilder(function (QueryBuilder $qb) {
