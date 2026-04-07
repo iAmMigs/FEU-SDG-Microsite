@@ -1,0 +1,97 @@
+{% extends '@EasyAdmin/crud/index.html.twig' %}
+
+{% block body_javascript %}
+    {{ parent() }}
+    
+    <div class="modal fade" id="csvImportModal" tabindex="-1" aria-labelledby="csvImportModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+
+                <form id="csvImportForm" action="{{ path('admin_project_import_csv') }}" method="POST" enctype="multipart/form-data">
+                    
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="csvImportModalLabel">Add Multiple Projects (CSV)</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <div class="alert alert-info" role="alert">
+                            <i class="fas fa-info-circle me-2"></i>
+                            <strong>Note:</strong> Make sure your data exactly matches the format of the project table. The first row must be the headers:
+                            <br><br>
+                            <code>Title, Authors, Description, Target SDGs, Publication Link</code>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="csvFileInput" class="form-label">Upload CSV File</label>
+                            <input class="form-control" type="file" id="csvFileInput" name="csv_file" accept=".csv" required>
+                            <div id="fileValidationFeedback" class="form-text text-danger mt-2" style="display: none;"></div>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                        <button type="submit" class="btn btn-primary" id="confirmImportBtn" disabled>Confirm Upload</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const fileInput = document.getElementById('csvFileInput');
+            const confirmBtn = document.getElementById('confirmImportBtn');
+            const feedback = document.getElementById('fileValidationFeedback');
+
+            // The expected headers stripped of spaces and made lowercase for loose matching
+            const expectedHeaders = "Title, Authors, Description, Target SDGs, Publication Link".toLowerCase().replace(/\s/g, '');
+
+            fileInput.addEventListener('change', function(e) {
+                const file = e.target.files[0];
+                
+                if (!file) {
+                    confirmBtn.disabled = true;
+                    feedback.style.display = 'none';
+                    return;
+                }
+
+                if (file.type !== 'text/csv' && !file.name.toLowerCase().endsWith('.csv')) {
+                    showError("Invalid file type. Please upload a .csv file.");
+                    return;
+                }
+
+                const reader = new FileReader();
+                reader.onload = function(event) {
+                    const text = event.target.result;
+                    const firstLine = text.split('\n')[0]; 
+                    
+                    const uploadedHeaders = firstLine.toLowerCase().replace(/\s/g, '').replace(/"/g, '');
+
+                    if (uploadedHeaders.includes(expectedHeaders)) {
+                        feedback.style.display = 'none';
+                        confirmBtn.disabled = false;
+                        fileInput.classList.remove('is-invalid');
+                        fileInput.classList.add('is-valid');
+                    } else {
+                        showError("Header mismatch. Please ensure your CSV headers are exactly: Title, Authors, Description, Target SDGs, Publication Link");
+                    }
+                };
+
+                reader.onerror = function() {
+                    showError("Error reading file. Please try uploading again.");
+                };
+
+                const blob = file.slice(0, 1024);
+                reader.readAsText(blob);
+            });
+
+            function showError(message) {
+                confirmBtn.disabled = true;
+                fileInput.classList.remove('is-valid');
+                fileInput.classList.add('is-invalid');
+                feedback.textContent = message;
+                feedback.style.display = 'block';
+                fileInput.value = ''; 
+            }
+        });
+    </script>
+{% endblock %}

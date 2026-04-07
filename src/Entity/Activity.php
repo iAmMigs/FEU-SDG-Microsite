@@ -20,7 +20,7 @@ class Activity
     private ?string $title = null;
 
     #[ORM\Column(length: 100)]
-    private ?string $category = null; // e.g., 'Seminar', 'Workshop', 'News'
+    private ?string $category = null;
 
     #[ORM\Column(type: Types::TEXT)]
     private ?string $content = null;
@@ -42,7 +42,7 @@ class Activity
     private Collection $sdgs;
 
     #[ORM\Column]
-    private ?bool $isActive = null;
+    private ?bool $isActive = false;
 
     #[ORM\Column(nullable: true)]
     private ?\DateTime $publishAt = null;

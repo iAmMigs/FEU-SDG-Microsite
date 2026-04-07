@@ -30,6 +30,9 @@ class Thesis
     #[ORM\Column(options: ['default' => 0])]
     private ?int $views = 0;
 
+    #[ORM\Column(type: Types::JSON, nullable: true)]
+    private ?array $regionViews = [];
+
     #[ORM\Column(length: 255, nullable: true)]
     private ?string $coverImage = null;
 
@@ -72,7 +75,19 @@ class Thesis
 
     public function getViews(): ?int { return $this->views; }
     public function setViews(int $views): static { $this->views = $views; return $this; }
-    public function incrementViews(): static { $this->views++; return $this; }
+
+    public function getRegionViews(): ?array
+    {
+        return $this->regionViews ?? [];
+    }
+
+    public function setRegionViews(?array $regionViews): static
+    {
+        $this->regionViews = $regionViews;
+        $this->calculateTotalViews(); // Automatically update total views when regions change
+
+        return $this;
+    }
 
     public function getCoverImage(): ?string { return $this->coverImage; }
     public function setCoverImage(?string $coverImage): static { $this->coverImage = $coverImage; return $this; }
@@ -118,6 +133,33 @@ class Thesis
     public function __toString(): string
     {
         return (string) $this->title;
+    }
+
+    public function incrementViews(string $countryCode = 'Unknown'): static
+    {
+        $regions = $this->getRegionViews();
+        
+        // Increment the specific country's count
+        if (isset($regions[$countryCode])) {
+            $regions[$countryCode]++;
+        } else {
+            $regions[$countryCode] = 1;
+        }
+        
+        $this->regionViews = $regions;
+        $this->calculateTotalViews();
+
+        return $this;
+    }
+
+    private function calculateTotalViews(): void
+    {
+        if (empty($this->regionViews)) {
+            $this->views = 0;
+            return;
+        }
+
+        $this->views = array_sum($this->regionViews);
     }
 
 }
