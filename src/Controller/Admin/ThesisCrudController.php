@@ -8,12 +8,14 @@ use Doctrine\ORM\EntityManagerInterface;
 use EasyCorp\Bundle\EasyAdminBundle\Config\Action;
 use EasyCorp\Bundle\EasyAdminBundle\Config\Actions;
 use EasyCorp\Bundle\EasyAdminBundle\Config\Crud;
+use EasyCorp\Bundle\EasyAdminBundle\Config\Assets;
 use EasyCorp\Bundle\EasyAdminBundle\Controller\AbstractCrudController;
 use EasyCorp\Bundle\EasyAdminBundle\Field\BooleanField;
 use EasyCorp\Bundle\EasyAdminBundle\Config\KeyValueStore;
 use EasyCorp\Bundle\EasyAdminBundle\Context\AdminContext;
 use EasyCorp\Bundle\EasyAdminBundle\Dto\EntityDto;
 use EasyCorp\Bundle\EasyAdminBundle\Field\AssociationField;
+use EasyCorp\Bundle\EasyAdminBundle\Field\ChoiceField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\DateTimeField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\IdField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\ImageField;
@@ -26,7 +28,7 @@ use EasyCorp\Bundle\EasyAdminBundle\Router\AdminUrlGenerator;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\Routing\Attribute\Route; // Standard Symfony Route
+use Symfony\Component\Routing\Attribute\Route;
 use Doctrine\ORM\QueryBuilder;
 
 class ThesisCrudController extends AbstractCrudController
@@ -60,21 +62,42 @@ class ThesisCrudController extends AbstractCrudController
         return $actions->add(Crud::PAGE_INDEX, $importAction);
     }
 
-    /**
-     * Using a standard route bypasses EasyAdmin's action blocking.
-     */
+    public function configureAssets(Assets $assets): Assets
+    {
+        /*
+         * Injects a listener into the admin edit/new forms. It evaluates user input
+         * in the publication link field in real-time. If the data matches a standard 
+         * DOI format, it auto-prepends the domain to formalize it into a valid URL.
+         */
+        return parent::configureAssets($assets)->addHtmlContentToBody('
+            <script>
+                document.addEventListener("DOMContentLoaded", function() {
+                    const pubLinkInput = document.querySelector(\'input[name="Thesis[publicationLink]"]\');
+                    if (pubLinkInput) {
+                        pubLinkInput.addEventListener("input", function(e) {
+                            let val = e.target.value.trim();
+                            const doiRegex = /^10\.\d{4,9}\/[-._;()\/:a-zA-Z0-9]+$/i;
+                            if (doiRegex.test(val)) {
+                                e.target.value = "https://doi.org/" + val;
+                            }
+                        });
+                    }
+                });
+            </script>
+        ');
+    }
+
     #[Route('/admin/projects/import-csv', name: 'admin_project_import_csv', methods: ['POST'])]
     public function importCsvAction(Request $request, EntityManagerInterface $entityManager, SdgRepository $sdgRepository, AdminUrlGenerator $adminUrlGenerator): Response
     {
         $file = $request->files->get('csv_file');
         
-        // Ensure the file exists and is a CSV
         if ($file && $file->isValid() && strtolower($file->getClientOriginalExtension()) === 'csv') {
             $importedCount = 0;
             
             if (($handle = fopen($file->getPathname(), 'r')) !== false) {
                 
-                fgetcsv($handle); // Skip the header row
+                fgetcsv($handle);
                 
                 while (($data = fgetcsv($handle)) !== false) {
                     
@@ -84,12 +107,27 @@ class ThesisCrudController extends AbstractCrudController
                     $project->setTitle(trim($data[0] ?? ''));
                     $project->setAuthors(trim($data[1] ?? ''));
                     $project->setDescription(trim($data[2] ?? ''));
-                    $project->setPublicationLink(trim($data[4] ?? ''));
-                    $project->setIsActive(true);
+                    $project->setIsActive(false); 
                     $project->setViews(0);
-                    $project->setRegionViews([]); // Initialize JSON column
+                    $project->setRegionViews([]);
 
-                    // Map SDGs
+                    /*
+                     * Evaluates the imported link against standard DOI registry formats.
+                     * If it matches, the protocol and resolving host are automatically 
+                     * appended before saving to the database.
+                     */
+                    $externalLink = trim($data[4] ?? '');
+                    if ($externalLink !== '') {
+                        if (preg_match('/^10\.\d{4,9}\/[-._;()\/:a-zA-Z0-9]+$/i', $externalLink)) {
+                            $project->setPublicationLink('https://doi.org/' . $externalLink);
+                        } else {
+                            $project->setPublicationLink($externalLink);
+                        }
+                    }
+
+                    $project->setType(!empty($data[5]) ? trim($data[5]) : null);
+                    $project->setCollege(!empty($data[6]) ? trim($data[6]) : null);
+
                     $sdgColumn = trim($data[3] ?? '');
                     if ($sdgColumn !== '') {
                         $sdgIds = array_map('trim', explode(',', $sdgColumn));
@@ -106,7 +144,6 @@ class ThesisCrudController extends AbstractCrudController
                     $entityManager->persist($project);
                     $importedCount++;
 
-                    // Batch processing to prevent memory limits
                     if ($importedCount % 50 === 0) {
                         $entityManager->flush();
                         $entityManager->clear(Thesis::class);
@@ -121,7 +158,6 @@ class ThesisCrudController extends AbstractCrudController
             $this->addFlash('danger', 'Failed to upload or read the CSV file.');
         }
 
-        // Redirect back to the Projects table
         $url = $adminUrlGenerator
             ->setController(self::class)
             ->setAction(Action::INDEX)
@@ -157,17 +193,30 @@ class ThesisCrudController extends AbstractCrudController
     public function configureFields(string $pageName): iterable
     {
         return [
-            IdField::new('id')->hideOnForm(),
+            IdField::new('id')->hideOnForm()
+            ->hideOnIndex(),
             BooleanField::new('isActive', 'Active'),
             TextField::new('title', 'Thesis Title'),
             TextField::new('authors', 'Authors'),
+            ChoiceField::new('type', 'Type')->setChoices([
+                'Article' => 'Article',
+                'Book Chapter' => 'Book Chapter',
+                'Letter' => 'Letter',
+                'Proceedings' => 'Proceedings',
+                'Review' => 'Review',
+                'Editorial' => 'Editorial',
+                'Book' => 'Book',
+            ])->setRequired(false),
+            TextField::new('college', 'College')->setRequired(false),
             TextareaField::new('description', 'Abstract / Description')->setNumOfRows(6)->hideOnIndex(),
             AssociationField::new('sdgs', 'Targeted SDGs')
                 ->setFormTypeOptions(['by_reference' => false])
                 ->setQueryBuilder(function (QueryBuilder $queryBuilder) {
                     return $queryBuilder->orderBy('entity.id', 'ASC');
                 })->autocomplete(),
-            UrlField::new('publicationLink', 'External Publication Link')->setHelp('Optional URL to an external journal or publication')->setRequired(false),
+            UrlField::new('publicationLink', 'External Publication Link')
+                ->setHelp('Paste a DOI or URL to an external journal or publication')
+                ->setRequired(false),
             TextField::new('documentFile', 'PDF Document')
                 ->setFormType(FileUploadType::class)
                 ->setFormTypeOptions([
@@ -176,6 +225,7 @@ class ThesisCrudController extends AbstractCrudController
                     'attr' => ['accept' => 'application/pdf']
                 ])->hideOnIndex(),
             ImageField::new('coverImage', 'Cover Image')
+                ->hideOnIndex()
                 ->setBasePath('uploads/theses')
                 ->setUploadDir('public/uploads/theses')
                 ->setUploadedFileNamePattern('[randomhash].[extension]')

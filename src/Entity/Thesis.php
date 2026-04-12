@@ -27,6 +27,12 @@ class Thesis
     #[ORM\Column(length: 255)]
     private ?string $authors = null;
 
+    #[ORM\Column(length: 255, nullable: true)]
+    private ?string $type = null;
+
+    #[ORM\Column(length: 255, nullable: true)]
+    private ?string $college = null;
+
     #[ORM\Column(options: ['default' => 0])]
     private ?int $views = 0;
 
@@ -45,8 +51,8 @@ class Thesis
     #[ORM\Column(length: 255, nullable: true)]
     private ?string $publicationLink = null;
 
-    #[ORM\Column(type: 'boolean', options: ['default' => true])]
-    private ?bool $isActive = true;
+    #[ORM\Column(type: 'boolean', options: ['default' => false])]
+    private ?bool $isActive = false;
 
     /**
      * @var Collection<int, Sdg>
@@ -58,9 +64,8 @@ class Thesis
     {
         $this->sdgs = new ArrayCollection();
         $this->createdAt = new \DateTimeImmutable();
+        $this->isActive = false;
     }
-
-    // --- GETTERS & SETTERS ---
 
     public function getId(): ?int { return $this->id; }
 
@@ -73,6 +78,12 @@ class Thesis
     public function getAuthors(): ?string { return $this->authors; }
     public function setAuthors(string $authors): static { $this->authors = $authors; return $this; }
 
+    public function getType(): ?string { return $this->type; }
+    public function setType(?string $type): static { $this->type = $type; return $this; }
+
+    public function getCollege(): ?string { return $this->college; }
+    public function setCollege(?string $college): static { $this->college = $college; return $this; }
+
     public function getViews(): ?int { return $this->views; }
     public function setViews(int $views): static { $this->views = $views; return $this; }
 
@@ -84,7 +95,7 @@ class Thesis
     public function setRegionViews(?array $regionViews): static
     {
         $this->regionViews = $regionViews;
-        $this->calculateTotalViews(); // Automatically update total views when regions change
+        $this->calculateTotalViews(); 
 
         return $this;
     }
@@ -139,7 +150,6 @@ class Thesis
     {
         $regions = $this->getRegionViews();
         
-        // Increment the specific country's count
         if (isset($regions[$countryCode])) {
             $regions[$countryCode]++;
         } else {
@@ -161,5 +171,4 @@ class Thesis
 
         $this->views = array_sum($this->regionViews);
     }
-
 }
