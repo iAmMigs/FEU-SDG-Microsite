@@ -14,7 +14,7 @@
     1: '#E5243B', 2: '#DDA63A', 3: '#4C9F38', 4: '#C5192D', 5: '#FF3A21', 6: '#26BDE2',
     7: '#FCC30B', 8: '#A21942', 9: '#FD6925', 10: '#DD1367', 11: '#FD9D24', 12: '#BF8B2E',
     13: '#3F7E44', 14: '#0A97D9', 15: '#56C02B', 16: '#00689D', 17: '#19486A'
-} %}
+    } %}
 
     <section class="bg-feu-green-900 py-16 px-6 text-center border-b-4 border-feu-gold-400">
         <div class="max-w-4xl mx-auto">
@@ -77,19 +77,38 @@
             {# We keep the frame ID distinct for routing #}
             <turbo-frame id="news_list" class="group/frame">
                 
+                {# Replace the frame count header starting around line 146 with: #}
                 <div class="flex flex-col sm:flex-row justify-between items-center mb-8 pb-4 border-b border-gray-200 gap-4">
-                    <p class="text-gray-600 font-medium font-work">Showing <span class="font-bold text-feu-green-900">{{ total_count|default(0) }}</span> activities found.</p>
+                    <div class="flex flex-col gap-3">
+                        <p class="text-gray-600 font-medium font-work">Showing <span class="font-bold text-feu-green-900">{{ total_count|default(0) }}</span> activities found.</p>
+                        
+                        {# Evaluate if any goals are filtered and append visual labels #}
+                        {% if selected_goals is defined and selected_goals|length > 0 %}
+                            <div class="flex flex-wrap items-center gap-2">
+                                <span class="text-xs font-bold text-gray-400 font-work uppercase tracking-wider">Filtered by:</span>
+                                {% for goalId in selected_goals %}
+                                    {% for sdg in all_sdgs %}
+                                        {% if sdg.id == goalId %}
+                                            <span class="text-white text-[10px] font-bold px-3 py-1.5 rounded-full font-work uppercase tracking-wider shadow-sm" style="background-color: {{ sdg_colors[sdg.id]|default('#166534') }}; text-shadow: 0px 1px 2px rgba(0,0,0,0.2);">
+                                                {{ sdg.name }}
+                                            </span>
+                                        {% endif %}
+                                    {% endfor %}
+                                {% endfor %}
+                            </div>
+                        {% endif %}
+                    </div>
 
                     {% if total_pages > 1 %}
-                    <div class="flex items-center gap-2 text-sm font-work text-gray-700 bg-white px-3 py-1.5 rounded-xl border border-gray-200 shadow-sm">
-                        <button type="button" data-action="click->autosubmit#prevPage" class="p-1 text-gray-400 hover:text-feu-green-700 transition {% if current_page <= 1 %}opacity-30 cursor-not-allowed pointer-events-none{% endif %}">
-                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path></svg>
-                        </button>
-                        <span class="font-bold text-feu-green-900 mx-2">Page {{ current_page }} of {{ total_pages }}</span>
-                        <button type="button" data-action="click->autosubmit#nextPage" class="p-1 text-gray-400 hover:text-feu-green-700 transition {% if current_page >= total_pages %}opacity-30 cursor-not-allowed pointer-events-none{% endif %}">
-                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg>
-                        </button>
-                    </div>
+                        <div class="flex items-center gap-2 text-sm font-work text-gray-700 bg-white px-3 py-1.5 rounded-xl border border-gray-200 shadow-sm">
+                            <button type="button" data-action="click->autosubmit#prevPage" class="p-1 text-gray-400 hover:text-feu-green-700 transition {% if current_page <= 1 %}opacity-30 cursor-not-allowed pointer-events-none{% endif %}">
+                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path></svg>
+                            </button>
+                            <span class="font-bold text-feu-green-900 mx-2">Page {{ current_page }} of {{ total_pages }}</span>
+                            <button type="button" data-action="click->autosubmit#nextPage" class="p-1 text-gray-400 hover:text-feu-green-700 transition {% if current_page >= total_pages %}opacity-30 cursor-not-allowed pointer-events-none{% endif %}">
+                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg>
+                            </button>
+                        </div>
                     {% endif %}
                 </div>
 

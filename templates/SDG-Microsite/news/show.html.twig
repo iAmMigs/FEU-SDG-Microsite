@@ -7,12 +7,11 @@
 {% set word_count = activity.content|striptags|split(' ')|length %}
 {% set reading_time = (word_count / 200)|round(0, 'ceil') %}
 
-{# Define SDG Colors for the tags #}
 {% set sdg_colors = {
     1: '#E5243B', 2: '#DDA63A', 3: '#4C9F38', 4: '#C5192D', 5: '#FF3A21', 6: '#26BDE2',
     7: '#FCC30B', 8: '#A21942', 9: '#FD6925', 10: '#DD1367', 11: '#FD9D24', 12: '#BF8B2E',
     13: '#3F7E44', 14: '#0A97D9', 15: '#56C02B', 16: '#00689D', 17: '#19486A'
-} %}
+    } %}
 
 <section class="bg-gray-50 py-12 px-6 min-h-screen">
     <div class="max-w-4xl mx-auto">
@@ -47,7 +46,7 @@
                     {# The Colored SDG Tags right next to the category #}
                     {% for sdg in activity.sdgs %}
                         <span class="text-white text-[10px] font-bold px-3 py-1.5 rounded-full font-work uppercase tracking-wider shadow-sm" style="background-color: {{ sdg_colors[sdg.id]|default('#166534') }}; text-shadow: 0px 1px 2px rgba(0,0,0,0.2);">
-                            SDG {{ sdg.id }}
+                            SDG {{ sdg.id }}: {{ sdg.name }}
                         </span>
                     {% endfor %}
                     

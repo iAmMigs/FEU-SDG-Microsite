@@ -118,13 +118,17 @@ class DashboardController extends AbstractDashboardController
     {
         yield MenuItem::linkToDashboard('Dashboard Overview', 'fa fa-chart-pie');
 
-        yield MenuItem::section('Data Management');
+        yield MenuItem::section('Content Management');
         yield MenuItem::linkTo(ThesisCrudController::class, 'Theses & Studies', 'fas fa-book-bookmark');
-        yield MenuItem::linkTo(SdgCrudController::class, 'SDG Categories', 'fas fa-bullseye');
         yield MenuItem::linkTo(ActivityCrudController::class, 'Activities & Events', 'fas fa-newspaper');
-        yield MenuItem::linkTo(LeadingVoiceCrudController::class, 'Leading Voices', 'fas fa-users');
+        
 
-        yield MenuItem::section('Audiit Logs');
+        yield MenuItem::section('Data Management');
+        yield MenuItem::linkTo(SdgCrudController::class, 'SDG Categories', 'fas fa-bullseye');
+        yield MenuItem::linkTo(ActivityCategoryCrudController::class, 'Activity Categories', 'fas fa-tags');
+        yield MenuItem::linkTo(LeadingVoiceCrudController::class, 'Featured Voices', 'fas fa-users');
+        yield MenuItem::linkTo(ProjectTypeCrudController::class, 'Project Types', 'fas fa-tags');
+        yield MenuItem::linkTo(CollegeCrudController::class, 'Colleges', 'fas fa-school');
 
         yield MenuItem::section('Public Portal');
         yield MenuItem::linkToRoute('View Site', 'fas fa-arrow-right-from-bracket', 'app_home');

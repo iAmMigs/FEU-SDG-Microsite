@@ -3,6 +3,8 @@
 namespace App\Controller\Admin;
 
 use App\Entity\Thesis;
+use App\Entity\ProjectType;
+use App\Entity\College;
 use App\Repository\SdgRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use EasyCorp\Bundle\EasyAdminBundle\Config\Action;
@@ -15,7 +17,6 @@ use EasyCorp\Bundle\EasyAdminBundle\Config\KeyValueStore;
 use EasyCorp\Bundle\EasyAdminBundle\Context\AdminContext;
 use EasyCorp\Bundle\EasyAdminBundle\Dto\EntityDto;
 use EasyCorp\Bundle\EasyAdminBundle\Field\AssociationField;
-use EasyCorp\Bundle\EasyAdminBundle\Field\ChoiceField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\DateTimeField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\IdField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\ImageField;
@@ -62,107 +63,127 @@ class ThesisCrudController extends AbstractCrudController
         return $actions->add(Crud::PAGE_INDEX, $importAction);
     }
 
-    public function configureAssets(Assets $assets): Assets
-    {
-        /*
-         * Injects a listener into the admin edit/new forms. It evaluates user input
-         * in the publication link field in real-time. If the data matches a standard 
-         * DOI format, it auto-prepends the domain to formalize it into a valid URL.
-         */
-        return parent::configureAssets($assets)->addHtmlContentToBody('
-            <script>
-                document.addEventListener("DOMContentLoaded", function() {
-                    const pubLinkInput = document.querySelector(\'input[name="Thesis[publicationLink]"]\');
-                    if (pubLinkInput) {
-                        pubLinkInput.addEventListener("input", function(e) {
-                            let val = e.target.value.trim();
-                            const doiRegex = /^10\.\d{4,9}\/[-._;()\/:a-zA-Z0-9]+$/i;
-                            if (doiRegex.test(val)) {
-                                e.target.value = "https://doi.org/" + val;
-                            }
-                        });
-                    }
-                });
-            </script>
-        ');
-    }
-
     #[Route('/admin/projects/import-csv', name: 'admin_project_import_csv', methods: ['POST'])]
     public function importCsvAction(Request $request, EntityManagerInterface $entityManager, SdgRepository $sdgRepository, AdminUrlGenerator $adminUrlGenerator): Response
     {
         $file = $request->files->get('csv_file');
         
         if ($file && $file->isValid() && strtolower($file->getClientOriginalExtension()) === 'csv') {
-            $importedCount = 0;
             
-            if (($handle = fopen($file->getPathname(), 'r')) !== false) {
-                
-                fgetcsv($handle);
-                
-                while (($data = fgetcsv($handle)) !== false) {
+            ini_set('auto_detect_line_endings', true);
+            $importedCount = 0;
+            $skippedCount = 0;
+            
+            try {
+                if (($handle = fopen($file->getPathname(), 'r')) !== false) {
                     
-                    if (empty(array_filter($data))) continue;
-
-                    $project = new Thesis();
-                    $project->setTitle(trim($data[0] ?? ''));
-                    $project->setAuthors(trim($data[1] ?? ''));
-                    $project->setDescription(trim($data[2] ?? ''));
-                    $project->setIsActive(false); 
-                    $project->setViews(0);
-                    $project->setRegionViews([]);
-
-                    /*
-                     * Evaluates the imported link against standard DOI registry formats.
-                     * If it matches, the protocol and resolving host are automatically 
-                     * appended before saving to the database.
-                     */
-                    $externalLink = trim($data[4] ?? '');
-                    if ($externalLink !== '') {
-                        if (preg_match('/^10\.\d{4,9}\/[-._;()\/:a-zA-Z0-9]+$/i', $externalLink)) {
-                            $project->setPublicationLink('https://doi.org/' . $externalLink);
-                        } else {
-                            $project->setPublicationLink($externalLink);
-                        }
+                    $firstLine = fgets($handle);
+                    if (!$firstLine) throw new \Exception("The CSV file appears to be empty.");
+                    
+                    $delimiter = (substr_count($firstLine, ';') > substr_count($firstLine, ',')) ? ';' : ',';
+                    rewind($handle);
+                    
+                    $headers = fgetcsv($handle, 0, $delimiter);
+                    $headers[0] = preg_replace('/^\xEF\xBB\xBF/', '', $headers[0]); // Strip BOM
+                    
+                    $headerMap = [];
+                    foreach ($headers as $index => $header) {
+                        $cleanHeader = preg_replace('/[\x00-\x1F\x80-\xFF]/', '', $header);
+                        $normalized = strtolower(trim($cleanHeader));
+                        if (!empty($normalized)) $headerMap[$normalized] = $index;
                     }
+                    
+                    $authorsIdx  = $headerMap['authors'] ?? $headerMap['author'] ?? -1;
+                    $titleIdx    = $headerMap['title'] ?? -1;
+                    $abstractIdx = $headerMap['abstract'] ?? $headerMap['description'] ?? -1;
+                    $doiIdx      = $headerMap['doi'] ?? -1;
+                    $typeIdx     = $headerMap['type'] ?? $headerMap['projecttype'] ?? -1;
+                    $collegeIdx  = $headerMap['college'] ?? -1;
+                    $sdgIdx      = $headerMap['sdg'] ?? $headerMap['targetsdgs'] ?? -1;
 
-                    $project->setType(!empty($data[5]) ? trim($data[5]) : null);
-                    $project->setCollege(!empty($data[6]) ? trim($data[6]) : null);
+                    if ($titleIdx === -1 || $authorsIdx === -1) {
+                        $foundHeaders = implode(' | ', array_keys($headerMap));
+                        throw new \Exception("Header Mismatch! Detected Delimiter: '$delimiter'. Found: [ $foundHeaders ]. Columns must include 'Authors' and 'Title'.");
+                    }
+                    
+                    while (($data = fgetcsv($handle, 0, $delimiter)) !== false) {
+                        if (empty(array_filter($data))) continue;
 
-                    $sdgColumn = trim($data[3] ?? '');
-                    if ($sdgColumn !== '') {
-                        $sdgIds = array_map('trim', explode(',', $sdgColumn));
-                        foreach ($sdgIds as $sdgId) {
-                            if (is_numeric($sdgId)) {
-                                $sdg = $sdgRepository->find((int) $sdgId);
-                                if ($sdg) {
-                                    $project->addSdg($sdg);
+                        $title = trim($data[$titleIdx] ?? '');
+                        if (empty($title)) {
+                            $skippedCount++;
+                            continue; 
+                        }
+
+                        $project = new Thesis();
+                        $project->setTitle($title);
+                        if ($authorsIdx !== -1) $project->setAuthors(trim($data[$authorsIdx] ?? ''));
+                        if ($abstractIdx !== -1) $project->setDescription(trim($data[$abstractIdx] ?? ''));
+                        if ($doiIdx !== -1) $project->setDoi(trim($data[$doiIdx] ?? ''));
+                        
+                        $project->setIsActive(false); 
+                        $project->setViews(0);
+                        $project->setRegionViews([]);
+
+                        if ($typeIdx !== -1 && !empty(trim($data[$typeIdx] ?? ''))) {
+                            $typeStr = trim($data[$typeIdx]);
+                            $type = $entityManager->getRepository(ProjectType::class)->findOneBy(['name' => $typeStr]);
+                            if (!$type) {
+                                $type = new ProjectType();
+                                $type->setName($typeStr);
+                                $entityManager->persist($type);
+                                $entityManager->flush();
+                            }
+                            $project->setType($type);
+                        }
+
+                        if ($collegeIdx !== -1 && !empty(trim($data[$collegeIdx] ?? ''))) {
+                            $collegeStr = trim($data[$collegeIdx]);
+                            $college = $entityManager->getRepository(College::class)->findOneBy(['name' => $collegeStr]);
+                            if (!$college) {
+                                $college = new College();
+                                $college->setName($collegeStr);
+                                $entityManager->persist($college);
+                                $entityManager->flush();
+                            }
+                            $project->setCollege($college);
+                        }
+
+                        if ($sdgIdx !== -1 && !empty(trim($data[$sdgIdx] ?? ''))) {
+                            $sdgIds = array_map('trim', explode(',', trim($data[$sdgIdx])));
+                            foreach ($sdgIds as $sdgId) {
+                                if (is_numeric($sdgId)) {
+                                    $sdg = $sdgRepository->find((int) $sdgId);
+                                    if ($sdg) $project->addSdg($sdg);
                                 }
                             }
                         }
-                    }
 
-                    $entityManager->persist($project);
-                    $importedCount++;
+                        $entityManager->persist($project);
+                        $importedCount++;
 
-                    if ($importedCount % 50 === 0) {
-                        $entityManager->flush();
-                        $entityManager->clear(Thesis::class);
+                        if ($importedCount % 50 === 0) {
+                            $entityManager->flush();
+                            $entityManager->clear(Thesis::class);
+                        }
                     }
+                    fclose($handle);
                 }
-                fclose($handle);
+                
+                $entityManager->flush();
+                $msg = "Successfully imported $importedCount projects.";
+                if ($skippedCount > 0) $msg .= " (Skipped $skippedCount rows missing a title).";
+                $this->addFlash('success', $msg);
+                
+            } catch (\Exception $e) {
+                $this->addFlash('danger', $e->getMessage());
             }
             
-            $entityManager->flush();
-            $this->addFlash('success', "Successfully imported $importedCount projects.");
         } else {
-            $this->addFlash('danger', 'Failed to upload or read the CSV file.');
+            $this->addFlash('danger', 'Failed to upload. Ensure the file is saved as a .csv format.');
         }
 
-        $url = $adminUrlGenerator
-            ->setController(self::class)
-            ->setAction(Action::INDEX)
-            ->generateUrl();
-
+        $url = $adminUrlGenerator->setController(self::class)->setAction(Action::INDEX)->generateUrl();
         return $this->redirect($url);
     }
 
@@ -193,30 +214,29 @@ class ThesisCrudController extends AbstractCrudController
     public function configureFields(string $pageName): iterable
     {
         return [
-            IdField::new('id')->hideOnForm()
-            ->hideOnIndex(),
+            IdField::new('id')->hideOnForm()->hideOnIndex(),
             BooleanField::new('isActive', 'Active'),
             TextField::new('title', 'Thesis Title'),
-            TextField::new('authors', 'Authors'),
-            ChoiceField::new('type', 'Type')->setChoices([
-                'Article' => 'Article',
-                'Book Chapter' => 'Book Chapter',
-                'Letter' => 'Letter',
-                'Proceedings' => 'Proceedings',
-                'Review' => 'Review',
-                'Editorial' => 'Editorial',
-                'Book' => 'Book',
-            ])->setRequired(false),
-            TextField::new('college', 'College')->setRequired(false),
-            TextareaField::new('description', 'Abstract / Description')->setNumOfRows(6)->hideOnIndex(),
+            TextField::new('authors', 'Authors')
+                ->setHelp('Separate multiple authors with a semicolon (;) to match our dataset format.'),
+            
+            AssociationField::new('type', 'Type')->setRequired(false),
+            AssociationField::new('college', 'College')->setRequired(false)
+                ->hideOnIndex(),
+            
+            TextareaField::new('description', 'Abstract')->setNumOfRows(6)->hideOnIndex(),
+            
             AssociationField::new('sdgs', 'Targeted SDGs')
                 ->setFormTypeOptions(['by_reference' => false])
                 ->setQueryBuilder(function (QueryBuilder $queryBuilder) {
                     return $queryBuilder->orderBy('entity.id', 'ASC');
                 })->autocomplete(),
+                
+            TextField::new('doi', 'DOI')
+                ->setHelp('Provide the Digital Object Identifier. (e.g. 10.1234/5678)')->setRequired(false),
             UrlField::new('publicationLink', 'External Publication Link')
-                ->setHelp('Paste a DOI or URL to an external journal or publication')
-                ->setRequired(false),
+                ->setHelp('Paste the URL to an external journal or publication if applicable')->setRequired(false),
+                
             TextField::new('documentFile', 'PDF Document')
                 ->setFormType(FileUploadType::class)
                 ->setFormTypeOptions([

@@ -18,7 +18,7 @@
                             <i class="fas fa-info-circle me-2"></i>
                             <strong>Note:</strong> Make sure your data exactly matches the format of the project table. The first row must be the headers:
                             <br><br>
-                            <code>Title, Authors, Description, Target SDGs, Publication Link</code>
+                            <code>Authors, Title, Abstract, DOI, Type, College, SDG</code>
                         </div>
                         
                         <div class="mb-3">
@@ -42,9 +42,6 @@
             const confirmBtn = document.getElementById('confirmImportBtn');
             const feedback = document.getElementById('fileValidationFeedback');
 
-            // The expected headers stripped of spaces and made lowercase for loose matching
-            const expectedHeaders = "Title, Authors, Description, Target SDGs, Publication Link".toLowerCase().replace(/\s/g, '');
-
             fileInput.addEventListener('change', function(e) {
                 const file = e.target.files[0];
                 
@@ -62,20 +59,19 @@
                 const reader = new FileReader();
                 reader.onload = function(event) {
                     const text = event.target.result;
-                    const firstLine = text.split('\n')[0]; 
+                    const firstLine = text.split('\n')[0].toLowerCase(); 
                     
-                    const uploadedHeaders = firstLine.toLowerCase().replace(/\s/g, '').replace(/"/g, '');
-
-                    if (uploadedHeaders.includes(expectedHeaders)) {
+                    // Loose validation: Just make sure it at least contains 'title' and 'authors' 
+                    // since our new PHP backend parser is highly dynamic.
+                    if (firstLine.includes('title') && (firstLine.includes('author') || firstLine.includes('authors'))) {
                         feedback.style.display = 'none';
                         confirmBtn.disabled = false;
                         fileInput.classList.remove('is-invalid');
                         fileInput.classList.add('is-valid');
                     } else {
-                        showError("Header mismatch. Please ensure your CSV headers are exactly: Title, Authors, Description, Target SDGs, Publication Link");
+                        showError("Header mismatch. Please ensure your CSV headers are exactly: Authors, Title, Abstract, DOI, Type, College, SDG");
                     }
                 };
-
                 reader.onerror = function() {
                     showError("Error reading file. Please try uploading again.");
                 };

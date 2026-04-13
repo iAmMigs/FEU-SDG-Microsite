@@ -4,9 +4,10 @@
 
 {% block body %}
     {# Official UN SDG Hex Colors Mapping #}
-    {% set sdg_colors = {
-        3: '#4C9F38', 4: '#C5192D', 7: '#FCC30B', 8: '#A21942',
-        9: '#FD6925', 11: '#FD9D24', 12: '#BF8B2E', 17: '#19486A'
+{% set sdg_colors = {
+    1: '#E5243B', 2: '#DDA63A', 3: '#4C9F38', 4: '#C5192D', 5: '#FF3A21', 6: '#26BDE2',
+    7: '#FCC30B', 8: '#A21942', 9: '#FD6925', 10: '#DD1367', 11: '#FD9D24', 12: '#BF8B2E',
+    13: '#3F7E44', 14: '#0A97D9', 15: '#56C02B', 16: '#00689D', 17: '#19486A'
     } %}
 
 <section class="bg-white py-12 px-6 min-h-screen">
@@ -25,47 +26,67 @@
             </div>
         {% endif %}
 
+        {% set ext_link = thesis.publicationLink %}
+        {% set doi_link = thesis.doi ? 'https://doi.org/' ~ thesis.doi : null %}
+
+        {% set pub_btn_link = null %}
+        {% set citeLink = null %}
+
+        {% if thesis.doi and ext_link %}
+            {# Both exist: Button gets External, Citation gets DOI #}
+            {% set pub_btn_link = ext_link %}
+            {% set citeLink = doi_link %}
+        {% elseif not thesis.doi and ext_link %}
+            {# Only External Link exists: Both get External #}
+            {% set pub_btn_link = ext_link %}
+            {% set citeLink = ext_link %}
+        {% elseif thesis.doi and not ext_link %}
+            {# Only DOI exists: Both get DOI #}
+            {% set pub_btn_link = doi_link %}
+            {% set citeLink = doi_link %}
+        {% endif %}
+
+
         <div class="flex flex-col md:flex-row justify-between items-start md:items-end gap-6 mb-12 border-b border-gray-200 pb-8">
-       
             <div class="max-w-4xl">
                 <h1 class="text-4xl md:text-5xl font-bold text-gray-900 font-bebas tracking-wide mb-4 leading-tight">
                     {{ thesis.title }}
                 </h1>
-                <p class="text-gray-600 font-medium font-work text-lg mb-4">By {{ thesis.authors }}</p>
+                <p class="text-gray-600 font-medium font-work text-lg mb-4">By {{ thesis.authors|replace({';': ', '}) }}</p>
+
                 <div class="flex flex-wrap gap-2">
                     {% for sdg in thesis.sdgs %}
-                        <span class="text-white text-xs font-bold px-3 py-1 rounded-full font-work uppercase tracking-wider shadow-sm" style="background-color: {{ sdg_colors[sdg.id]|default('#166534') }}; text-shadow: 0px 1px 2px rgba(0,0,0,0.2);">
-                            SDG {{ sdg.id }}
+                        <span class="text-white text-[10px] font-bold px-3 py-1.5 rounded-full font-work uppercase tracking-wider shadow-sm" style="background-color: {{ sdg_colors[sdg.id]|default('#166534') }}; text-shadow: 0px 1px 2px rgba(0,0,0,0.2);">
+                           SDG {{ sdg.id }}: {{ sdg.name }} 
                         </span>
                     {% endfor %}
                 </div>
             </div>
 
-            {% if thesis.publicationLink %}
-                <a href="{{ thesis.publicationLink }}" target="_blank" class="inline-flex shrink-0 items-center px-6 py-3 text-sm font-bold rounded-full text-feu-green-950 bg-[#FCC30B] hover:bg-yellow-400 transition shadow-sm gap-2 font-work">
+            {% if pub_btn_link %}
+                <a href="{{ pub_btn_link }}" target="_blank" class="inline-flex shrink-0 items-center px-6 py-3 text-sm font-bold rounded-full text-feu-green-950 bg-[#FCC30B] hover:bg-yellow-400 transition shadow-sm gap-2 font-work">
                     View Publication
                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"></path></svg>
                 </a>
             {% endif %}
-            
         </div>
 
         <div class="grid grid-cols-1 lg:grid-cols-3 gap-12">
-           
             <div class="lg:col-span-2">
                 <h2 class="text-2xl font-bold text-gray-900 font-bebas tracking-wide mb-6">Abstract</h2>
                 <div class="text-gray-800 font-work leading-relaxed space-y-5 text-justify mb-12">
                     <p class="whitespace-pre-line">{{ thesis.description }}</p>
                 </div>
 
-                {# 2. TURBO-PROOF CITATION GENERATION #}
+                {# --- 2. TURBO-PROOF CITATION GENERATION --- #}
                 {% set pubYear = thesis.createdAt|date('Y') %}
-                {% set currentUrl = url('app_library_show', {id: thesis.id}) %}
-                {% set citeLink = thesis.publicationLink ? thesis.publicationLink : currentUrl %}
+                {% set formatted_authors = thesis.authors|replace({';': ', '}) %}
                 
-                {% set cite_apa = thesis.authors ~ ' (' ~ pubYear ~ '). ' ~ thesis.title ~ '. FEU SDG Microsite. ' ~ citeLink %}
-                {% set cite_ieee = thesis.authors ~ ', "' ~ thesis.title ~ '," FEU SDG Microsite, ' ~ pubYear ~ '. [Online]. Available: ' ~ citeLink %}
-                {% set cite_mla = thesis.authors ~ '. "' ~ thesis.title ~ '." FEU SDG Microsite, ' ~ pubYear ~ ', ' ~ citeLink ~ '.' %}
+                {% set cite_apa = formatted_authors ~ ' (' ~ pubYear ~ '). ' ~ thesis.title ~ '. FEU SDG Microsite.' ~ (citeLink ? ' ' ~ citeLink : '') %}
+                
+                {% set cite_ieee = formatted_authors ~ ', "' ~ thesis.title ~ '," FEU SDG Microsite, ' ~ pubYear ~ '.' ~ (citeLink ? ' [Online]. Available: ' ~ citeLink : '') %}
+                
+                {% set cite_mla = formatted_authors ~ '. "' ~ thesis.title ~ '." FEU SDG Microsite, ' ~ pubYear ~ (citeLink ? ', ' ~ citeLink : '') ~ '.' %}
 
                 <div class="p-8 border border-gray-200 bg-gray-50 rounded-2xl shadow-sm" id="citation-card">
                     <h2 class="text-xl font-bold text-gray-900 font-bebas tracking-wide mb-6">Recommended Citation</h2>
@@ -85,7 +106,6 @@
                             Copy
                         </button>
                     </div>
-        
                 </div>
             </div>
 

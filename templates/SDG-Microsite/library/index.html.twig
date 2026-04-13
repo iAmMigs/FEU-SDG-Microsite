@@ -16,7 +16,7 @@
 
     <section class="bg-feu-green-900 py-16 px-6 text-center border-b-4 border-feu-gold-400">
         <div class="max-w-4xl mx-auto">
-            <h1 class="text-4xl md:text-5xl font-bold text-white mb-4 font-bebas tracking-wide">Research Library</h1>
+            <h1 class="text-4xl md:text-5xl font-bold text-white mb-4 font-bebas tracking-wide">Project Library</h1>
             <p class="text-lg text-feu-green-50 font-medium font-work max-w-2xl mx-auto">
                 Explore student theses and community projects dedicated to sustainable development.
             </p>
@@ -88,20 +88,41 @@
             <main class="w-full lg:w-3/4">
                 <turbo-frame id="theses_list">
                     
-                    <div class="flex flex-col sm:flex-row justify-between items-center mb-6 pb-4 border-b border-gray-200 gap-4">
-                        <p class="text-gray-600 font-medium font-work">Showing <span class="font-bold text-feu-green-900">{{ total_count|default(0) }}</span> studies found.</p>
-
-                        <div class="flex items-center gap-2 text-sm font-work text-gray-700 bg-white px-3 py-1.5 rounded-lg border border-gray-200 shadow-sm">
-                            <span class="hidden sm:inline font-medium mr-1">Page</span>
-                            <button type="button" data-action="click->autosubmit#prevPage" class="p-1 text-gray-400 hover:text-feu-green-700 transition {% if current_page|default(1) <= 1 %}opacity-30 cursor-not-allowed pointer-events-none{% endif %}">
-                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path></svg>
-                            </button>
-                            <input type="number" name="page" form="filter-form" data-autosubmit-target="page" data-action="change->autosubmit#submit" data-max="{{ total_pages|default(1) }}" value="{{ current_page|default(1) }}" min="1" max="{{ total_pages|default(1) }}" class="w-14 text-center rounded-md border-gray-200 focus:border-feu-green-700 focus:ring-feu-green-700 py-1 border font-bold text-feu-green-900 bg-gray-50 hide-arrows">
-                            <button type="button" data-action="click->autosubmit#nextPage" class="p-1 text-gray-400 hover:text-feu-green-700 transition {% if current_page|default(1) >= total_pages|default(1) %}opacity-30 cursor-not-allowed pointer-events-none{% endif %}">
-                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg>
-                            </button>
-                            <span class="hidden sm:inline font-medium ml-1">of {{ total_pages|default(1) }}</span>
+                    <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6 pb-4 border-b border-gray-200 gap-4">
+                        <div class="flex flex-col gap-3">
+                            <p class="text-gray-600 font-medium font-work">Showing <span class="font-bold text-feu-green-900">{{ total_count|default(0) }}</span> studies found.</p>
+                            
+                            {# Evaluate if any goals are filtered and append visual labels #}
+                            {% if selected_goals is defined and selected_goals|length > 0 %}
+                                <div class="flex flex-wrap items-center gap-2 mt-1">
+                                    <span class="text-xs font-bold text-gray-400 font-work uppercase tracking-wider">Filtered by:</span>
+                                    {% for goalId in selected_goals %}
+                                        {% for sdg in active_sdgs %}
+                                            {% if sdg.id == goalId %}
+                                                <span class="text-white text-[10px] font-bold px-3 py-1.5 rounded-full font-work uppercase tracking-wider shadow-sm" style="background-color: {{ sdg_colors[sdg.id]|default('#166534') }}; text-shadow: 0px 1px 2px rgba(0,0,0,0.2);">
+                                                    {{ sdg.name }}
+                                                </span>
+                                            {% endif %}
+                                        {% endfor %}
+                                    {% endfor %}
+                                </div>
+                            {% endif %}
                         </div>
+
+                        {# The pagination controls (preserved exactly as you had them for the library) #}
+                        {% if total_pages|default(1) > 1 %}
+                            <div class="flex items-center gap-2 text-sm font-work text-gray-700 bg-white px-3 py-1.5 rounded-lg border border-gray-200 shadow-sm shrink-0">
+                                <span class="hidden sm:inline font-medium mr-1">Page</span>
+                                <button type="button" data-action="click->autosubmit#prevPage" class="p-1 text-gray-400 hover:text-feu-green-700 transition {% if current_page|default(1) <= 1 %}opacity-30 cursor-not-allowed pointer-events-none{% endif %}">
+                                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path></svg>
+                                </button>
+                                <input type="number" name="page" form="filter-form" data-autosubmit-target="page" data-action="change->autosubmit#submit" data-max="{{ total_pages|default(1) }}" value="{{ current_page|default(1) }}" min="1" max="{{ total_pages|default(1) }}" class="w-14 text-center rounded-md border-gray-200 focus:border-feu-green-700 focus:ring-feu-green-700 py-1 border font-bold text-feu-green-900 bg-gray-50 hide-arrows">
+                                <button type="button" data-action="click->autosubmit#nextPage" class="p-1 text-gray-400 hover:text-feu-green-700 transition {% if current_page|default(1) >= total_pages|default(1) %}opacity-30 cursor-not-allowed pointer-events-none{% endif %}">
+                                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg>
+                                </button>
+                                <span class="hidden sm:inline font-medium ml-1">of {{ total_pages|default(1) }}</span>
+                            </div>
+                        {% endif %}
                     </div>
 
                     <div id="theses-skeleton" class="space-y-6 hidden">
@@ -153,7 +174,7 @@
                                 <div class="flex flex-col xl:flex-row xl:items-center justify-between mt-4 pt-4 border-t border-gray-100 gap-4">
                                     
                                     <div class="flex flex-wrap items-center gap-4 text-sm font-work">
-                                        <span class="font-bold text-gray-600">By {{ thesis.authors }}</span>
+                                        <span class="font-bold text-gray-600">By {{ thesis.authors|replace({';': ', '}) }}</span>
                                         <div class="flex items-center text-feu-green-700 font-bold gap-1 bg-feu-green-50 px-2 py-1 rounded-md">
                                             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path></svg>
                                             {{ thesis.views|number_format }} Views

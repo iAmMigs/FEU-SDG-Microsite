@@ -19,8 +19,8 @@ class Activity
     #[ORM\Column(length: 255)]
     private ?string $title = null;
 
-    #[ORM\Column(length: 100)]
-    private ?string $category = null;
+    #[ORM\ManyToOne(targetEntity: ActivityCategory::class)]
+    private ?ActivityCategory $category = null;
 
     #[ORM\Column(type: Types::TEXT)]
     private ?string $content = null;
@@ -60,8 +60,16 @@ class Activity
     public function getTitle(): ?string { return $this->title; }
     public function setTitle(string $title): static { $this->title = $title; return $this; }
 
-    public function getCategory(): ?string { return $this->category; }
-    public function setCategory(string $category): static { $this->category = $category; return $this; }
+    public function getCategory(): ?ActivityCategory 
+    { 
+        return $this->category; 
+    }
+    
+    public function setCategory(?ActivityCategory $category): static 
+    { 
+        $this->category = $category; 
+        return $this; 
+    }
 
     public function setContent(?string $content): static 
     { 

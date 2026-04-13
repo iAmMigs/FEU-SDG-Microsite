@@ -27,11 +27,14 @@ class Thesis
     #[ORM\Column(length: 255)]
     private ?string $authors = null;
 
-    #[ORM\Column(length: 255, nullable: true)]
-    private ?string $type = null;
+    #[ORM\ManyToOne(targetEntity: ProjectType::class)]
+    private ?ProjectType $type = null;
+
+    #[ORM\ManyToOne(targetEntity: College::class)]
+    private ?College $college = null;
 
     #[ORM\Column(length: 255, nullable: true)]
-    private ?string $college = null;
+    private ?string $doi = null;
 
     #[ORM\Column(options: ['default' => 0])]
     private ?int $views = 0;
@@ -78,11 +81,14 @@ class Thesis
     public function getAuthors(): ?string { return $this->authors; }
     public function setAuthors(string $authors): static { $this->authors = $authors; return $this; }
 
-    public function getType(): ?string { return $this->type; }
-    public function setType(?string $type): static { $this->type = $type; return $this; }
+    public function getType(): ?ProjectType { return $this->type; }
+    public function setType(?ProjectType $type): static { $this->type = $type; return $this; }
 
-    public function getCollege(): ?string { return $this->college; }
-    public function setCollege(?string $college): static { $this->college = $college; return $this; }
+    public function getCollege(): ?College { return $this->college; }
+    public function setCollege(?College $college): static { $this->college = $college; return $this; }
+
+    public function getDoi(): ?string { return $this->doi; }
+    public function setDoi(?string $doi): static { $this->doi = $doi; return $this; }
 
     public function getViews(): ?int { return $this->views; }
     public function setViews(int $views): static { $this->views = $views; return $this; }
