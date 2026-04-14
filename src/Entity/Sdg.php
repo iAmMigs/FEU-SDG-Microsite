@@ -7,12 +7,18 @@ use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 
+/**
+ * Represents one of the 17 UN Sustainable Development Goals.
+ */
 #[ORM\Entity(repositoryClass: SdgRepository::class)]
 class Sdg
 {
+    /**
+     * Primary Key maps directly to the official UN SDG designation number (1-17).
+     */
     #[ORM\Id]
     #[ORM\Column]
-    private ?int $id = null; // This IS the SDG number (e.g., 1 to 17)
+    private ?int $id = null; 
 
     #[ORM\Column(length: 255)]
     private ?string $name = null;

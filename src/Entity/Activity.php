@@ -8,6 +8,9 @@ use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 
+/**
+ * Represents a news article, event, or community activity.
+ */
 #[ORM\Entity(repositoryClass: ActivityRepository::class)]
 class Activity
 {
@@ -28,7 +31,6 @@ class Activity
     #[ORM\Column(length: 255, nullable: true)]
     private ?string $image = null;
 
-    // To this:
     #[ORM\Column(type: Types::DATETIME_MUTABLE)]
     private ?\DateTimeInterface $eventDate = null;
 
@@ -53,23 +55,13 @@ class Activity
         $this->sdgs = new ArrayCollection();
     }
 
-    // --- GETTERS & SETTERS ---
-
     public function getId(): ?int { return $this->id; }
 
     public function getTitle(): ?string { return $this->title; }
     public function setTitle(string $title): static { $this->title = $title; return $this; }
 
-    public function getCategory(): ?ActivityCategory 
-    { 
-        return $this->category; 
-    }
-    
-    public function setCategory(?ActivityCategory $category): static 
-    { 
-        $this->category = $category; 
-        return $this; 
-    }
+    public function getCategory(): ?ActivityCategory { return $this->category; }
+    public function setCategory(?ActivityCategory $category): static { $this->category = $category; return $this; }
 
     public function setContent(?string $content): static 
     { 
@@ -138,7 +130,4 @@ class Activity
 
         return $this;
     }
-
-    
-
 }

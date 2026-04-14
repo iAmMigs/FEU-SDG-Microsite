@@ -6,6 +6,9 @@ use App\Repository\LeadingVoiceRepository;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 
+/**
+ * Represents a featured researcher, faculty member, or public figure.
+ */
 #[ORM\Entity(repositoryClass: LeadingVoiceRepository::class)]
 class LeadingVoice
 {

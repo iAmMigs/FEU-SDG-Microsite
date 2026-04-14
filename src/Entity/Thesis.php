@@ -8,6 +8,9 @@ use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 
+/**
+ * Represents a student research project, academic thesis, or official publication.
+ */
 #[ORM\Entity(repositoryClass: ThesisRepository::class)]
 #[ORM\Index(name: 'idx_thesis_search', columns: ['title', 'authors'])]
 #[ORM\Index(name: 'idx_thesis_trending', columns: ['views'])]
@@ -33,9 +36,6 @@ class Thesis
     #[ORM\ManyToOne(targetEntity: College::class)]
     private ?College $college = null;
 
-    #[ORM\Column(length: 255, nullable: true)]
-    private ?string $doi = null;
-
     #[ORM\Column(options: ['default' => 0])]
     private ?int $views = 0;
 
@@ -50,6 +50,9 @@ class Thesis
 
     #[ORM\Column(type: Types::DATETIME_IMMUTABLE)]
     private ?\DateTimeImmutable $createdAt = null;
+
+    #[ORM\Column(length: 255, nullable: true)]
+    private ?string $doi = null;
 
     #[ORM\Column(length: 255, nullable: true)]
     private ?string $publicationLink = null;
@@ -86,9 +89,6 @@ class Thesis
 
     public function getCollege(): ?College { return $this->college; }
     public function setCollege(?College $college): static { $this->college = $college; return $this; }
-
-    public function getDoi(): ?string { return $this->doi; }
-    public function setDoi(?string $doi): static { $this->doi = $doi; return $this; }
 
     public function getViews(): ?int { return $this->views; }
     public function setViews(int $views): static { $this->views = $views; return $this; }
@@ -127,6 +127,9 @@ class Thesis
     public function getCreatedAt(): ?\DateTimeImmutable { return $this->createdAt; }
     public function setCreatedAt(\DateTimeImmutable $createdAt): static { $this->createdAt = $createdAt; return $this; }
 
+    public function getDoi(): ?string { return $this->doi; }
+    public function setDoi(?string $doi): static { $this->doi = $doi; return $this; }
+
     public function getPublicationLink(): ?string { return $this->publicationLink; }
     public function setPublicationLink(?string $publicationLink): static { $this->publicationLink = $publicationLink; return $this; }
 
@@ -152,6 +155,9 @@ class Thesis
         return (string) $this->title;
     }
 
+    /**
+     * Increments the overall view count and tracks geographic distribution.
+     */
     public function incrementViews(string $countryCode = 'Unknown'): static
     {
         $regions = $this->getRegionViews();

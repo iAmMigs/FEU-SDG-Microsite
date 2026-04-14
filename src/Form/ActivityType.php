@@ -23,10 +23,8 @@ class ActivityType extends AbstractType
             ])
             ->add('category', TextType::class)
             ->add('content', TextareaType::class, [
-                // We add a specific class to target with our JS Rich Text Editor
                 'attr' => ['class' => 'rich-text-editor min-h-[400px]']
             ])
-            // File upload logic for the main cover image remains the same
             ->add('image') 
             ->add('event_date', DateTimeType::class, [
                 'widget' => 'single_text',
@@ -35,7 +33,7 @@ class ActivityType extends AbstractType
                 'class' => Sdg::class,
                 'choice_label' => 'name',
                 'multiple' => true,
-                'expanded' => true, // Renders as checkboxes
+                'expanded' => true,
                 'label' => 'Tag SDGs'
             ])
             ->add('isActive', CheckboxType::class, [
