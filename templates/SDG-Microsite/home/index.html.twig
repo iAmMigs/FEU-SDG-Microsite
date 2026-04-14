@@ -4,13 +4,11 @@
 
 {% block body %}
     <section class="relative h-screen w-full bg-feu-green-900 text-white overflow-hidden" data-controller="carousel">
-    
         <div class="absolute inset-0 z-0 pointer-events-none">
             <img data-carousel-target="slide" src="{{ asset('images/hero-1.jpg') }}" class="absolute inset-0 w-full h-full object-cover transition-opacity duration-1000 opacity-0" alt="FEU Campus 1">
             <img data-carousel-target="slide" src="{{ asset('images/hero-2.jpg') }}" class="absolute inset-0 w-full h-full object-cover transition-opacity duration-1000 opacity-0" alt="FEU Campus 2">
             <img data-carousel-target="slide" src="{{ asset('images/hero-3.jpg') }}" class="absolute inset-0 w-full h-full object-cover transition-opacity duration-1000 opacity-0" alt="FEU Campus 3">
             <img data-carousel-target="slide" src="{{ asset('images/hero-4.jpg') }}" class="absolute inset-0 w-full h-full object-cover transition-opacity duration-1000 opacity-0" alt="FEU Campus 4">
-            
             <div class="absolute inset-0 bg-feu-green-900/70 mix-blend-multiply"></div>
         </div>
 
@@ -28,55 +26,129 @@
     </section>
 
     <section id="goals" class="py-20 px-6 bg-gray-50">
-        <div class="max-w-7xl mx-auto">
-            <div class="text-center mb-16">
-                <h2 class="text-3xl font-bold text-gray-900 mb-4 font-bebas tracking-wide">Our SDG Focus Areas</h2>
-                <p class="text-gray-600 max-w-2xl mx-auto font-work">FEU aligns its academic research, student theses, and institutional projects specifically toward these 8 key Sustainable Development Goals.</p>
+        <div class="max-w-7xl mx-auto text-center mb-16">
+            <h2 class="text-3xl font-bold text-gray-900 mb-4 font-bebas tracking-wide">Our SDG Focus Areas</h2>
+            <p class="text-gray-600 max-w-2xl mx-auto font-work">FEU aligns its academic research, student theses, and institutional projects specifically toward these key Sustainable Development Goals.</p>
+        </div>
+
+        <div data-controller="modal" class="max-w-7xl mx-auto">
+            
+            <div class="flex justify-center mb-10">
+                <div class="bg-gray-200 p-1 rounded-full flex gap-1 shadow-inner relative z-20">
+                    <button type="button"
+                            id="btn-focused-sdgs"
+                            onclick="filterSdgs('focused')"
+                            class="px-6 py-2 rounded-full text-sm font-bold font-work transition-all duration-300 bg-feu-green-900 text-white shadow-md cursor-pointer">
+                        Focused SDGs
+                    </button>
+                    <button type="button"
+                            id="btn-all-sdgs"
+                            onclick="filterSdgs('all')"
+                            class="px-6 py-2 rounded-full text-sm font-bold font-work transition-all duration-300 bg-gray-200 text-gray-600 hover:bg-gray-300 cursor-pointer">
+                        All SDGs
+                    </button>
+                </div>
             </div>
 
-            <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-6">
+            <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-6 lg:gap-8">
+                {% for sdg in all_sdgs %}
+                    {% set formatted_num = '%02d'|format(sdg.num) %}
+                    {% set is_active = sdg.num in active_sdg_ids %}
+                    
+                    <button type="button" 
+                            data-modal-target="card"
+                            data-action="click->modal#open"
+                            data-goal="{{ sdg.num }}"
+                            data-title="{{ sdg.title }}"
+                            data-description="{{ sdg.desc }}"
+                            data-active="{{ is_active ? 'true' : 'false' }}"
+                            data-image="{{ asset('images/sdg/E-WEB-Goal-' ~ formatted_num ~ '.png') }}"
+                            style="{{ is_active ? 'display: block; opacity: 1; transform: scale(1);' : 'display: none; opacity: 0; transform: scale(0.95);' }}"
+                            class="sdg-card group relative rounded-2xl overflow-hidden shadow-md hover:shadow-2xl transition-all duration-300 hover:-translate-y-2 border border-gray-100 bg-white aspect-square text-left focus:outline-none focus:ring-4 focus:ring-green-700/30 cursor-pointer">
+                        
+                        <img src="{{ asset('images/sdg/E-WEB-Goal-' ~ formatted_num ~ '.png') }}" alt="Goal {{ sdg.num }}" class="absolute inset-0 w-full h-full object-cover transition-opacity duration-300 opacity-100 group-hover:opacity-0">
+                        <img src="{{ asset('images/sdg/E Inverted Icons_WEB-' ~ formatted_num ~ '.png') }}" alt="Goal {{ sdg.num }}" class="absolute inset-0 w-full h-full object-cover transition-opacity duration-300 opacity-0 group-hover:opacity-100">
+                    </button>
+                {% endfor %}
+            </div>
+
+            <div data-modal-target="backdrop" class="fixed inset-0 z-[100] hidden opacity-0 transition-opacity duration-300 flex items-center justify-center p-4 md:p-6">
+                <div class="absolute inset-0 bg-black/60 backdrop-blur-md cursor-pointer" data-action="click->modal#close"></div>
                 
-                <a href="{{ path('app_library') }}?goals[]=3" class="block group relative rounded-xl overflow-hidden shadow-sm hover:shadow-2xl transition-all duration-300 hover:-translate-y-1.5 border border-gray-100 bg-white aspect-square">
-                    <img src="{{ asset('images/sdg-3.jpg') }}" alt="Goal 3: Good Health and Well-Being" class="absolute inset-0 w-full h-full object-cover transition-opacity duration-300 opacity-100 group-hover:opacity-0">
-                    <img src="{{ asset('images/sdg-3-inv.jpg') }}" alt="Goal 3: Good Health and Well-Being" class="absolute inset-0 w-full h-full object-cover transition-opacity duration-300 opacity-0 group-hover:opacity-100">
-                </a>
+                <div data-modal-target="panel" class="relative bg-white rounded-3xl overflow-hidden shadow-2xl w-full max-w-4xl flex flex-col md:flex-row transform opacity-0 scale-95 translate-y-4 transition-all duration-300 ease-out z-10">
+                    <button type="button" data-action="click->modal#close" class="absolute top-4 right-4 z-20 bg-white/50 hover:bg-white backdrop-blur-sm text-gray-900 p-2 rounded-full transition duration-200 shadow-sm focus:outline-none cursor-pointer">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+                    </button>
 
-                <a href="{{ path('app_library') }}?goals[]=4" class="block group relative rounded-xl overflow-hidden shadow-sm hover:shadow-2xl transition-all duration-300 hover:-translate-y-1.5 border border-gray-100 bg-white aspect-square">
-                    <img src="{{ asset('images/sdg-4.jpg') }}" alt="Goal 4: Quality Education" class="absolute inset-0 w-full h-full object-cover transition-opacity duration-300 opacity-100 group-hover:opacity-0">
-                    <img src="{{ asset('images/sdg-4-inv.jpg') }}" alt="Goal 4: Quality Education" class="absolute inset-0 w-full h-full object-cover transition-opacity duration-300 opacity-0 group-hover:opacity-100">
-                </a>
-
-                <a href="{{ path('app_library') }}?goals[]=7" class="block group relative rounded-xl overflow-hidden shadow-sm hover:shadow-2xl transition-all duration-300 hover:-translate-y-1.5 border border-gray-100 bg-white aspect-square">
-                    <img src="{{ asset('images/sdg-7.jpg') }}" alt="Goal 7: Affordable and Clean Energy" class="absolute inset-0 w-full h-full object-cover transition-opacity duration-300 opacity-100 group-hover:opacity-0">
-                    <img src="{{ asset('images/sdg-7-inv.jpg') }}" alt="Goal 7: Affordable and Clean Energy" class="absolute inset-0 w-full h-full object-cover transition-opacity duration-300 opacity-0 group-hover:opacity-100">
-                </a>
-
-                <a href="{{ path('app_library') }}?goals[]=8" class="block group relative rounded-xl overflow-hidden shadow-sm hover:shadow-2xl transition-all duration-300 hover:-translate-y-1.5 border border-gray-100 bg-white aspect-square">
-                    <img src="{{ asset('images/sdg-8.jpg') }}" alt="Goal 8: Decent Work and Economic Growth" class="absolute inset-0 w-full h-full object-cover transition-opacity duration-300 opacity-100 group-hover:opacity-0">
-                    <img src="{{ asset('images/sdg-8-inv.jpg') }}" alt="Goal 8: Decent Work and Economic Growth" class="absolute inset-0 w-full h-full object-cover transition-opacity duration-300 opacity-0 group-hover:opacity-100">
-                </a>
-
-                <a href="{{ path('app_library') }}?goals[]=9" class="block group relative rounded-xl overflow-hidden shadow-sm hover:shadow-2xl transition-all duration-300 hover:-translate-y-1.5 border border-gray-100 bg-white aspect-square">
-                    <img src="{{ asset('images/sdg-9.jpg') }}" alt="Goal 9: Industry, Innovation and Infrastructure" class="absolute inset-0 w-full h-full object-cover transition-opacity duration-300 opacity-100 group-hover:opacity-0">
-                    <img src="{{ asset('images/sdg-9-inv.jpg') }}" alt="Goal 9: Industry, Innovation and Infrastructure" class="absolute inset-0 w-full h-full object-cover transition-opacity duration-300 opacity-0 group-hover:opacity-100">
-                </a>
-
-                <a href="{{ path('app_library') }}?goals[]=11" class="block group relative rounded-xl overflow-hidden shadow-sm hover:shadow-2xl transition-all duration-300 hover:-translate-y-1.5 border border-gray-100 bg-white aspect-square">
-                    <img src="{{ asset('images/sdg-11.jpg') }}" alt="Goal 11: Sustainable Cities and Communities" class="absolute inset-0 w-full h-full object-cover transition-opacity duration-300 opacity-100 group-hover:opacity-0">
-                    <img src="{{ asset('images/sdg-11-inv.jpg') }}" alt="Goal 11: Sustainable Cities and Communities" class="absolute inset-0 w-full h-full object-cover transition-opacity duration-300 opacity-0 group-hover:opacity-100">
-                </a>
-
-                <a href="{{ path('app_library') }}?goals[]=12" class="block group relative rounded-xl overflow-hidden shadow-sm hover:shadow-2xl transition-all duration-300 hover:-translate-y-1.5 border border-gray-100 bg-white aspect-square">
-                    <img src="{{ asset('images/sdg-12.jpg') }}" alt="Goal 12: Responsible Consumption and Production" class="absolute inset-0 w-full h-full object-cover transition-opacity duration-300 opacity-100 group-hover:opacity-0">
-                    <img src="{{ asset('images/sdg-12-inv.jpg') }}" alt="Goal 12: Responsible Consumption and Production" class="absolute inset-0 w-full h-full object-cover transition-opacity duration-300 opacity-0 group-hover:opacity-100">
-                </a>
-
-                <a href="{{ path('app_library') }}?goals[]=17" class="block group relative rounded-xl overflow-hidden shadow-sm hover:shadow-2xl transition-all duration-300 hover:-translate-y-1.5 border border-gray-100 bg-white aspect-square">
-                    <img src="{{ asset('images/sdg-17.jpg') }}" alt="Goal 17: Partnerships for the Goals" class="absolute inset-0 w-full h-full object-cover transition-opacity duration-300 opacity-100 group-hover:opacity-0">
-                    <img src="{{ asset('images/sdg-17-inv.jpg') }}" alt="Goal 17: Partnerships for the Goals" class="absolute inset-0 w-full h-full object-cover transition-opacity duration-300 opacity-0 group-hover:opacity-100">
-                </a>
-
+                    <div class="md:w-1/2 h-64 md:h-auto relative bg-white">
+                        <img data-modal-target="image" src="" alt="SDG Target Cover" class="absolute inset-0 w-full h-full object-contain p-8">
+                    </div>
+                    
+                    <div class="md:w-1/2 p-10 md:p-14 flex flex-col justify-center bg-white">
+                        <h2 data-modal-target="title" class="text-4xl md:text-5xl font-bold text-green-950 mb-6 font-bebas tracking-wide leading-none">
+                            Goal Title
+                        </h2>
+                        <p data-modal-target="description" class="text-gray-600 text-lg leading-relaxed font-work">
+                            Goal Description
+                        </p>
+                        
+                        <div class="mt-10 pt-8 border-t border-gray-100 flex flex-col gap-3 text-center">
+                            <h4 data-modal-target="actionPrompt" class="text-sm font-bold text-gray-400 uppercase tracking-widest font-work mb-4">Which would you like to visit?</h4>
+                            
+                            <div data-modal-target="buttonsContainer" class="flex-col gap-3" style="display: flex;">
+                                <a href="#" data-modal-target="libraryBtn" class="block w-full text-center bg-feu-green-900 text-white font-bold px-6 py-4 rounded-xl hover:bg-feu-green-800 transition duration-300 font-work shadow-md">
+                                    SDG Related Project Library
+                                </a>
+                                <a href="#" data-modal-target="activityBtn" class="block w-full text-center bg-feu-gold-400 text-feu-green-900 font-bold px-6 py-4 rounded-xl hover:bg-feu-gold-500 transition duration-300 font-work shadow-md">
+                                    SDG Related Activities
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
             </div>
+            
+            <script>
+                let currentMode = 'focused';
+
+                function filterSdgs(mode) {
+                    if (currentMode === mode) return;
+                    currentMode = mode;
+
+                    const btnAll = document.getElementById('btn-all-sdgs');
+                    const btnFocused = document.getElementById('btn-focused-sdgs');
+                    const cards = document.querySelectorAll('.sdg-card');
+
+                    if (mode === 'all') {
+                        btnAll.className = "px-6 py-2 rounded-full text-sm font-bold font-work transition-all duration-300 bg-feu-green-900 text-white shadow-md cursor-pointer";
+                        btnFocused.className = "px-6 py-2 rounded-full text-sm font-bold font-work transition-all duration-300 bg-gray-200 text-gray-600 hover:bg-gray-300 cursor-pointer";
+                    } else {
+                        btnFocused.className = "px-6 py-2 rounded-full text-sm font-bold font-work transition-all duration-300 bg-feu-green-900 text-white shadow-md cursor-pointer";
+                        btnAll.className = "px-6 py-2 rounded-full text-sm font-bold font-work transition-all duration-300 bg-gray-200 text-gray-600 hover:bg-gray-300 cursor-pointer";
+                    }
+
+                    cards.forEach(card => {
+                        const isActive = card.dataset.active === 'true';
+                        const shouldShow = mode === 'all' || isActive;
+
+                        if (shouldShow) {
+                            card.style.display = 'block';
+                            requestAnimationFrame(() => {
+                                card.style.opacity = '1';
+                                card.style.transform = 'scale(1)';
+                            });
+                        } else {
+                            card.style.opacity = '0';
+                            card.style.transform = 'scale(0.95)';
+                            setTimeout(() => {
+                                if (currentMode === 'focused' && !isActive) {
+                                    card.style.display = 'none';
+                                }
+                            }, 300);
+                        }
+                    });
+                }
+            </script>
         </div>
     </section>
 
@@ -85,7 +157,6 @@
             <img src="{{ asset('images/hero-2.jpg') }}" alt="FEU Campus" class="w-full h-full object-cover">
             <div class="absolute inset-0 bg-feu-green-900/80 mix-blend-multiply"></div>
         </div>
-
         <div class="relative z-10 max-w-7xl mx-auto">
             <div class="text-center mb-16">
                 <h2 class="text-4xl md:text-5xl font-bold text-white font-bebas tracking-wide mb-3">Leading Voices in Research</h2>
@@ -93,52 +164,52 @@
                     Meet the dedicated students and faculty members driving sustainable innovation and impactful solutions at FEU.
                 </p>
             </div>
+            
+            {% if leading_voices|length > 0 %}
+                {# Dynamic Grid sizing based on how many voices exist (Max 4) #}
+                {% set grid_class = 'lg:grid-cols-4' %}
+                {% if leading_voices|length == 3 %}
+                    {% set grid_class = 'lg:grid-cols-3 max-w-5xl mx-auto' %}
+                {% elseif leading_voices|length == 2 %}
+                    {% set grid_class = 'lg:grid-cols-2 max-w-3xl mx-auto' %}
+                {% elseif leading_voices|length == 1 %}
+                    {% set grid_class = 'lg:grid-cols-1 max-w-sm mx-auto' %}
+                {% endif %}
 
-            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
-                
-                <div class="bg-white rounded-2xl p-8 text-center shadow-xl hover:-translate-y-2 transition duration-300 group">
-                    <div class="w-20 h-20 mx-auto bg-feu-green-100 text-feu-green-800 rounded-full flex items-center justify-center text-2xl font-black font-bebas mb-4 border-4 border-feu-green-50 shadow-sm group-hover:bg-feu-gold-400 group-hover:text-feu-green-900 group-hover:border-feu-gold-100 transition">
-                        JS
-                    </div>
-                    <h3 class="text-xl font-bold text-gray-900 font-bebas tracking-wide mb-1">Engr. Jose Somigao</h3>
-                    <p class="text-xs font-bold text-feu-green-700 uppercase tracking-widest mb-3 font-work">Faculty Researcher</p>
-                    <p class="text-sm text-gray-600 font-work leading-relaxed">Focuses on sustainable urban infrastructure and waste-to-energy systems.</p>
+                <div class="grid grid-cols-1 sm:grid-cols-2 {{ grid_class }} gap-8">
+                    {% for voice in leading_voices %}
+                        <div class="bg-white rounded-2xl p-8 text-center shadow-xl hover:-translate-y-2 transition duration-300 group">
+                            
+                            {# Image / Initials Fallback #}
+                            {% if voice.image %}
+                                {# UPDATED: Changed border color to #FCC30B (FEU Gold) #}
+                                <img src="{{ asset('uploads/voices/' ~ voice.image) }}" alt="{{ voice.name }}" class="w-20 h-20 mx-auto rounded-full object-cover mb-4 border-4 border-[#FCC30B] shadow-sm transition group-hover:scale-110">
+                            {% else %}
+                                {% set name_parts = voice.name|split(' ') %}
+                                {% set initials = (name_parts|first|slice(0,1) ~ name_parts|last|slice(0,1))|upper %}
+                                
+                                {# UPDATED: Changed border color to #FCC30B (FEU Gold) #}
+                                <div class="w-20 h-20 mx-auto bg-feu-green-100 text-feu-green-800 rounded-full flex items-center justify-center text-2xl font-black font-bebas mb-4 border-4 border-[#FCC30B] shadow-sm group-hover:bg-[#FCC30B] group-hover:text-feu-green-900 transition group-hover:scale-110">
+                                    {{ initials }}
+                                </div>
+                            {% endif %}
+                            
+                            <h3 class="text-xl font-bold text-gray-900 font-bebas tracking-wide mb-1">{{ voice.name }}</h3>
+                            <p class="text-xs font-bold text-feu-green-700 uppercase tracking-widest mb-3 font-work">{{ voice.title }}</p>
+                            <p class="text-sm text-gray-600 font-work leading-relaxed">{{ voice.description }}</p>
+                        </div>
+                    {% endfor %}
                 </div>
-
-                <div class="bg-white rounded-2xl p-8 text-center shadow-xl hover:-translate-y-2 transition duration-300 group">
-                    <div class="w-20 h-20 mx-auto bg-feu-green-100 text-feu-green-800 rounded-full flex items-center justify-center text-2xl font-black font-bebas mb-4 border-4 border-feu-green-50 shadow-sm group-hover:bg-feu-gold-400 group-hover:text-feu-green-900 group-hover:border-feu-gold-100 transition">
-                        AR
-                    </div>
-                    <h3 class="text-xl font-bold text-gray-900 font-bebas tracking-wide mb-1">Anna Reyes</h3>
-                    <p class="text-xs font-bold text-feu-green-700 uppercase tracking-widest mb-3 font-work">Student Innovator</p>
-                    <p class="text-sm text-gray-600 font-work leading-relaxed">Developing AI-assisted modules for accessible engineering education.</p>
+            {% else %}
+                <div class="text-center p-12 bg-white/10 backdrop-blur-md rounded-2xl border border-white/20">
+                    <p class="text-feu-green-50 font-medium font-work">Voices will appear here once added in the dashboard.</p>
                 </div>
-
-                <div class="bg-white rounded-2xl p-8 text-center shadow-xl hover:-translate-y-2 transition duration-300 group">
-                    <div class="w-20 h-20 mx-auto bg-feu-green-100 text-feu-green-800 rounded-full flex items-center justify-center text-2xl font-black font-bebas mb-4 border-4 border-feu-green-50 shadow-sm group-hover:bg-feu-gold-400 group-hover:text-feu-green-900 group-hover:border-feu-gold-100 transition">
-                        JD
-                    </div>
-                    <h3 class="text-xl font-bold text-gray-900 font-bebas tracking-wide mb-1">J. Dela Cruz</h3>
-                    <p class="text-xs font-bold text-feu-green-700 uppercase tracking-widest mb-3 font-work">Lead Researcher</p>
-                    <p class="text-sm text-gray-600 font-work leading-relaxed">Pioneering genetic algorithms for optimizing Metro Manila transit.</p>
-                </div>
-
-                <div class="bg-white rounded-2xl p-8 text-center shadow-xl hover:-translate-y-2 transition duration-300 group">
-                    <div class="w-20 h-20 mx-auto bg-feu-green-100 text-feu-green-800 rounded-full flex items-center justify-center text-2xl font-black font-bebas mb-4 border-4 border-feu-green-50 shadow-sm group-hover:bg-feu-gold-400 group-hover:text-feu-green-900 group-hover:border-feu-gold-100 transition">
-                        MS
-                    </div>
-                    <h3 class="text-xl font-bold text-gray-900 font-bebas tracking-wide mb-1">Maria Santos</h3>
-                    <p class="text-xs font-bold text-feu-green-700 uppercase tracking-widest mb-3 font-work">Community Lead</p>
-                    <p class="text-sm text-gray-600 font-work leading-relaxed">Bridging the digital divide with tech literacy programs for LGUs.</p>
-                </div>
-
-            </div>
+            {% endif %}
         </div>
     </section>
 
     <section class="py-24 px-6 bg-gray-50 border-t border-gray-100">
         <div class="max-w-7xl mx-auto">
-            
             <div class="flex justify-between items-end mb-12">
                 <div>
                     <h2 class="text-4xl md:text-5xl font-bold text-gray-900 font-bebas tracking-wide mb-3">Latest Updates</h2>
@@ -148,11 +219,13 @@
                     View All News <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"></path></svg>
                 </a>
             </div>
-
             <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
-                {% for activity in latest_activities %}
+                
+                {# 
+                 * Limits the loop to a maximum of 3 items using the slice filter.
+                 #}
+                {% for activity in latest_activities|slice(0, 3) %}
                     <article class="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden flex flex-col hover:shadow-xl transition duration-300 group">
-                        
                         <div class="h-56 relative bg-gray-100 overflow-hidden shrink-0">
                             {% if activity.image %}
                                 <img src="{{ asset('uploads/activities/' ~ activity.image) }}" alt="{{ activity.title }}" class="absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition duration-500">
@@ -160,28 +233,30 @@
                                 <img src="{{ asset('images/hero-3.jpg') }}" alt="FEU Event" class="absolute inset-0 w-full h-full object-cover opacity-90 group-hover:scale-105 transition duration-500">
                             {% endif %}
                         </div>
-
+  
                         <div class="p-8 flex flex-col flex-grow">
                             <div class="flex items-center gap-3 mb-4">
                                 <span class="bg-feu-green-100 text-feu-green-800 text-[10px] font-bold px-3 py-1 rounded-full uppercase tracking-widest">{{ activity.category }}</span>
                                 <span class="text-gray-400 text-xs font-medium">{{ activity.eventDate|date('M j, Y') }}</span>
                             </div>
                             
-                            <h3 class="text-2xl font-bold text-gray-900 mb-3 group-hover:text-feu-green-700 transition font-bebas tracking-wide">
+                            {# Added line-clamp-2 here to prevent extra-long titles from breaking the card layout #}
+                            <h3 class="text-2xl font-bold text-gray-900 mb-3 group-hover:text-feu-green-700 transition font-bebas tracking-wide line-clamp-2">
                                 <a href="#">{{ activity.title }}</a>
                             </h3>
                             
                             <div class="text-gray-600 text-sm leading-relaxed mb-6 line-clamp-2 font-work max-w-none">
-                                <p class="whitespace-pre-line">{{ activity.content }}</p>
+                                <p class="whitespace-pre-line">{{ activity.content|striptags }}</p>
                             </div>
                             
-                            <a href="{{ path('app_news_show', { id: activity.id }) }}" 
-                            class="text-feu-green-800 hover:text-feu-gold-600 font-bold text-sm transition-colors flex items-center gap-1 group font-work">
+                            {# 
+                             * Added mt-auto here. It forces the link to dynamically align 
+                             * at the very bottom of the flex container, fixing the unequal button placement.
+                             #}
+                            <a href="{{ path('app_news_show', { id: activity.id }) }}" class="mt-auto text-feu-green-800 hover:text-feu-gold-600 font-bold text-sm transition-colors flex items-center gap-1 group font-work">
                                 View Article
-                                <svg class="w-4 h-4 group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M14 5l7 7m0 0l-7 7m7-7H3"></path>
-                                </svg>
-                            </a>
+                                <svg class="w-4 h-4 group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M14 5l7 7m0 0l-7 7m7-7H3"></path></svg>
+                             </a>
                         </div>
                     </article>
                 {% else %}
@@ -190,13 +265,11 @@
                     </div>
                 {% endfor %}
             </div>
-            
             <div class="mt-8 text-center md:hidden">
                 <a href="{{ path('app_news') }}" class="inline-block bg-feu-green-800 text-white px-8 py-3 rounded-full font-bold font-work shadow-md">
                     View All News
                 </a>
             </div>
-
         </div>
     </section>
 {% endblock %}

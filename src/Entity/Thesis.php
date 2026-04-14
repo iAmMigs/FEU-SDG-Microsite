@@ -8,6 +8,9 @@ use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 
+/**
+ * Represents a student research project, academic thesis, or official publication.
+ */
 #[ORM\Entity(repositoryClass: ThesisRepository::class)]
 #[ORM\Index(name: 'idx_thesis_search', columns: ['title', 'authors'])]
 #[ORM\Index(name: 'idx_thesis_trending', columns: ['views'])]
@@ -27,8 +30,17 @@ class Thesis
     #[ORM\Column(length: 255)]
     private ?string $authors = null;
 
+    #[ORM\ManyToOne(targetEntity: ProjectType::class)]
+    private ?ProjectType $type = null;
+
+    #[ORM\ManyToOne(targetEntity: College::class)]
+    private ?College $college = null;
+
     #[ORM\Column(options: ['default' => 0])]
     private ?int $views = 0;
+
+    #[ORM\Column(type: Types::JSON, nullable: true)]
+    private ?array $regionViews = [];
 
     #[ORM\Column(length: 255, nullable: true)]
     private ?string $coverImage = null;
@@ -40,8 +52,13 @@ class Thesis
     private ?\DateTimeImmutable $createdAt = null;
 
     #[ORM\Column(length: 255, nullable: true)]
+    private ?string $doi = null;
+
+    #[ORM\Column(length: 255, nullable: true)]
     private ?string $publicationLink = null;
 
+    #[ORM\Column(type: 'boolean', options: ['default' => false])]
+    private ?bool $isActive = false;
 
     /**
      * @var Collection<int, Sdg>
@@ -53,9 +70,8 @@ class Thesis
     {
         $this->sdgs = new ArrayCollection();
         $this->createdAt = new \DateTimeImmutable();
+        $this->isActive = false;
     }
-
-    // --- GETTERS & SETTERS ---
 
     public function getId(): ?int { return $this->id; }
 
@@ -68,18 +84,51 @@ class Thesis
     public function getAuthors(): ?string { return $this->authors; }
     public function setAuthors(string $authors): static { $this->authors = $authors; return $this; }
 
+    public function getType(): ?ProjectType { return $this->type; }
+    public function setType(?ProjectType $type): static { $this->type = $type; return $this; }
+
+    public function getCollege(): ?College { return $this->college; }
+    public function setCollege(?College $college): static { $this->college = $college; return $this; }
+
     public function getViews(): ?int { return $this->views; }
     public function setViews(int $views): static { $this->views = $views; return $this; }
-    public function incrementViews(): static { $this->views++; return $this; }
+
+    public function getRegionViews(): ?array
+    {
+        return $this->regionViews ?? [];
+    }
+
+    public function setRegionViews(?array $regionViews): static
+    {
+        $this->regionViews = $regionViews;
+        $this->calculateTotalViews(); 
+
+        return $this;
+    }
 
     public function getCoverImage(): ?string { return $this->coverImage; }
     public function setCoverImage(?string $coverImage): static { $this->coverImage = $coverImage; return $this; }
+
+    public function isActive(): ?bool
+    {
+        return $this->isActive;
+    }
+
+    public function setIsActive(bool $isActive): static
+    {
+        $this->isActive = $isActive;
+
+        return $this;
+    }
 
     public function getDocumentFile(): ?string { return $this->documentFile; }
     public function setDocumentFile(?string $documentFile): static { $this->documentFile = $documentFile; return $this; }
 
     public function getCreatedAt(): ?\DateTimeImmutable { return $this->createdAt; }
     public function setCreatedAt(\DateTimeImmutable $createdAt): static { $this->createdAt = $createdAt; return $this; }
+
+    public function getDoi(): ?string { return $this->doi; }
+    public function setDoi(?string $doi): static { $this->doi = $doi; return $this; }
 
     public function getPublicationLink(): ?string { return $this->publicationLink; }
     public function setPublicationLink(?string $publicationLink): static { $this->publicationLink = $publicationLink; return $this; }
@@ -106,4 +155,32 @@ class Thesis
         return (string) $this->title;
     }
 
+    /**
+     * Increments the overall view count and tracks geographic distribution.
+     */
+    public function incrementViews(string $countryCode = 'Unknown'): static
+    {
+        $regions = $this->getRegionViews();
+        
+        if (isset($regions[$countryCode])) {
+            $regions[$countryCode]++;
+        } else {
+            $regions[$countryCode] = 1;
+        }
+        
+        $this->regionViews = $regions;
+        $this->calculateTotalViews();
+
+        return $this;
+    }
+
+    private function calculateTotalViews(): void
+    {
+        if (empty($this->regionViews)) {
+            $this->views = 0;
+            return;
+        }
+
+        $this->views = array_sum($this->regionViews);
+    }
 }

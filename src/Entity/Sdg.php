@@ -7,12 +7,18 @@ use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 
+/**
+ * Represents one of the 17 UN Sustainable Development Goals.
+ */
 #[ORM\Entity(repositoryClass: SdgRepository::class)]
 class Sdg
 {
+    /**
+     * Primary Key maps directly to the official UN SDG designation number (1-17).
+     */
     #[ORM\Id]
     #[ORM\Column]
-    private ?int $id = null; // This IS the SDG number (e.g., 1 to 17)
+    private ?int $id = null; 
 
     #[ORM\Column(length: 255)]
     private ?string $name = null;
@@ -23,9 +29,19 @@ class Sdg
     #[ORM\ManyToMany(targetEntity: Thesis::class, mappedBy: 'sdgs')]
     private Collection $theses;
 
+    /**
+     * @var Collection<int, Activity>
+     */
+    #[ORM\ManyToMany(targetEntity: Activity::class, mappedBy: 'sdgs')]
+    private Collection $activities;
+
+    #[ORM\Column(type: 'boolean')]
+    private ?bool $isActive = false;
+
     public function __construct()
     {
         $this->theses = new ArrayCollection();
+        $this->activities = new ArrayCollection();
     }
 
     public function __toString(): string
@@ -56,6 +72,45 @@ class Sdg
         if ($this->theses->removeElement($thesis)) {
             $thesis->removeSdg($this);
         }
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, Activity>
+     */
+    public function getActivities(): Collection
+    {
+        return $this->activities;
+    }
+
+    public function addActivity(Activity $activity): static
+    {
+        if (!$this->activities->contains($activity)) {
+            $this->activities->add($activity);
+            $activity->addSdg($this);
+        }
+
+        return $this;
+    }
+
+    public function removeActivity(Activity $activity): static
+    {
+        if ($this->activities->removeElement($activity)) {
+            $activity->removeSdg($this);
+        }
+
+        return $this;
+    }
+
+    public function isActive(): ?bool
+    {
+        return $this->isActive;
+    }
+
+    public function setIsActive(bool $isActive): static
+    {
+        $this->isActive = $isActive;
+
         return $this;
     }
 }

@@ -1,0 +1,62 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Manage Activities{% endblock %}
+
+{% block body %}
+<div class="max-w-7xl mx-auto py-10 px-6">
+    <div class="flex justify-between items-center mb-8">
+        <h1 class="text-3xl font-bebas text-feu-green-900 tracking-wide">News & Activities Management</h1>
+        <a href="{{ path('app_admin_activity_new') }}" class="bg-feu-green-800 hover:bg-feu-green-700 text-white font-bold py-2 px-6 rounded-lg transition font-work">
+            + Create New Post
+        </a>
+    </div>
+
+    <div class="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
+        <table class="min-w-full divide-y divide-gray-200 text-left font-work">
+            <thead class="bg-gray-50">
+                <tr>
+                    <th class="px-6 py-4 text-xs font-bold text-gray-500 uppercase tracking-wider">Status</th>
+                    <th class="px-6 py-4 text-xs font-bold text-gray-500 uppercase tracking-wider">Title</th>
+                    <th class="px-6 py-4 text-xs font-bold text-gray-500 uppercase tracking-wider">SDGs</th>
+                    <th class="px-6 py-4 text-xs font-bold text-gray-500 uppercase tracking-wider">Publish Date</th>
+                    <th class="px-6 py-4 text-xs font-bold text-gray-500 uppercase tracking-wider text-right">Actions</th>
+                </tr>
+            </thead>
+            <tbody class="divide-y divide-gray-200">
+            {% for activity in activities %}
+                {# Determine if it's currently published based on time and active toggle #}
+                {% set is_published = activity.isActive and (activity.publishAt is null or activity.publishAt <= date()) %}
+                
+                <tr class="hover:bg-gray-50 transition">
+                    <td class="px-6 py-4 whitespace-nowrap">
+                        {% if is_published %}
+                            <span class="px-3 py-1 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800">Live</span>
+                        {% elseif activity.isActive and activity.publishAt > date() %}
+                            <span class="px-3 py-1 inline-flex text-xs leading-5 font-semibold rounded-full bg-blue-100 text-blue-800">Scheduled</span>
+                        {% else %}
+                            <span class="px-3 py-1 inline-flex text-xs leading-5 font-semibold rounded-full bg-red-100 text-red-800">Inactive</span>
+                        {% endif %}
+                    </td>
+                    <td class="px-6 py-4 font-bold text-gray-900">{{ activity.title }}</td>
+                    <td class="px-6 py-4 text-sm text-gray-500">
+                        {% for sdg in activity.sdgs %}
+                            <span class="inline-block bg-gray-100 rounded px-2 py-0.5 text-xs mr-1">SDG {{ sdg.num }}</span>
+                        {% endfor %}
+                    </td>
+                    <td class="px-6 py-4 text-sm text-gray-500">
+                        {{ activity.publishAt ? activity.publishAt|date('Y-m-d H:i') : 'Immediate' }}
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+                        <a href="{{ path('app_admin_activity_edit', {'id': activity.id}) }}" class="text-feu-gold-600 hover:text-feu-gold-800 mr-4">Edit</a>
+                    </td>
+                </tr>
+            {% else %}
+                <tr>
+                    <td colspan="5" class="px-6 py-12 text-center text-gray-500">No activities found.</td>
+                </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}

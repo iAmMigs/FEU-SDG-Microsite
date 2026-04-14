@@ -3,6 +3,7 @@
 namespace App\Controller\Admin;
 
 use App\Repository\ActivityRepository;
+use App\Repository\SdgRepository;
 use App\Repository\ThesisRepository;
 use EasyCorp\Bundle\EasyAdminBundle\Attribute\AdminDashboard;
 use EasyCorp\Bundle\EasyAdminBundle\Config\Assets;
@@ -20,15 +21,79 @@ class DashboardController extends AbstractDashboardController
 {
     public function __construct(
         private ThesisRepository $thesisRepository,
-        private ActivityRepository $activityRepository
+        private ActivityRepository $activityRepository,
+        private SdgRepository $sdgRepository 
     ) {
     }
 
     public function index(): Response
     {
+        $request = $this->container->get('request_stack')->getCurrentRequest();
+
+        $monthsLabels = [];
+        $monthsDataMap = [];
+        
+        for ($i = 5; $i >= 0; $i--) {
+            $date = (new \DateTime())->modify("-$i months");
+            $label = $date->format('M Y');
+            $monthsLabels[] = $label;
+            $monthsDataMap[$label] = 0;
+        }
+
+        $sixMonthsAgo = (new \DateTimeImmutable())->modify('-5 months')->modify('first day of this month');
+        
+        /**
+         * Optimizes dashboard load times by strictly fetching the 'createdAt' date property
+         * as a lightweight array instead of hydrating full Thesis entity objects into memory.
+         */
+        $recentTheses = $this->thesisRepository->createQueryBuilder('t')
+            ->select('t.createdAt')
+            ->where('t.createdAt >= :date')
+            ->setParameter('date', $sixMonthsAgo)
+            ->getQuery()
+            ->getArrayResult();
+
+        foreach ($recentTheses as $thesis) {
+            $label = $thesis['createdAt']->format('M Y');
+            if (isset($monthsDataMap[$label])) {
+                $monthsDataMap[$label]++;
+            }
+        }
+
+        $selectedSdg = $request->query->get('sdg');
+
+        $qb = $this->thesisRepository->createQueryBuilder('t')
+            ->orderBy('t.views', 'DESC')
+            ->setMaxResults(10);
+
+        if ($selectedSdg) {
+            $qb->join('t.sdgs', 's')
+               ->andWhere('s.id = :sdg')
+               ->setParameter('sdg', $selectedSdg);
+        }
+
+        $topTheses = $qb->getQuery()->getResult();
+
+        $topLabels = [];
+        $topData = [];
+        foreach ($topTheses as $t) {
+            $title = $t->getTitle();
+            $topLabels[] = (mb_strlen($title) > 30) ? mb_substr($title, 0, 30) . '...' : $title;
+            $topData[] = $t->getViews();
+        }
+
         return $this->render('Admin-Microsite/dashboard.html.twig', [
             'theses_count' => $this->thesisRepository->count([]),
             'activities_count' => $this->activityRepository->count([]),
+            
+            'chart_months_labels' => json_encode($monthsLabels),
+            'chart_months_data' => json_encode(array_values($monthsDataMap)),
+            
+            'chart_top_labels' => json_encode($topLabels),
+            'chart_top_data' => json_encode($topData),
+            
+            'sdgs' => $this->sdgRepository->findBy([], ['id' => 'ASC']),
+            'selected_sdg' => $selectedSdg
         ]);
     }
 
@@ -42,21 +107,23 @@ class DashboardController extends AbstractDashboardController
     public function configureAssets(): Assets
     {
         return Assets::new()
-            ->addCssFile('assets/styles/admin.css');
+            ->addCssFile('/css/admin.css');
     }
 
     public function configureMenuItems(): iterable
     {
         yield MenuItem::linkToDashboard('Dashboard Overview', 'fa fa-chart-pie');
 
-        yield MenuItem::section('Thesis Library Management');
+        yield MenuItem::section('Content Management');
         yield MenuItem::linkTo(ThesisCrudController::class, 'Theses & Studies', 'fas fa-book-bookmark');
-        yield MenuItem::linkTo(SdgCrudController::class, 'SDG Categories', 'fas fa-bullseye');
-
-        yield MenuItem::section('News & Media');
         yield MenuItem::linkTo(ActivityCrudController::class, 'Activities & Events', 'fas fa-newspaper');
-
-        yield MenuItem::section('Audiit Logs');
+        
+        yield MenuItem::section('Data Management');
+        yield MenuItem::linkTo(SdgCrudController::class, 'SDG Categories', 'fas fa-bullseye');
+        yield MenuItem::linkTo(ActivityCategoryCrudController::class, 'Activity Categories', 'fas fa-tags');
+        yield MenuItem::linkTo(LeadingVoiceCrudController::class, 'Featured Voices', 'fas fa-users');
+        yield MenuItem::linkTo(ProjectTypeCrudController::class, 'Project Types', 'fas fa-tags');
+        yield MenuItem::linkTo(CollegeCrudController::class, 'Colleges', 'fas fa-school');
 
         yield MenuItem::section('Public Portal');
         yield MenuItem::linkToRoute('View Site', 'fas fa-arrow-right-from-bracket', 'app_home');

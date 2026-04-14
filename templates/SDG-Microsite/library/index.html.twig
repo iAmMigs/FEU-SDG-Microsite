@@ -1,0 +1,206 @@
+{% extends 'SDG-Microsite/base.html.twig' %}
+
+{% block head %}
+    {{ parent() }}
+    <meta name="turbo-cache-control" content="no-cache">
+{% endblock %}
+
+{% block title %}Library - FEU SDG Microsite{% endblock %}
+
+{% block body %}
+    <section class="bg-feu-green-900 py-16 px-6 text-center border-b-4 border-feu-gold-400">
+        <div class="max-w-4xl mx-auto">
+            <h1 class="text-4xl md:text-5xl font-bold text-white mb-4 font-bebas tracking-wide">Project Library</h1>
+            <p class="text-lg text-feu-green-50 font-medium font-work max-w-2xl mx-auto">
+                From classroom to community: Explore a growing repository of research and innovation from students and faculty dedicated to advancing the Global Goals.
+            </p>
+        </div>
+    </section>
+
+    <section class="py-12 px-6 bg-gray-50 min-h-screen">
+        <div class="max-w-7xl mx-auto flex flex-col lg:flex-row gap-8" data-controller="autosubmit">
+            
+            <aside class="w-full lg:w-1/4 flex-shrink-0">
+                <div class="bg-white p-6 rounded-xl shadow-sm border border-gray-100 sticky top-28 max-h-[calc(100vh-8rem)] overflow-y-auto">
+                    <h2 class="text-lg font-bold text-feu-green-950 mb-4 border-b pb-2 font-bebas tracking-wide">Filter Research</h2>
+                    
+                    <form id="filter-form" action="{{ path('app_library') }}" method="GET" class="space-y-4"
+                          data-autosubmit-target="form"
+                          data-action="change->autosubmit#submit input->autosubmit#submit"
+                          data-turbo-frame="theses_list"
+                          autocomplete="off">
+                        
+                        <div>
+                            <label for="author" class="block text-sm font-semibold text-gray-700 mb-2 font-work">Search Author</label>
+                            <input type="text" id="author" name="author" value="{{ search_author|default('') }}" placeholder="e.g. Dela Cruz" class="w-full rounded-lg border-gray-300 shadow-sm focus:border-feu-green-700 focus:ring-feu-green-700 px-4 py-2 border font-work">
+                        </div>
+
+                        <div>
+                            <label for="title" class="block text-sm font-semibold text-gray-700 mb-2 font-work">Search Title</label>
+                            <input type="text" id="title" name="title" value="{{ search_title|default('') }}" placeholder="Project title..." class="w-full rounded-lg border-gray-300 shadow-sm focus:border-feu-green-700 focus:ring-feu-green-700 px-4 py-2 border font-work">
+                        </div>
+
+                        <div>
+                            <label for="keyword" class="block text-sm font-semibold text-gray-700 mb-2 font-work">Search Abstract</label>
+                            <input type="text" id="keyword" name="keyword" value="{{ search_keyword|default('') }}" placeholder="Specific terms..." class="w-full rounded-lg border-gray-300 shadow-sm focus:border-feu-green-700 focus:ring-feu-green-700 px-4 py-2 border font-work">
+                        </div>
+
+                        <div>
+                            <label class="block text-sm font-semibold text-gray-700 mb-3 font-work">Filter by SDG</label>
+                            <div class="grid grid-cols-4 gap-2 mb-4">
+                                {% for sdg in active_sdgs %}
+                                    {% set formatted_num = '%02d'|format(sdg.id) %}
+                                    <label class="cursor-pointer relative block aspect-square rounded-md overflow-hidden shadow-sm hover:shadow-md transition group border border-gray-100 bg-white">
+                                        <input type="checkbox" name="goals[]" value="{{ sdg.id }}" class="peer hidden" 
+                                               {% if selected_goals is defined and sdg.id ~ '' in selected_goals %}checked{% endif %}>
+                                        
+                                        <img src="{{ asset('images/sdg/E Inverted Icons_WEB-' ~ formatted_num ~ '.png') }}" alt="Goal {{ sdg.id }}" class="absolute inset-0 w-full h-full object-cover transition-opacity duration-300 opacity-100 peer-checked:opacity-0 group-hover:opacity-75">
+                                        <img src="{{ asset('images/sdg/E-WEB-Goal-' ~ formatted_num ~ '.png') }}" alt="Goal {{ sdg.id }}" class="absolute inset-0 w-full h-full object-cover transition-opacity duration-300 opacity-0 peer-checked:opacity-100">
+                                        
+                                        <div class="absolute inset-0 border-2 border-feu-green-700 rounded-md opacity-0 peer-checked:opacity-100 transition-opacity pointer-events-none"></div>
+                                    </label>
+                                {% endfor %}
+                            </div>
+
+                            <div class="flex items-center bg-gray-50 p-3 rounded-lg border border-gray-200">
+                                <input type="checkbox" id="exclusive" name="exclusive" value="1" 
+                                       class="w-5 h-5 rounded border-gray-300 text-feu-green-700 focus:ring-feu-green-700 cursor-pointer" 
+                                       {% if is_exclusive|default(false) %}checked{% endif %}>
+                                <label for="exclusive" class="ml-3 text-sm font-semibold text-gray-700 font-work cursor-pointer select-none">
+                                    Precision Search <span class="block text-xs text-gray-500 font-normal">Show only studies with the EXACT SDGs selected</span>
+                                </label>
+                            </div>
+                        </div>
+
+                        <noscript>
+                            <button type="submit" class="w-full bg-feu-green-800 hover:bg-feu-green-700 text-white font-bold py-3 rounded-lg transition shadow-sm">Search</button>
+                        </noscript>
+                    </form>
+                </div>
+            </aside>
+
+            <main class="w-full lg:w-3/4">
+                <turbo-frame id="theses_list">
+                    
+                    <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6 pb-4 border-b border-gray-200 gap-4">
+                        <div class="flex flex-col gap-3">
+                            <p class="text-gray-600 font-medium font-work">Showing <span class="font-bold text-feu-green-900">{{ total_count|default(0) }}</span> studies found.</p>
+                            
+                            {% if selected_goals is defined and selected_goals|length > 0 %}
+                                <div class="flex flex-wrap items-center gap-2 mt-1">
+                                    <span class="text-xs font-bold text-gray-400 font-work uppercase tracking-wider">Filtered by:</span>
+                                    {% for goalId in selected_goals %}
+                                        {% for sdg in active_sdgs %}
+                                            {% if sdg.id == goalId %}
+                                                <span class="text-white text-[10px] font-bold px-3 py-1.5 rounded-full font-work uppercase tracking-wider shadow-sm" style="background-color: {{ sdg_colors[sdg.id]|default('#166534') }}; text-shadow: 0px 1px 2px rgba(0,0,0,0.2);">
+                                                    {{ sdg.name }}
+                                                </span>
+                                            {% endif %}
+                                        {% endfor %}
+                                    {% endfor %}
+                                </div>
+                            {% endif %}
+                        </div>
+
+                        {% if total_pages|default(1) > 1 %}
+                            <div class="flex items-center gap-2 text-sm font-work text-gray-700 bg-white px-3 py-1.5 rounded-lg border border-gray-200 shadow-sm shrink-0">
+                                <span class="hidden sm:inline font-medium mr-1">Page</span>
+                                <button type="button" data-action="click->autosubmit#prevPage" class="p-1 text-gray-400 hover:text-feu-green-700 transition {% if current_page|default(1) <= 1 %}opacity-30 cursor-not-allowed pointer-events-none{% endif %}">
+                                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path></svg>
+                                </button>
+                                <input type="number" name="page" form="filter-form" data-autosubmit-target="page" data-action="change->autosubmit#submit" data-max="{{ total_pages|default(1) }}" value="{{ current_page|default(1) }}" min="1" max="{{ total_pages|default(1) }}" class="w-14 text-center rounded-md border-gray-200 focus:border-feu-green-700 focus:ring-feu-green-700 py-1 border font-bold text-feu-green-900 bg-gray-50 hide-arrows">
+                                <button type="button" data-action="click->autosubmit#nextPage" class="p-1 text-gray-400 hover:text-feu-green-700 transition {% if current_page|default(1) >= total_pages|default(1) %}opacity-30 cursor-not-allowed pointer-events-none{% endif %}">
+                                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg>
+                                </button>
+                                <span class="hidden sm:inline font-medium ml-1">of {{ total_pages|default(1) }}</span>
+                            </div>
+                        {% endif %}
+                    </div>
+
+                    <div id="theses-skeleton" class="space-y-6 hidden">
+                        {% for i in 1..3 %}
+                        <div class="bg-white rounded-2xl p-8 border border-gray-100 shadow-sm animate-pulse flex flex-col md:flex-row gap-6">
+                            <div class="flex-grow">
+                                <div class="flex gap-2 mb-4">
+                                    <div class="h-6 w-20 bg-gray-200 rounded-full"></div>
+                                    <div class="h-6 w-24 bg-gray-200 rounded-full"></div>
+                                </div>
+                                <div class="h-6 w-3/4 bg-gray-200 rounded mb-3"></div>
+                                <div class="h-4 w-full bg-gray-200 rounded mb-2"></div>
+                                <div class="h-4 w-5/6 bg-gray-200 rounded mb-4"></div>
+                                <div class="flex justify-between items-center mt-6">
+                                    <div class="h-4 w-1/4 bg-gray-200 rounded"></div>
+                                    <div class="h-4 w-16 bg-gray-200 rounded"></div>
+                                </div>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+
+                    <div id="theses-results" class="space-y-6">
+                        {% for thesis in theses %}
+                            <article class="bg-white rounded-2xl p-8 border border-gray-100 shadow-sm hover:shadow-lg transition flex flex-col gap-4">
+                                
+                                <div class="flex flex-wrap gap-2 mb-1">
+                                    {% for sdg in thesis.sdgs %}
+                                        <span class="text-white text-xs font-bold px-3 py-1 rounded-full font-work uppercase tracking-wider shadow-sm" style="background-color: {{ sdg_colors[sdg.id]|default('#166534') }}; text-shadow: 0px 1px 2px rgba(0,0,0,0.2);">
+                                            SDG {{ sdg.id }}
+                                        </span>
+                                    {% endfor %}
+                                </div>
+                                
+                                <h3 class="text-2xl font-bold text-gray-900 hover:text-feu-green-700 transition font-bebas tracking-wide">
+                                    <a href="{{ path('app_library_show', {id: thesis.id}) }}" data-turbo-frame="_top">{{ thesis.title }}</a>
+                                </h3>
+                                
+                                {% if thesis.description|trim is not empty %}
+                                    <div id="abstract-wrapper-{{ thesis.id }}" class="mt-4 hidden bg-gray-50 p-6 md:p-8 rounded-xl border border-gray-200">
+                                        <p class="text-gray-800 font-medium text-sm leading-relaxed font-work whitespace-pre-wrap break-words text-justify">
+                                            {{ thesis.description }}
+                                        </p>
+                                    </div>
+                                {% endif %}
+                                
+                                <div class="flex flex-col xl:flex-row xl:items-center justify-between mt-4 pt-4 border-t border-gray-100 gap-4">
+                                    <div class="flex flex-wrap items-center gap-4 text-sm font-work">
+                                        <span class="font-bold text-gray-600">By {{ thesis.authors|replace({';': ', '}) }}</span>
+                                        <div class="flex items-center text-feu-green-700 font-bold gap-1 bg-feu-green-50 px-2 py-1 rounded-md">
+                                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path></svg>
+                                            {{ thesis.views|number_format }} Views
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="flex flex-wrap items-center gap-2">
+                                        {% if thesis.description|trim is not empty %}
+                                            <button type="button" onclick="document.getElementById('abstract-wrapper-{{ thesis.id }}').classList.toggle('hidden')" class="px-4 py-2.5 bg-gray-100 hover:bg-gray-200 text-gray-800 font-bold rounded-lg transition text-xs flex items-center gap-1.5 border border-gray-200 font-work cursor-pointer">
+                                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h7"></path></svg>
+                                                Abstract
+                                            </button>
+                                        {% endif %}
+
+                                        {% if thesis.documentFile %}
+                                            <a href="{{ asset('uploads/theses/' ~ thesis.documentFile) }}" target="_blank" class="px-4 py-2.5 bg-red-50 hover:bg-red-100 text-red-700 font-bold rounded-lg transition text-xs flex items-center gap-1.5 border border-red-200 font-work">
+                                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z"></path></svg>
+                                                View PDF
+                                            </a>
+                                        {% endif %}
+
+                                        <a href="{{ path('app_library_show', {id: thesis.id}) }}" data-turbo-frame="_top" class="px-5 py-2.5 bg-feu-green-900 hover:bg-feu-green-800 text-white font-bold rounded-lg transition text-xs flex items-center gap-1.5 shadow-sm font-work">
+                                            View Article &rarr;
+                                        </a>
+                                    </div>
+                                </div>
+
+                            </article>
+                        {% else %}
+                            <div class="p-12 text-center bg-white rounded-2xl border border-dashed border-gray-300">
+                                <p class="text-gray-500 font-medium font-work">No projects found for the selected filters.</p>
+                            </div>
+                        {% endfor %}
+                    </div>
+
+                </turbo-frame>
+            </main>
+        </div>
+    </section>
+{% endblock %}

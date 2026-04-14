@@ -1,0 +1,127 @@
+/* * FEU SDG MICROSITE - ADMIN OVERHAUL
+ * Uses official EasyAdmin (--ea-) variables mapped to the Tailwind FEU palette.
+ */
+
+/* 1. Import Montserrat directly for the Admin environment
+@font-face {
+    font-family: 'Montserrat';
+    src: url('../fonts/montserrat/Montserrat-Regular.otf') format('opentype');
+    font-weight: 400;
+    font-display: swap;
+} */
+
+:root {
+    /* --- TYPOGRAPHY --- */
+    /* Forces EasyAdmin to use Montserrat across the entire dashboard */
+    --ea-font-family-base: 'Montserrat', ui-sans-serif, system-ui, -apple-system, sans-serif;
+    --font-family-sans: var(--ea-font-family-base);
+    --font-family-base: var(--ea-font-family-base);
+
+    /* --- BRAND COLORS (Mapped from app.css Tailwind Config) --- */
+    --ea-color-primary: #166534;        /* feu-green-800 */
+    --ea-color-primary-dark: #14532d;   /* feu-green-900 */
+    --ea-color-primary-light: #40916c;  /* feu-green-500 */
+    
+    --color-warning: #FCC30B;           /* FEU Gold fallback */
+
+    /* --- SIDEBAR THEME --- */
+    --ea-sidebar-bg: #ffffff;
+    --ea-sidebar-color: #475569;
+    
+    /* Menu Links */
+    --ea-sidebar-menu-color: #64748b;
+    --ea-sidebar-menu-hover-bg: #f8fafc;
+    --ea-sidebar-menu-hover-color: #0f172a;
+    
+    /* Active Menu Link */
+    --ea-sidebar-menu-active-bg: #f0fdf4; /* feu-green-50 */
+    --ea-sidebar-menu-active-color: var(--ea-color-primary);
+    --ea-sidebar-menu-active-color-border: var(--ea-color-primary);
+}
+
+/* --- CUSTOM UI REFINEMENTS --- */
+
+/* Ensures the body strictly adheres to the custom font */
+body {
+    font-family: var(--ea-font-family-base) !important;
+}
+
+/* Add FEU Gold accent line to the top of the sidebar */
+.sidebar {
+    border-top: 4px solid var(--color-warning);
+}
+
+/* Thicker Section Headers in Sidebar */
+.menu-header {
+    letter-spacing: 1px;
+    font-size: 0.85rem;
+    color: #94a3b8;
+    margin-top: 1.5rem;
+    text-transform: uppercase;
+    font-weight: 700;
+}
+
+/* Pill-shaped modern buttons for standard actions */
+.btn-primary {
+    border-radius: 9999px; /* Pill shape */
+    font-weight: 700;
+    letter-spacing: 0.05em;
+}
+
+/* --- DATAGRID HEADERS --- */
+
+/* 1. Define our custom color variables (Defaults to Light Mode) */
+:root {
+    --admin-header-bg: #f1f5f9;
+    --admin-header-text: #475569;
+    --admin-header-border: transparent;
+}
+
+/* 2. Switch the variables when EasyAdmin triggers Dark Mode */
+/* This covers both EA4's modern data attribute and older class fallbacks */
+[data-bs-theme="dark"], 
+html[data-bs-theme="dark"], 
+body.ea-dark-scheme {
+    --admin-header-bg: #1e293b;       /* Dark slate background */
+    --admin-header-text: #e2e8f0;     /* Light slate text */
+    --admin-header-border: #334155;   /* Dark border */
+}
+
+/* 3. Apply the variables to the table header */
+.datagrid thead th {
+    background-color: var(--admin-header-bg) !important;
+    color: var(--admin-header-text) !important;
+    border-bottom: 1px solid var(--admin-header-border) !important;
+    
+    text-transform: uppercase !important;
+    font-size: 0.75rem !important;
+    letter-spacing: 0.05em !important;
+    padding: 1rem !important;
+}
+
+/* ------------------------------------ */
+
+/* --- DASHBOARD STAT CARDS --- */
+
+/* Primary Stat Card (Green) - Light Mode */
+/* --- DARK MODE OVERRIDES --- */
+
+/* Primary Stat Card (Green) - Dark Mode */
+html[data-bs-theme="dark"] .stat-card-primary,
+body.ea-dark-scheme .stat-card-primary {
+    background-color: #064e3b !important; /* Deeper Emerald */
+    border: 1px solid #047857 !important;
+}
+html[data-bs-theme="dark"] .stat-card-primary .stat-title { color: #6ee7b7; } /* Bright pastel green */
+html[data-bs-theme="dark"] .stat-card-primary .stat-value,
+html[data-bs-theme="dark"] .stat-card-primary .stat-link { color: #ffffff; } /* Pure white */
+
+/* Warning Stat Card (Gold) - Dark Mode */
+html[data-bs-theme="dark"] .stat-card-warning,
+body.ea-dark-scheme .stat-card-warning {
+    background-color: #a16207 !important; /* Rich Dark Gold / Muted Yellow */
+    border: 1px solid #ca8a04 !important;
+}
+html[data-bs-theme="dark"] .stat-card-warning .stat-title { color: #fef08a; } /* Bright pastel yellow (Matches primary style) */
+html[data-bs-theme="dark"] .stat-card-warning .stat-value,
+html[data-bs-theme="dark"] .stat-card-warning .stat-link { color: #ffffff !important; } /* Pure white (Matches primary style) */

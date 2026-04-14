@@ -4,6 +4,7 @@ namespace App\Controller;
 
 use App\Entity\Thesis;
 use App\Repository\ThesisRepository;
+use App\Repository\SdgRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\Tools\Pagination\Paginator;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -11,100 +12,110 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
 
+/**
+ * Handles the Project Library search, filtering, and view counter logic.
+ */
 final class ThesisController extends AbstractController
 {
     #[Route('/library', name: 'app_library')]
-    public function index(Request $request, ThesisRepository $thesisRepository): Response
+    public function index(Request $request, ThesisRepository $thesisRepository, SdgRepository $sdgRepository): Response
     {
-        $selectedGoals = $request->query->all('goals');
-        $searchAuthor = $request->query->get('author');
-        $searchTitle = $request->query->get('title');
-        $searchKeyword = $request->query->get('keyword');
-        
+        $searchAuthor = $request->query->get('author', '');
+        $searchTitle = $request->query->get('title', '');
+        $searchKeyword = $request->query->get('keyword', '');
+        $selectedSdgs = $request->query->all('goals');
         $isExclusive = $request->query->getBoolean('exclusive', false);
         
         $page = max(1, $request->query->getInt('page', 1));
         $limit = 10;
 
+        /**
+         * leftJoin and addSelect pre-fetches all associated SDGs in the initial query.
+         */
         $qb = $thesisRepository->createQueryBuilder('t')
-            ->leftJoin('t.sdgs', 's')
-            ->addSelect('s')
+            ->leftJoin('t.sdgs', 'all_sdgs')
+            ->addSelect('all_sdgs')
+            ->where('t.isActive = :active')
+            ->setParameter('active', true)
             ->orderBy('t.createdAt', 'DESC');
 
-        if (!empty($selectedGoals)) {
-            if ($isExclusive) {
-                /* * EXACT MATCH LOGIC (Fixed for Collection Hydration):
-                 * 1. The SIZE() function natively checks that the thesis has the exact 
-                 * amount of tags as the user's selection, bypassing the need for GROUP BY.
-                 */
-                $qb->andWhere('SIZE(t.sdgs) = :goalCount')
-                   ->setParameter('goalCount', count($selectedGoals));
+        if ($searchAuthor) {
+            $qb->andWhere('t.authors LIKE :author')
+               ->setParameter('author', '%' . $searchAuthor . '%');
+        }
+        if ($searchTitle) {
+            $qb->andWhere('t.title LIKE :title')
+               ->setParameter('title', '%' . $searchTitle . '%');
+        }
+        if ($searchKeyword) {
+            $qb->andWhere('t.description LIKE :keyword OR t.title LIKE :keyword OR t.authors LIKE :keyword')
+               ->setParameter('keyword', '%' . $searchKeyword . '%');
+        }
 
-                /* * 2. Subquery ensures NO tags exist on this thesis that fall 
-                 * outside of the user's selected goals.
-                 */
-                $qb->andWhere(
-                    $qb->expr()->not(
-                        $qb->expr()->exists(
-                            "SELECT 1 FROM App\Entity\Thesis t2 
-                             JOIN t2.sdgs s2 
-                             WHERE t2.id = t.id AND s2.id NOT IN (:goals)"
-                        )
-                    )
-                )->setParameter('goals', $selectedGoals);
-                
+        if (!empty($selectedSdgs)) {
+            if ($isExclusive) {
+                foreach ($selectedSdgs as $index => $sdgId) {
+                    $alias = 's' . $index;
+                    $qb->join('t.sdgs', $alias)
+                       ->andWhere($alias . '.id = :sdg' . $index)
+                       ->setParameter('sdg' . $index, $sdgId);
+                }
+                $qb->andWhere('SIZE(t.sdgs) = :count')
+                   ->setParameter('count', count($selectedSdgs));
             } else {
-                /* * INCLUSIVE MATCH LOGIC:
-                 * Subquery ensures we find any thesis connected to at least one selected goal,
-                 * without restricting the main fetch array so all tags still display.
-                 */
-                $qb->andWhere(
-                    $qb->expr()->exists(
-                        "SELECT 1 FROM App\Entity\Thesis t3 
-                         JOIN t3.sdgs s3 
-                         WHERE t3.id = t.id AND s3.id IN (:goals)"
-                    )
-                )->setParameter('goals', $selectedGoals);
+                $qb->join('t.sdgs', 's')
+                   ->andWhere('s.id IN (:sdgs)')
+                   ->setParameter('sdgs', $selectedSdgs);
             }
         }
-        
-        if (!empty($searchAuthor)) {
-            $qb->andWhere('t.authors LIKE :author')->setParameter('author', '%' . $searchAuthor . '%');
-        }
-        if (!empty($searchTitle)) {
-            $qb->andWhere('t.title LIKE :title')->setParameter('title', '%' . $searchTitle . '%');
-        }
-        if (!empty($searchKeyword)) {
-            $qb->andWhere('t.description LIKE :keyword')->setParameter('keyword', '%' . $searchKeyword . '%');
-        }
-
-        $qb->setFirstResult(($page - 1) * $limit)
-           ->setMaxResults($limit);
 
         $paginator = new Paginator($qb, true);
         $totalCount = count($paginator);
         $totalPages = max(1, ceil($totalCount / $limit));
 
-        return $this->render('SDG-Microsite/thesis/index.html.twig', [
-            'selected_goals' => $selectedGoals,
-            'is_exclusive' => $isExclusive,
-            'theses' => $paginator,
+        $qb->setFirstResult(($page - 1) * $limit)
+           ->setMaxResults($limit);
+
+        $theses = $qb->getQuery()->getResult();
+        $activeSdgs = $sdgRepository->findBy(['isActive' => true], ['id' => 'ASC']);
+
+        return $this->render('SDG-Microsite/library/index.html.twig', [
+            'theses' => $theses,
             'search_author' => $searchAuthor,
             'search_title' => $searchTitle,
             'search_keyword' => $searchKeyword,
+            'selected_goals' => $selectedSdgs,
+            'is_exclusive' => $isExclusive,
             'current_page' => $page,
             'total_pages' => $totalPages,
             'total_count' => $totalCount,
+            'active_sdgs' => $activeSdgs,
         ]);
     }
 
-    #[Route('/library/article/{id}', name: 'app_thesis_show')]
-    public function show(Thesis $thesis, EntityManagerInterface $em): Response
+    #[Route('/library/thesis/{id}', name: 'app_library_show')]
+    public function show(Request $request, Thesis $thesis, EntityManagerInterface $em): Response
     {
-        $thesis->incrementViews();
-        $em->flush();
+        if (!$thesis->isActive()) {
+            throw $this->createNotFoundException('This thesis is no longer available.');
+        }
 
-        return $this->render('SDG-Microsite/thesis/show.html.twig', [
+        /**
+         * Session-based view counter logic.
+         * Prevents manipulation by recording accessed project IDs in the active user session.
+         */
+        $session = $request->getSession();
+        $viewedTheses = $session->get('viewed_theses', []);
+
+        if (!in_array($thesis->getId(), $viewedTheses)) {
+            $thesis->incrementViews();
+            $em->flush();
+
+            $viewedTheses[] = $thesis->getId();
+            $session->set('viewed_theses', $viewedTheses);
+        }
+
+        return $this->render('SDG-Microsite/library/show.html.twig', [
             'thesis' => $thesis,
         ]);
     }

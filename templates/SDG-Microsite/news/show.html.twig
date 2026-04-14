@@ -3,41 +3,104 @@
 {% block title %}{{ activity.title }} - FEU SDG Microsite{% endblock %}
 
 {% block body %}
+{# Calculate Estimated Reading Time (Average 200 words per minute) #}
+{% set word_count = activity.content|striptags|split(' ')|length %}
+{% set reading_time = (word_count / 200)|round(0, 'ceil') %}
+
+{% set sdg_colors = {
+    1: '#E5243B', 2: '#DDA63A', 3: '#4C9F38', 4: '#C5192D', 5: '#FF3A21', 6: '#26BDE2',
+    7: '#FCC30B', 8: '#A21942', 9: '#FD6925', 10: '#DD1367', 11: '#FD9D24', 12: '#BF8B2E',
+    13: '#3F7E44', 14: '#0A97D9', 15: '#56C02B', 16: '#00689D', 17: '#19486A'
+    } %}
+
 <section class="bg-gray-50 py-12 px-6 min-h-screen">
     <div class="max-w-4xl mx-auto">
         
-        <a href="{{ path('app_news') }}" class="text-gray-500 hover:text-feu-green-700 font-bold text-sm mb-8 inline-flex items-center gap-2 transition font-work">
-            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path></svg>
+        <a href="{{ path('app_news') }}" class="text-gray-500 hover:text-feu-green-700 font-bold text-sm mb-8 inline-flex items-center gap-2 transition font-work group">
+            <svg class="w-4 h-4 transition-transform group-hover:-translate-x-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path>
+            </svg>
             Back to News & Activities
         </a>
 
-        <article class="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
+        <article class="bg-white rounded-3xl shadow-sm border border-gray-100 overflow-hidden">
             
             {# Hero Image Header #}
-            <div class="w-full h-64 md:h-[28rem] relative bg-gray-100 overflow-hidden shrink-0 border-b-4 border-feu-gold-400">
+            <div class="w-full h-64 md:h-[32rem] relative bg-gray-100 overflow-hidden shrink-0 border-b-4 border-feu-gold-400">
                 {% if activity.image %}
                     <img src="{{ asset('uploads/activities/' ~ activity.image) }}" alt="{{ activity.title }}" class="absolute inset-0 w-full h-full object-cover">
                 {% else %}
                     <img src="{{ asset('images/hero-3.jpg') }}" alt="FEU Event" class="absolute inset-0 w-full h-full object-cover opacity-90">
                 {% endif %}
-                <div class="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent"></div>
+                <div class="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent"></div>
             </div>
 
-            <div class="p-8 md:p-12 lg:px-16">
-                {# Metadata #}
-                <div class="flex items-center gap-3 mb-6">
-                    <span class="bg-feu-green-100 text-feu-green-800 text-xs font-bold px-3 py-1 rounded-full uppercase tracking-widest font-work">{{ activity.category }}</span>
-                    <span class="text-gray-500 font-medium font-work text-sm">{{ activity.eventDate|date('F j, Y') }}</span>
+            <div class="p-8 md:p-12 lg:p-16">
+                {# Metadata & SDG Tags #}
+                <div class="flex flex-wrap items-center gap-3 mb-8">
+                    {# Category Tag #}
+                    <span class="bg-feu-green-900 text-white text-[10px] font-bold px-3 py-1.5 rounded-full uppercase tracking-widest font-work shadow-sm">
+                        {{ activity.category }}
+                    </span>
+                    
+                    {# The Colored SDG Tags right next to the category #}
+                    {% for sdg in activity.sdgs %}
+                        <span class="text-white text-[10px] font-bold px-3 py-1.5 rounded-full font-work uppercase tracking-wider shadow-sm" style="background-color: {{ sdg_colors[sdg.id]|default('#166534') }}; text-shadow: 0px 1px 2px rgba(0,0,0,0.2);">
+                            SDG {{ sdg.id }}: {{ sdg.name }}
+                        </span>
+                    {% endfor %}
+                    
+                    <div class="h-4 w-px bg-gray-300 hidden sm:block ml-1"></div>
+                    
+                    <span class="text-gray-500 font-bold font-work text-sm flex items-center gap-1.5">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>
+                        {{ activity.eventDate|date('F j, Y') }}
+                    </span>
+
+                    <div class="h-4 w-px bg-gray-300 hidden sm:block"></div>
+
+                    <span class="text-gray-500 font-bold font-work text-sm flex items-center gap-1.5">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                        {{ reading_time }} min read
+                    </span>
                 </div>
                 
                 {# Article Title #}
-                <h1 class="text-4xl md:text-5xl font-bold text-gray-900 mb-8 font-bebas tracking-wide leading-tight">
+                <h1 class="text-4xl md:text-6xl font-bold text-gray-950 mb-10 font-bebas tracking-wide leading-[1.1] pb-8 border-b border-gray-100">
                     {{ activity.title }}
                 </h1>
                 
-                {# Article Content #}
-                <div class="text-gray-800 font-work leading-relaxed text-lg whitespace-pre-line">
-                    {{ activity.content }}
+                <style>
+                    /* Explicit overrides to restore TinyMCE HTML tags stripped by Tailwind */
+                    .article-content h1 { font-size: 2.5rem; font-weight: 700; margin-top: 2.5rem; margin-bottom: 1rem; font-family: 'Bebas Neue', sans-serif; color: #022c22; line-height: 1.1; letter-spacing: 0.025em; }
+                    .article-content h2 { font-size: 2rem; font-weight: 700; margin-top: 2rem; margin-bottom: 1rem; font-family: 'Bebas Neue', sans-serif; color: #022c22; line-height: 1.2; letter-spacing: 0.025em; }
+                    .article-content h3 { font-size: 1.75rem; font-weight: 700; margin-top: 1.75rem; margin-bottom: 1rem; font-family: 'Bebas Neue', sans-serif; color: #022c22; line-height: 1.3; }
+                    .article-content h4 { font-size: 1.5rem; font-weight: 700; margin-top: 1.5rem; margin-bottom: 1rem; font-family: 'Bebas Neue', sans-serif; color: #022c22; }
+                    .article-content h5 { font-size: 1.25rem; font-weight: 700; margin-top: 1rem; margin-bottom: 0.5rem; }
+                    .article-content ul { list-style-type: disc; padding-left: 1.5rem; margin-bottom: 1.5rem; }
+                    .article-content ol { list-style-type: decimal; padding-left: 1.5rem; margin-bottom: 1.5rem; }
+                    .article-content li { margin-bottom: 0.5rem; }
+                    .article-content p { margin-bottom: 1.5rem; }
+                    .article-content strong { color: #000; font-weight: 700; }
+                    .article-content a { color: #16a34a; text-decoration: underline; transition: color 0.2s; }
+                    .article-content a:hover { color: #15803d; }
+                    .article-content blockquote { border-left: 4px solid #166534; padding: 1.25rem; font-style: italic; color: #4b5563; margin: 2rem 0; background: #f0fdf4; border-radius: 0 0.5rem 0.5rem 0; }
+                    
+                    /* Image Resizing Fix: max-w-full prevents overflow, while inline height:auto respects TinyMCE dimensions */
+                    .article-content img { 
+                        max-width: 100%; 
+                        height: auto !important; 
+                        border-radius: 1.5rem; 
+                        box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04); 
+                        border: 1px solid #f3f4f6; 
+                        margin-top: 2rem; 
+                        margin-bottom: 2rem; 
+                        display: inline-block; 
+                    }
+                </style>
+
+                <div class="article-content text-lg lg:text-xl text-gray-800 font-work leading-relaxed">
+                    {{ activity.content|raw }}
                 </div>
             </div>
             

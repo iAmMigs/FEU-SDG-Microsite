@@ -62,9 +62,8 @@
     font-display: swap;
 }
 
-/* Tailwind Theme Configuration Settings */
 @theme {
-    /* Typography Variables */
+    /* Fonts: This generates classes like .font-bebas, .font-work */
     --font-sans: 'Montserrat', ui-sans-serif, system-ui, sans-serif;
     --font-bebas: 'BebasNeue', sans-serif;
     --font-coolvetica: 'Coolvetica', sans-serif;
@@ -73,7 +72,7 @@
     --font-work: 'WorkSans', sans-serif;
     --font-della: 'DellaRespira', serif;
 
-    /* FEU Green Color Palette */
+    /* Colors: This generates classes like .bg-feu-green-900, .text-feu-gold-400 */
     --color-feu-green-50: #f0fdf4;
     --color-feu-green-100: #dcfce7;
     --color-feu-green-200: #bbf7d0;
@@ -85,7 +84,6 @@
     --color-feu-green-800: #166534;
     --color-feu-green-900: #14532d;
 
-    /* FEU Gold Color Palette */
     --color-feu-gold-50: #fefce8;
     --color-feu-gold-100: #fef3c7;
     --color-feu-gold-200: #fde68a;

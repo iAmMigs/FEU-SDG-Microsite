@@ -1,0 +1,187 @@
+{% extends 'SDG-Microsite/base.html.twig' %}
+
+{% block title %}{{ thesis.title }} - FEU SDG Microsite{% endblock %}
+
+{% block body %}
+
+<section class="bg-white py-12 px-6 min-h-screen">
+    <div class="max-w-7xl mx-auto">
+
+        <a href="{{ path('app_library') }}" class="text-gray-500 hover:text-feu-green-700 font-bold text-sm mb-8 inline-flex items-center gap-2 transition font-work">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path></svg>
+            Back to Repository
+        </a>
+
+        {% if thesis.coverImage %}
+            <div class="w-full h-64 md:h-[28rem] relative rounded-2xl overflow-hidden mb-12 shadow-sm border border-gray-100 bg-gray-100">
+                <img src="{{ asset('uploads/theses/' ~ thesis.coverImage) }}" alt="{{ thesis.title }} Cover" class="absolute inset-0 w-full h-full object-cover">
+                <div class="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent pointer-events-none"></div>
+            </div>
+        {% endif %}
+
+        {% set ext_link = thesis.publicationLink %}
+        {% set doi_link = thesis.doi ? 'https://doi.org/' ~ thesis.doi : null %}
+
+        {% set pub_btn_link = null %}
+        {% set citeLink = null %}
+
+        {% if thesis.doi and ext_link %}
+            {% set pub_btn_link = ext_link %}
+            {% set citeLink = doi_link %}
+        {% elseif not thesis.doi and ext_link %}
+            {% set pub_btn_link = ext_link %}
+            {% set citeLink = ext_link %}
+        {% elseif thesis.doi and not ext_link %}
+            {% set pub_btn_link = doi_link %}
+            {% set citeLink = doi_link %}
+        {% endif %}
+
+        <div class="flex flex-col md:flex-row justify-between items-start md:items-end gap-6 mb-12 border-b border-gray-200 pb-8">
+            <div class="max-w-4xl">
+                <h1 class="text-4xl md:text-5xl font-bold text-gray-900 font-bebas tracking-wide mb-4 leading-tight">
+                    {{ thesis.title }}
+                </h1>
+                <p class="text-gray-600 font-medium font-work text-lg mb-4">By {{ thesis.authors|replace({';': ', '}) }}</p>
+
+                <div class="flex flex-wrap gap-2">
+                    {% for sdg in thesis.sdgs %}
+                        <span class="text-white text-[10px] font-bold px-3 py-1.5 rounded-full font-work uppercase tracking-wider shadow-sm" style="background-color: {{ sdg_colors[sdg.id]|default('#166534') }}; text-shadow: 0px 1px 2px rgba(0,0,0,0.2);">
+                           SDG {{ sdg.id }}: {{ sdg.name }} 
+                        </span>
+                    {% endfor %}
+                </div>
+            </div>
+
+            {% if pub_btn_link %}
+                <a href="{{ pub_btn_link }}" target="_blank" class="inline-flex shrink-0 items-center px-6 py-3 text-sm font-bold rounded-full text-feu-green-950 bg-[#FCC30B] hover:bg-yellow-400 transition shadow-sm gap-2 font-work">
+                    View Publication
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"></path></svg>
+                </a>
+            {% endif %}
+        </div>
+
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-12">
+            <div class="lg:col-span-2">
+                <h2 class="text-2xl font-bold text-gray-900 font-bebas tracking-wide mb-6">Abstract</h2>
+                <div class="text-gray-800 font-work leading-relaxed space-y-5 text-justify mb-12">
+                    <p class="whitespace-pre-line">{{ thesis.description }}</p>
+                </div>
+
+                {% set pubYear = thesis.createdAt|date('Y') %}
+                {% set formatted_authors = thesis.authors|replace({';': ', '}) %}
+                
+                {% set cite_apa = formatted_authors ~ ' (' ~ pubYear ~ '). ' ~ thesis.title ~ '.' ~ (citeLink ? ' ' ~ citeLink : '') %}
+                
+                {% set cite_ieee = formatted_authors ~ ', "' ~ thesis.title ~ '," ' ~ pubYear ~ '.' ~ (citeLink ? ' [Online]. Available: ' ~ citeLink : '') %}
+                
+                {% set cite_mla = formatted_authors ~ '. "' ~ thesis.title ~ '." ' ~ pubYear ~ (citeLink ? ', ' ~ citeLink : '') ~ '.' %}
+                
+                <div class="p-8 border border-gray-200 bg-gray-50 rounded-2xl shadow-sm" id="citation-card">
+                    <h2 class="text-xl font-bold text-gray-900 font-bebas tracking-wide mb-6">Recommended Citation</h2>
+                    
+                    <div class="flex flex-wrap items-center gap-1 border-b border-gray-200 mb-6 font-work">
+                        <button type="button" onclick="swapCite(this, '{{ cite_apa|e('js') }}')" class="cit-tab px-5 py-2.5 font-bold text-xs bg-white text-feu-green-900 border border-gray-200 border-b-white rounded-t-lg -mb-px">APA</button>
+                        <button type="button" onclick="swapCite(this, '{{ cite_ieee|e('js') }}')" class="cit-tab px-5 py-2.5 font-bold text-xs bg-gray-100 text-gray-500 hover:text-gray-800 hover:bg-white rounded-t-lg border border-transparent">IEEE</button>
+                        <button type="button" onclick="swapCite(this, '{{ cite_mla|e('js') }}')" class="cit-tab px-5 py-2.5 font-bold text-xs bg-gray-100 text-gray-500 hover:text-gray-800 hover:bg-white rounded-t-lg border border-transparent">MLA</button>
+                    </div>
+
+                    <div class="bg-white rounded-xl p-4 border border-gray-200 relative shadow-sm">
+                        <p class="text-sm font-medium text-gray-800 font-work leading-relaxed pr-24 break-words" id="citation-text">
+                            {{ cite_apa }}
+                        </p>
+                        
+                        <button type="button" onclick="copyCiteBtn(this)" class="absolute top-6 right-6 px-4 py-2 bg-gray-50 hover:bg-gray-100 text-gray-800 font-bold rounded-lg transition text-xs border border-gray-200 font-work cursor-pointer">
+                            Copy
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="lg:col-span-1">
+                <div class="bg-gray-50 rounded-2xl p-8 border border-gray-100 sticky top-28">
+                    <div class="space-y-6">
+                       
+                        <div>
+                            <h3 class="text-xs font-bold text-gray-400 uppercase tracking-wider mb-1 font-work">Date Added</h3>
+                            <p class="text-gray-900 font-bold font-work">{{ thesis.createdAt|date('d M, Y') }}</p>
+                        </div>
+                        
+                        <div>
+                            <h3 class="text-xs font-bold text-gray-400 uppercase tracking-wider mb-1 font-work">Authors</h3>
+                            <p class="text-gray-900 font-bold font-work">{{ thesis.authors }}</p>
+                        </div>
+
+                        <div>
+                            <h3 class="text-xs font-bold text-gray-400 uppercase tracking-wider mb-1 font-work">Views</h3>
+                            <p class="text-gray-900 font-bold font-work flex items-center gap-1.5">
+                                <svg class="w-4 h-4 text-feu-green-700" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path></svg>
+                                {{ thesis.views|number_format }}
+                            </p>
+                        </div>
+
+                        {% if thesis.type %}
+                            <div>
+                                <h3 class="text-xs font-bold text-gray-400 uppercase tracking-wider mb-1 font-work">Type</h3>
+                                <p class="text-gray-900 font-bold font-work">{{ thesis.type }}</p>
+                            </div>
+                        {% endif %}
+
+                        {% if thesis.college %}
+                            <div>
+                                <h3 class="text-xs font-bold text-gray-400 uppercase tracking-wider mb-1 font-work">College</h3>
+                                <p class="text-gray-900 font-bold font-work">{{ thesis.college }}</p>
+                            </div>
+                        {% endif %}
+
+                        {% if thesis.documentFile %}
+                            <div class="pt-6 border-t border-gray-200">
+                                <a href="{{ asset('uploads/theses/' ~ thesis.documentFile) }}" target="_blank" class="w-full inline-flex justify-center items-center px-5 py-3 bg-red-50 hover:bg-red-100 text-red-700 font-bold rounded-lg transition text-sm gap-2 border border-red-200 font-work">
+                                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z"></path></svg>
+                                    View PDF File
+                                </a>
+                            </div>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+           
+        </div>
+
+    </div>
+</section>
+
+<script>
+    /**
+     * Replaces the citation block text and updates styling to highlight the active format tab.
+     */
+    function swapCite(btn, text) {
+        document.getElementById('citation-text').innerText = text;
+        
+        document.querySelectorAll('.cit-tab').forEach(t => {
+            t.className = 'cit-tab px-5 py-2.5 font-bold text-xs bg-gray-100 text-gray-500 hover:text-gray-800 hover:bg-white rounded-t-lg border border-transparent';
+        });
+        
+        btn.className = 'cit-tab px-5 py-2.5 font-bold text-xs bg-white text-feu-green-900 border border-gray-200 border-b-white rounded-t-lg -mb-px';
+    }
+
+    /**
+     * Copies the active citation text to the system clipboard and provides visual feedback.
+     */
+    async function copyCiteBtn(btn) {
+        const text = document.getElementById('citation-text').innerText;
+        
+        try {
+            await navigator.clipboard.writeText(text);
+            btn.innerText = 'Copied!';
+            btn.classList.add('bg-feu-green-50', 'text-feu-green-900', 'border-feu-green-200');
+            
+            setTimeout(() => {
+                btn.innerText = 'Copy';
+                btn.classList.remove('bg-feu-green-50', 'text-feu-green-900', 'border-feu-green-200');
+            }, 2000);
+        } catch(e) {
+            alert('Failed to copy text.');
+        }
+    }
+</script>
+{% endblock %}

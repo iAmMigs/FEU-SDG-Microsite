@@ -1,8 +1,21 @@
+{# templates/SDG-Microsite/news/index.html.twig #}
 {% extends 'SDG-Microsite/base.html.twig' %}
+
+{% block head %}
+    {{ parent() }}
+    <meta name="turbo-cache-control" content="no-cache">
+{% endblock %}
 
 {% block title %}News & Activities - FEU SDG Microsite{% endblock %}
 
 {% block body %}
+
+{% set sdg_colors = {
+    1: '#E5243B', 2: '#DDA63A', 3: '#4C9F38', 4: '#C5192D', 5: '#FF3A21', 6: '#26BDE2',
+    7: '#FCC30B', 8: '#A21942', 9: '#FD6925', 10: '#DD1367', 11: '#FD9D24', 12: '#BF8B2E',
+    13: '#3F7E44', 14: '#0A97D9', 15: '#56C02B', 16: '#00689D', 17: '#19486A'
+    } %}
+
     <section class="bg-feu-green-900 py-16 px-6 text-center border-b-4 border-feu-gold-400">
         <div class="max-w-4xl mx-auto">
             <h1 class="text-4xl md:text-5xl font-bold text-white mb-4 font-bebas tracking-wide">News & Activities</h1>
@@ -12,43 +25,177 @@
         </div>
     </section>
 
-    <section class="py-16 px-6 bg-gray-50 min-h-screen">
-        <div class="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-            {% for activity in activities %}
-                <article class="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden flex flex-col hover:shadow-xl transition duration-300 group">
+    {# The controller is placed here to encompass both the form and the results grid #}
+    <section class="py-12 bg-gray-50 min-h-screen" data-controller="autosubmit">
+        <div class="max-w-7xl mx-auto px-8 md:px-16 lg:px-24">
+            
+            {# Horizontal Filter Bar #}
+            <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 mb-10 z-10 relative">
+                <form id="filter-form" action="{{ path('app_news') }}" method="GET" 
+                      data-autosubmit-target="form"
+                      data-action="change->autosubmit#submit input->autosubmit#submit"
+                      data-turbo-frame="news_list"
+                      autocomplete="off">
                     
-                    <div class="h-56 relative bg-gray-100 overflow-hidden shrink-0">
-                        {% if activity.image %}
-                            <img src="{{ asset('uploads/activities/' ~ activity.image) }}" alt="{{ activity.title }}" class="absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition duration-500">
-                        {% else %}
-                            <img src="{{ asset('images/hero-3.jpg') }}" alt="Fallback Event Image" class="absolute inset-0 w-full h-full object-cover opacity-90 group-hover:scale-105 transition duration-500">
+                    {# Hidden page input for pagination logic #}
+                    <input type="hidden" name="page" data-autosubmit-target="page" value="{{ current_page|default(1) }}" data-max="{{ total_pages|default(1) }}">
+
+                    <div class="flex flex-col lg:flex-row gap-8 items-start lg:items-center">
+                        <div class="w-full lg:w-1/4 shrink-0">
+                            <label for="date_range" class="block text-xs font-bold text-gray-400 mb-2 font-work uppercase tracking-widest">Timeframe</label>
+                            <select id="date_range" name="date_range" class="w-full rounded-xl border-gray-200 shadow-sm focus:border-feu-green-700 focus:ring-feu-green-700 px-4 py-3 bg-gray-50 font-work text-gray-800 font-bold cursor-pointer transition hover:bg-gray-100">
+                                <option value="">Anytime</option>
+                                <option value="1_day" {% if date_range == '1_day' %}selected{% endif %}>Past 24 Hours</option>
+                                <option value="7_days" {% if date_range == '7_days' %}selected{% endif %}>Past 7 Days</option>
+                                <option value="30_days" {% if date_range == '30_days' %}selected{% endif %}>Past Month</option>
+                            </select>
+                        </div>
+
+                        <div class="w-full lg:w-3/4">
+                            <label class="block text-xs font-bold text-gray-400 mb-2 font-work uppercase tracking-widest">Filter by Goal</label>
+                            <div class="flex flex-wrap gap-3">
+                                {% for sdg in all_sdgs %}
+                                    {% set formatted_num = '%02d'|format(sdg.id) %}
+                                    
+                                    {# Library Style Filter: Inverted vs Normal Images #}
+                                    <label for="sdg-filter-{{ sdg.id }}" class="cursor-pointer relative block w-14 h-14 rounded-md overflow-hidden shadow-sm hover:shadow-md transition group border border-gray-100 bg-white shrink-0">
+                                        <input type="checkbox" id="sdg-filter-{{ sdg.id }}" name="goals[]" value="{{ sdg.id }}" class="peer sr-only" 
+                                               {% if selected_goals is defined and sdg.id ~ '' in selected_goals %}checked{% endif %}>
+                                        
+                                        <img src="{{ asset('images/sdg/E Inverted Icons_WEB-' ~ formatted_num ~ '.png') }}" alt="Goal {{ sdg.id }}" class="absolute inset-0 w-full h-full object-cover transition-opacity duration-300 opacity-100 peer-checked:opacity-0 group-hover:opacity-75">
+                                        <img src="{{ asset('images/sdg/E-WEB-Goal-' ~ formatted_num ~ '.png') }}" alt="Goal {{ sdg.id }}" class="absolute inset-0 w-full h-full object-cover transition-opacity duration-300 opacity-0 peer-checked:opacity-100">
+                                        
+                                        <div class="absolute inset-0 border-2 border-feu-green-700 rounded-md opacity-0 peer-checked:opacity-100 transition-opacity pointer-events-none"></div>
+                                    </label>
+                                {% endfor %}
+                            </div>
+                        </div>
+                    </div>
+                </form>
+            </div>
+
+            {# We keep the frame ID distinct for routing #}
+            <turbo-frame id="news_list" class="group/frame">
+                
+                {# Replace the frame count header starting around line 146 with: #}
+                <div class="flex flex-col sm:flex-row justify-between items-center mb-8 pb-4 border-b border-gray-200 gap-4">
+                    <div class="flex flex-col gap-3">
+                        <p class="text-gray-600 font-medium font-work">Showing <span class="font-bold text-feu-green-900">{{ total_count|default(0) }}</span> activities found.</p>
+                        
+                        {# Evaluate if any goals are filtered and append visual labels #}
+                        {% if selected_goals is defined and selected_goals|length > 0 %}
+                            <div class="flex flex-wrap items-center gap-2">
+                                <span class="text-xs font-bold text-gray-400 font-work uppercase tracking-wider">Filtered by:</span>
+                                {% for goalId in selected_goals %}
+                                    {% for sdg in all_sdgs %}
+                                        {% if sdg.id == goalId %}
+                                            <span class="text-white text-[10px] font-bold px-3 py-1.5 rounded-full font-work uppercase tracking-wider shadow-sm" style="background-color: {{ sdg_colors[sdg.id]|default('#166534') }}; text-shadow: 0px 1px 2px rgba(0,0,0,0.2);">
+                                                {{ sdg.name }}
+                                            </span>
+                                        {% endif %}
+                                    {% endfor %}
+                                {% endfor %}
+                            </div>
                         {% endif %}
                     </div>
 
-                    <div class="p-8 flex flex-col flex-grow">
-                        <div class="flex items-center justify-between mb-4">
-                            <span class="bg-feu-green-100 text-feu-green-800 text-[10px] font-bold px-3 py-1 rounded-full uppercase tracking-widest">{{ activity.category }}</span>
-                            <span class="text-gray-400 text-xs font-medium">{{ activity.eventDate|date('M j, Y') }}</span>
+                    {% if total_pages > 1 %}
+                        <div class="flex items-center gap-2 text-sm font-work text-gray-700 bg-white px-3 py-1.5 rounded-xl border border-gray-200 shadow-sm">
+                            <button type="button" data-action="click->autosubmit#prevPage" class="p-1 text-gray-400 hover:text-feu-green-700 transition {% if current_page <= 1 %}opacity-30 cursor-not-allowed pointer-events-none{% endif %}">
+                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path></svg>
+                            </button>
+                            <span class="font-bold text-feu-green-900 mx-2">Page {{ current_page }} of {{ total_pages }}</span>
+                            <button type="button" data-action="click->autosubmit#nextPage" class="p-1 text-gray-400 hover:text-feu-green-700 transition {% if current_page >= total_pages %}opacity-30 cursor-not-allowed pointer-events-none{% endif %}">
+                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg>
+                            </button>
                         </div>
-                        
-                        <h3 class="text-2xl font-bold text-gray-900 mb-3 group-hover:text-feu-green-700 transition font-bebas tracking-wide">
-                            <a href="{{ path('app_news_show', {id: activity.id}) }}">{{ activity.title }}</a>
-                        </h3>
-                        
-                        <div class="text-gray-600 text-sm leading-relaxed mb-6 line-clamp-3 font-work">
-                            <p class="whitespace-pre-line">{{ activity.content }}</p>
-                        </div>
-                        
-                        <a href="{{ path('app_news_show', {id: activity.id}) }}" class="text-feu-green-700 font-bold hover:text-feu-green-500 transition flex items-center gap-1 text-sm mt-auto w-max font-work">
-                            Read Full Article &rarr;
-                        </a>
-                    </div>
-                </article>
-            {% else %}
-                <div class="col-span-1 md:col-span-2 lg:col-span-3 p-12 text-center bg-white rounded-2xl border border-dashed border-gray-300">
-                    <p class="text-gray-500 font-medium font-work">No activities have been posted yet.</p>
+                    {% endif %}
                 </div>
-            {% endfor %}
+
+                {# 
+                   THE FIX: We use inline styles to mimic exactly what your app.css does for the Library.
+                   When the turbo-frame gets the 'busy' attribute (which Turbo applies automatically during a fetch), 
+                   it forces the skeleton to display and hides the results! 
+                #}
+                <style>
+                    turbo-frame[busy] #news-skeleton { display: flex !important; }
+                    turbo-frame[busy] #news-results { display: none !important; }
+                </style>
+
+                {# SKELETON LOADER (Hidden by default, shown by the CSS above when busy) #}
+                <div id="news-skeleton" class="hidden flex-wrap justify-center gap-8 mb-8">
+                    {% for i in 1..3 %}
+                        <article class="w-full sm:w-[calc(50%-1rem)] lg:w-[calc(33.333%-1.34rem)] bg-white rounded-3xl shadow-sm border border-gray-100 overflow-hidden flex flex-col max-w-md animate-pulse">
+                            <div class="h-64 bg-gray-200"></div>
+                            <div class="p-8 flex flex-col gap-4">
+                                <div class="flex gap-2">
+                                    <div class="h-4 bg-gray-200 rounded w-16"></div>
+                                    <div class="h-4 bg-gray-200 rounded w-12"></div>
+                                </div>
+                                <div class="h-6 bg-gray-200 rounded w-full"></div>
+                                <div class="h-4 bg-gray-200 rounded w-5/6"></div>
+                                <div class="h-4 bg-gray-200 rounded w-4/6"></div>
+                                <div class="h-10 bg-gray-200 rounded w-full mt-4"></div>
+                            </div>
+                        </article>
+                    {% endfor %}
+                </div>
+
+                {# RESULTS GRID (Shown by default, hidden by the CSS above when busy) #}
+                <div id="news-results" class="flex flex-wrap justify-center gap-8">
+                    {% for activity in activities %}
+                        <article class="w-full sm:w-[calc(50%-1rem)] lg:w-[calc(33.333%-1.34rem)] bg-white rounded-3xl shadow-sm border border-gray-100 overflow-hidden flex flex-col hover:shadow-xl hover:-translate-y-1 transition-all duration-300 group max-w-md">
+                            <div class="h-64 relative bg-gray-100 overflow-hidden shrink-0">
+                                {% if activity.image %}
+                                    <img src="{{ asset('uploads/activities/' ~ activity.image) }}" alt="{{ activity.title }}" class="absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition-transform duration-700">
+                                {% else %}
+                                    <img src="{{ asset('images/hero-3.jpg') }}" alt="Default" class="absolute inset-0 w-full h-full object-cover opacity-90">
+                                {% endif %}
+                            </div>
+
+                            <div class="p-8 flex flex-col flex-grow">
+                                <div class="flex flex-wrap items-center gap-2 mb-4">
+                                    {# The Category Pill #}
+                                    <span class="bg-feu-green-900 text-white text-[10px] font-bold px-3 py-1.5 rounded-full uppercase tracking-widest shadow-sm">
+                                        {{ activity.category }}
+                                    </span>
+                                    
+                                    {# The Colored SDG Tags #}
+                                    {% for sdg in activity.sdgs %}
+                                        <span class="text-white text-[10px] font-bold px-3 py-1.5 rounded-full font-work uppercase tracking-wider shadow-sm" style="background-color: {{ sdg_colors[sdg.id]|default('#166534') }}; text-shadow: 0px 1px 2px rgba(0,0,0,0.2);">
+                                            SDG {{ sdg.id }}
+                                        </span>
+                                    {% endfor %}
+                                </div>
+                                
+                                <span class="text-gray-400 text-xs font-bold font-work flex items-center gap-1.5 mb-3">
+                                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor" class="w-4 h-4 text-feu-green-700">
+                                        <path stroke-linecap="round" stroke-linejoin="round" d="M6.75 3v2.25M17.25 3v2.25M3 18.75V7.5a2.25 2.25 0 012.25-2.25h13.5A2.25 2.25 0 0121 7.5v11.25m-18 0A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75m-18 0v-7.5A2.25 2.25 0 015.25 9h13.5A2.25 2.25 0 0121 11.25v7.5" />
+                                    </svg>
+                                    {{ activity.eventDate|date('M j, Y') }}
+                                </span>
+                                
+                                <h3 class="text-2xl font-bold text-gray-900 mb-4 group-hover:text-feu-green-700 transition-colors font-bebas tracking-wide leading-tight">
+                                    <a href="{{ path('app_news_show', {id: activity.id}) }}" data-turbo-frame="_top">{{ activity.title }}</a>
+                                </h3>
+                                
+                                <div class="text-gray-600 text-sm leading-relaxed mb-8 line-clamp-5 font-work">
+                                    <p>{{ activity.content|striptags|replace({'&nbsp;': ' '})|trim }}</p>
+                                </div>
+                                
+                                <a href="{{ path('app_news_show', {id: activity.id}) }}" data-turbo-frame="_top" class="mt-auto inline-flex items-center justify-center w-full py-3 bg-gray-50 hover:bg-feu-green-800 text-gray-800 hover:text-white font-bold rounded-xl transition-all duration-300 font-work text-sm group/btn">
+                                    Read Article &rarr;
+                                </a>
+                            </div>
+                        </article>
+                    {% else %}
+                        <div class="w-full p-16 text-center bg-white rounded-3xl border border-dashed border-gray-300">
+                            <p class="text-gray-500 font-medium font-work text-lg">No activities found matching your filters.</p>
+                        </div>
+                    {% endfor %}
+                </div>
+
+            </turbo-frame>
         </div>
     </section>
 {% endblock %}
