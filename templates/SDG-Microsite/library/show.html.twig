@@ -3,12 +3,6 @@
 {% block title %}{{ thesis.title }} - FEU SDG Microsite{% endblock %}
 
 {% block body %}
-    {# Official UN SDG Hex Colors Mapping #}
-{% set sdg_colors = {
-    1: '#E5243B', 2: '#DDA63A', 3: '#4C9F38', 4: '#C5192D', 5: '#FF3A21', 6: '#26BDE2',
-    7: '#FCC30B', 8: '#A21942', 9: '#FD6925', 10: '#DD1367', 11: '#FD9D24', 12: '#BF8B2E',
-    13: '#3F7E44', 14: '#0A97D9', 15: '#56C02B', 16: '#00689D', 17: '#19486A'
-    } %}
 
 <section class="bg-white py-12 px-6 min-h-screen">
     <div class="max-w-7xl mx-auto">
@@ -18,7 +12,6 @@
             Back to Repository
         </a>
 
-        {# 1. THE COVER IMAGE HERO SECTION #}
         {% if thesis.coverImage %}
             <div class="w-full h-64 md:h-[28rem] relative rounded-2xl overflow-hidden mb-12 shadow-sm border border-gray-100 bg-gray-100">
                 <img src="{{ asset('uploads/theses/' ~ thesis.coverImage) }}" alt="{{ thesis.title }} Cover" class="absolute inset-0 w-full h-full object-cover">
@@ -33,19 +26,15 @@
         {% set citeLink = null %}
 
         {% if thesis.doi and ext_link %}
-            {# Both exist: Button gets External, Citation gets DOI #}
             {% set pub_btn_link = ext_link %}
             {% set citeLink = doi_link %}
         {% elseif not thesis.doi and ext_link %}
-            {# Only External Link exists: Both get External #}
             {% set pub_btn_link = ext_link %}
             {% set citeLink = ext_link %}
         {% elseif thesis.doi and not ext_link %}
-            {# Only DOI exists: Both get DOI #}
             {% set pub_btn_link = doi_link %}
             {% set citeLink = doi_link %}
         {% endif %}
-
 
         <div class="flex flex-col md:flex-row justify-between items-start md:items-end gap-6 mb-12 border-b border-gray-200 pb-8">
             <div class="max-w-4xl">
@@ -78,16 +67,15 @@
                     <p class="whitespace-pre-line">{{ thesis.description }}</p>
                 </div>
 
-                {# --- 2. TURBO-PROOF CITATION GENERATION --- #}
                 {% set pubYear = thesis.createdAt|date('Y') %}
                 {% set formatted_authors = thesis.authors|replace({';': ', '}) %}
                 
-                {% set cite_apa = formatted_authors ~ ' (' ~ pubYear ~ '). ' ~ thesis.title ~ '. FEU SDG Microsite.' ~ (citeLink ? ' ' ~ citeLink : '') %}
+                {% set cite_apa = formatted_authors ~ ' (' ~ pubYear ~ '). ' ~ thesis.title ~ '.' ~ (citeLink ? ' ' ~ citeLink : '') %}
                 
-                {% set cite_ieee = formatted_authors ~ ', "' ~ thesis.title ~ '," FEU SDG Microsite, ' ~ pubYear ~ '.' ~ (citeLink ? ' [Online]. Available: ' ~ citeLink : '') %}
+                {% set cite_ieee = formatted_authors ~ ', "' ~ thesis.title ~ '," ' ~ pubYear ~ '.' ~ (citeLink ? ' [Online]. Available: ' ~ citeLink : '') %}
                 
-                {% set cite_mla = formatted_authors ~ '. "' ~ thesis.title ~ '." FEU SDG Microsite, ' ~ pubYear ~ (citeLink ? ', ' ~ citeLink : '') ~ '.' %}
-
+                {% set cite_mla = formatted_authors ~ '. "' ~ thesis.title ~ '." ' ~ pubYear ~ (citeLink ? ', ' ~ citeLink : '') ~ '.' %}
+                
                 <div class="p-8 border border-gray-200 bg-gray-50 rounded-2xl shadow-sm" id="citation-card">
                     <h2 class="text-xl font-bold text-gray-900 font-bebas tracking-wide mb-6">Recommended Citation</h2>
                     
@@ -153,7 +141,6 @@
                                 </a>
                             </div>
                         {% endif %}
-                        
                     </div>
                 </div>
             </div>
@@ -164,25 +151,30 @@
 </section>
 
 <script>
+    /**
+     * Replaces the citation block text and updates styling to highlight the active format tab.
+     */
     function swapCite(btn, text) {
-        // Update the text
         document.getElementById('citation-text').innerText = text;
         
-        // Reset all tabs
         document.querySelectorAll('.cit-tab').forEach(t => {
             t.className = 'cit-tab px-5 py-2.5 font-bold text-xs bg-gray-100 text-gray-500 hover:text-gray-800 hover:bg-white rounded-t-lg border border-transparent';
         });
         
-        // Highlight clicked tab
         btn.className = 'cit-tab px-5 py-2.5 font-bold text-xs bg-white text-feu-green-900 border border-gray-200 border-b-white rounded-t-lg -mb-px';
     }
 
+    /**
+     * Copies the active citation text to the system clipboard and provides visual feedback.
+     */
     async function copyCiteBtn(btn) {
         const text = document.getElementById('citation-text').innerText;
+        
         try {
             await navigator.clipboard.writeText(text);
             btn.innerText = 'Copied!';
             btn.classList.add('bg-feu-green-50', 'text-feu-green-900', 'border-feu-green-200');
+            
             setTimeout(() => {
                 btn.innerText = 'Copy';
                 btn.classList.remove('bg-feu-green-50', 'text-feu-green-900', 'border-feu-green-200');

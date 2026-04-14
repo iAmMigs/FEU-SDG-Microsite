@@ -22,7 +22,7 @@ class DashboardController extends AbstractDashboardController
     public function __construct(
         private ThesisRepository $thesisRepository,
         private ActivityRepository $activityRepository,
-        private SdgRepository $sdgRepository // Injected SDG Repository for the dropdown filter
+        private SdgRepository $sdgRepository 
     ) {
     }
 
@@ -30,11 +30,9 @@ class DashboardController extends AbstractDashboardController
     {
         $request = $this->container->get('request_stack')->getCurrentRequest();
 
-        // --- CHART 1: Theses submitted over the past 6 months ---
         $monthsLabels = [];
         $monthsDataMap = [];
         
-        // Generate the last 6 months list (e.g., "Oct 2025", "Nov 2025", etc.)
         for ($i = 5; $i >= 0; $i--) {
             $date = (new \DateTime())->modify("-$i months");
             $label = $date->format('M Y');
@@ -42,29 +40,32 @@ class DashboardController extends AbstractDashboardController
             $monthsDataMap[$label] = 0;
         }
 
-        // Fetch theses from the last 6 months
         $sixMonthsAgo = (new \DateTimeImmutable())->modify('-5 months')->modify('first day of this month');
+        
+        /**
+         * Optimizes dashboard load times by strictly fetching the 'createdAt' date property
+         * as a lightweight array instead of hydrating full Thesis entity objects into memory.
+         */
         $recentTheses = $this->thesisRepository->createQueryBuilder('t')
+            ->select('t.createdAt')
             ->where('t.createdAt >= :date')
             ->setParameter('date', $sixMonthsAgo)
-            ->getQuery()->getResult();
+            ->getQuery()
+            ->getArrayResult();
 
-        // Count theses per month
         foreach ($recentTheses as $thesis) {
-            $label = $thesis->getCreatedAt()->format('M Y');
+            $label = $thesis['createdAt']->format('M Y');
             if (isset($monthsDataMap[$label])) {
                 $monthsDataMap[$label]++;
             }
         }
 
-        // --- CHART 2: Top 10 Most Viewed Theses (with SDG Filter) ---
         $selectedSdg = $request->query->get('sdg');
 
         $qb = $this->thesisRepository->createQueryBuilder('t')
             ->orderBy('t.views', 'DESC')
             ->setMaxResults(10);
 
-        // Apply filter if an SDG is selected
         if ($selectedSdg) {
             $qb->join('t.sdgs', 's')
                ->andWhere('s.id = :sdg')
@@ -77,7 +78,6 @@ class DashboardController extends AbstractDashboardController
         $topData = [];
         foreach ($topTheses as $t) {
             $title = $t->getTitle();
-            // Truncate long titles so they don't break the chart layout
             $topLabels[] = (mb_strlen($title) > 30) ? mb_substr($title, 0, 30) . '...' : $title;
             $topData[] = $t->getViews();
         }
@@ -86,15 +86,12 @@ class DashboardController extends AbstractDashboardController
             'theses_count' => $this->thesisRepository->count([]),
             'activities_count' => $this->activityRepository->count([]),
             
-            // Chart 1 Variables
             'chart_months_labels' => json_encode($monthsLabels),
             'chart_months_data' => json_encode(array_values($monthsDataMap)),
             
-            // Chart 2 Variables
             'chart_top_labels' => json_encode($topLabels),
             'chart_top_data' => json_encode($topData),
             
-            // Filter Dropdown Variables
             'sdgs' => $this->sdgRepository->findBy([], ['id' => 'ASC']),
             'selected_sdg' => $selectedSdg
         ]);
@@ -109,7 +106,6 @@ class DashboardController extends AbstractDashboardController
 
     public function configureAssets(): Assets
     {
-        // The leading slash bypasses AssetMapper and looks directly in the public/ folder
         return Assets::new()
             ->addCssFile('/css/admin.css');
     }
@@ -122,7 +118,6 @@ class DashboardController extends AbstractDashboardController
         yield MenuItem::linkTo(ThesisCrudController::class, 'Theses & Studies', 'fas fa-book-bookmark');
         yield MenuItem::linkTo(ActivityCrudController::class, 'Activities & Events', 'fas fa-newspaper');
         
-
         yield MenuItem::section('Data Management');
         yield MenuItem::linkTo(SdgCrudController::class, 'SDG Categories', 'fas fa-bullseye');
         yield MenuItem::linkTo(ActivityCategoryCrudController::class, 'Activity Categories', 'fas fa-tags');

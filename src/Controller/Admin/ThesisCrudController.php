@@ -10,7 +10,6 @@ use Doctrine\ORM\EntityManagerInterface;
 use EasyCorp\Bundle\EasyAdminBundle\Config\Action;
 use EasyCorp\Bundle\EasyAdminBundle\Config\Actions;
 use EasyCorp\Bundle\EasyAdminBundle\Config\Crud;
-use EasyCorp\Bundle\EasyAdminBundle\Config\Assets;
 use EasyCorp\Bundle\EasyAdminBundle\Controller\AbstractCrudController;
 use EasyCorp\Bundle\EasyAdminBundle\Field\BooleanField;
 use EasyCorp\Bundle\EasyAdminBundle\Config\KeyValueStore;
@@ -63,6 +62,10 @@ class ThesisCrudController extends AbstractCrudController
         return $actions->add(Crud::PAGE_INDEX, $importAction);
     }
 
+    /**
+     * Processes the uploaded CSV file to import multiple project records.
+     * Validates headers dynamically and batches database flushes to optimize memory usage.
+     */
     #[Route('/admin/projects/import-csv', name: 'admin_project_import_csv', methods: ['POST'])]
     public function importCsvAction(Request $request, EntityManagerInterface $entityManager, SdgRepository $sdgRepository, AdminUrlGenerator $adminUrlGenerator): Response
     {
@@ -78,19 +81,23 @@ class ThesisCrudController extends AbstractCrudController
                 if (($handle = fopen($file->getPathname(), 'r')) !== false) {
                     
                     $firstLine = fgets($handle);
-                    if (!$firstLine) throw new \Exception("The CSV file appears to be empty.");
+                    if (!$firstLine) {
+                        throw new \Exception("The CSV file appears to be empty.");
+                    }
                     
                     $delimiter = (substr_count($firstLine, ';') > substr_count($firstLine, ',')) ? ';' : ',';
                     rewind($handle);
                     
                     $headers = fgetcsv($handle, 0, $delimiter);
-                    $headers[0] = preg_replace('/^\xEF\xBB\xBF/', '', $headers[0]); // Strip BOM
+                    $headers[0] = preg_replace('/^\xEF\xBB\xBF/', '', $headers[0]); 
                     
                     $headerMap = [];
                     foreach ($headers as $index => $header) {
                         $cleanHeader = preg_replace('/[\x00-\x1F\x80-\xFF]/', '', $header);
                         $normalized = strtolower(trim($cleanHeader));
-                        if (!empty($normalized)) $headerMap[$normalized] = $index;
+                        if (!empty($normalized)) {
+                            $headerMap[$normalized] = $index;
+                        }
                     }
                     
                     $authorsIdx  = $headerMap['authors'] ?? $headerMap['author'] ?? -1;
@@ -103,7 +110,7 @@ class ThesisCrudController extends AbstractCrudController
 
                     if ($titleIdx === -1 || $authorsIdx === -1) {
                         $foundHeaders = implode(' | ', array_keys($headerMap));
-                        throw new \Exception("Header Mismatch! Detected Delimiter: '$delimiter'. Found: [ $foundHeaders ]. Columns must include 'Authors' and 'Title'.");
+                        throw new \Exception("Header Mismatch. Detected Delimiter: '$delimiter'. Found: [ $foundHeaders ]. Columns must include 'Authors' and 'Title'.");
                     }
                     
                     while (($data = fgetcsv($handle, 0, $delimiter)) !== false) {
@@ -164,7 +171,7 @@ class ThesisCrudController extends AbstractCrudController
 
                         if ($importedCount % 50 === 0) {
                             $entityManager->flush();
-                            $entityManager->clear(Thesis::class);
+                            $entityManager->clear();
                         }
                     }
                     fclose($handle);
@@ -172,7 +179,9 @@ class ThesisCrudController extends AbstractCrudController
                 
                 $entityManager->flush();
                 $msg = "Successfully imported $importedCount projects.";
-                if ($skippedCount > 0) $msg .= " (Skipped $skippedCount rows missing a title).";
+                if ($skippedCount > 0) {
+                    $msg .= " (Skipped $skippedCount rows missing a title).";
+                }
                 $this->addFlash('success', $msg);
                 
             } catch (\Exception $e) {
@@ -187,6 +196,10 @@ class ThesisCrudController extends AbstractCrudController
         return $this->redirect($url);
     }
 
+    /**
+     * Validates file existence on the server when constructing the edit form.
+     * Automatically clears missing file references from the entity to prevent broken links.
+     */
     public function createEditFormBuilder(EntityDto $entityDto, KeyValueStore $formOptions, AdminContext $context): FormBuilderInterface
     {
         $formBuilder = parent::createEditFormBuilder($entityDto, $formOptions, $context);

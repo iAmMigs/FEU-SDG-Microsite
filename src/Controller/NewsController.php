@@ -11,20 +11,21 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
 use App\Repository\SdgRepository;
 
+/**
+ * Handles the display and filtering of news and activities.
+ */
 final class NewsController extends AbstractController
 {
     #[Route('/news', name: 'app_news')]
     public function index(Request $request, ActivityRepository $activityRepository, SdgRepository $sdgRepository): Response
     {
-        // 1. Get filter parameters
         $selectedSdgs = $request->query->all('goals');
         $dateRange = $request->query->get('date_range');
         
-        // Pagination parameters
-        $page = $request->query->getInt('page', 1);
-        $limit = 12; // Maximum 12 items per page
+        // Prevent negative pagination offsets
+        $page = max(1, $request->query->getInt('page', 1));
+        $limit = 12;
 
-        // 2. Base query
         $qb = $activityRepository->createQueryBuilder('a')
             ->where('a.isActive = :active')
             ->andWhere('a.publishAt IS NULL OR a.publishAt <= :now')
@@ -32,7 +33,6 @@ final class NewsController extends AbstractController
             ->setParameter('now', new \DateTime())
             ->orderBy('a.eventDate', 'DESC');
 
-        // 3. Apply Date Range Filter
         if ($dateRange) {
             $dateLimit = new \DateTime();
             if ($dateRange === '1_day') {
@@ -47,19 +47,16 @@ final class NewsController extends AbstractController
                ->setParameter('dateLimit', $dateLimit);
         }
 
-        // 4. Apply SDG Filter
         if (!empty($selectedSdgs)) {
             $qb->join('a.sdgs', 's')
                ->andWhere('s.id IN (:sdgs)')
                ->setParameter('sdgs', $selectedSdgs);
         }
 
-        // 5. Setup Pagination
         $paginator = new Paginator($qb);
         $totalCount = count($paginator);
-        $totalPages = ceil($totalCount / $limit) ?: 1; // Prevent division by zero
+        $totalPages = max(1, ceil($totalCount / $limit));
 
-        // Apply limits to the query
         $qb->setFirstResult(($page - 1) * $limit)
            ->setMaxResults($limit);
 
@@ -67,16 +64,14 @@ final class NewsController extends AbstractController
         $allSdgs = $sdgRepository->findBy([], ['id' => 'ASC']);
 
         return $this->render('SDG-Microsite/news/index.html.twig', [
-        'activities' => $activities,
-        'selected_goals' => $selectedSdgs,
-        'date_range' => $dateRange,
-        'current_page' => $page,
-        'total_pages' => $totalPages,
-        'total_count' => $totalCount,
-        'all_sdgs' => $allSdgs, 
-    ]);
-        
-        
+            'activities' => $activities,
+            'selected_goals' => $selectedSdgs,
+            'date_range' => $dateRange,
+            'current_page' => $page,
+            'total_pages' => $totalPages,
+            'total_count' => $totalCount,
+            'all_sdgs' => $allSdgs, 
+        ]);
     }
 
     #[Route('/news/article/{id}', name: 'app_news_show')]

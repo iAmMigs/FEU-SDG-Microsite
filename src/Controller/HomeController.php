@@ -10,6 +10,9 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
 
+/**
+ * Manages the landing page, aggregating recent activities, top voices, and active SDGs.
+ */
 final class HomeController extends AbstractController
 {
     #[Route('/', name: 'app_home')]
@@ -18,9 +21,9 @@ final class HomeController extends AbstractController
         $latestActivities = $activityRepository->findBy([], ['eventDate' => 'DESC'], 3);
         $totalTheses = $thesisRepository->count([]);
         
-        // CRITICAL FIX: Only fetch the active SDGs to pass their IDs to the template
         $activeSdgs = $sdgRepository->findBy(['isActive' => true]);
         $activeSdgIds = array_map(fn($sdg) => $sdg->getId(), $activeSdgs);
+        
         $leadingVoices = $leadingVoiceRepository->findBy([], null, 4);
 
         return $this->render('SDG-Microsite/home/index.html.twig', [
@@ -32,6 +35,9 @@ final class HomeController extends AbstractController
         ]);
     }
 
+    /**
+     * Provides static data definitions for all 17 Sustainable Development Goals.
+     */
     private function getAllSdgsData(): array
     {
         return [

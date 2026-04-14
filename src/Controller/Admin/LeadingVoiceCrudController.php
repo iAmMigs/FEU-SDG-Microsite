@@ -4,16 +4,27 @@ namespace App\Controller\Admin;
 
 use App\Entity\LeadingVoice;
 use EasyCorp\Bundle\EasyAdminBundle\Controller\AbstractCrudController;
+use EasyCorp\Bundle\EasyAdminBundle\Config\Crud;
 use EasyCorp\Bundle\EasyAdminBundle\Field\IdField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\TextField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\TextareaField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\ImageField;
 
+/**
+ * Manages the Featured Voices displayed on the microsite.
+ */
 class LeadingVoiceCrudController extends AbstractCrudController
 {
     public static function getEntityFqcn(): string
     {
         return LeadingVoice::class;
+    }
+
+    public function configureCrud(Crud $crud): Crud
+    {
+        return $crud
+            ->setEntityLabelInSingular('Featured Voice')
+            ->setEntityLabelInPlural('Featured Voices');
     }
 
     public function configureFields(string $pageName): iterable
@@ -25,7 +36,8 @@ class LeadingVoiceCrudController extends AbstractCrudController
                 ->setBasePath('uploads/voices')
                 ->setUploadDir('public/uploads/voices')
                 ->setUploadedFileNamePattern('[randomhash].[extension]')
-                ->setRequired(false)->setFormTypeOptions([
+                ->setRequired(false)
+                ->setFormTypeOptions([
                     'attr' => [
                         'accept' => 'image/jpeg, image/png, image/webp'
                     ]

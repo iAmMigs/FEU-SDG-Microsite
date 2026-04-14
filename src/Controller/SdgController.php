@@ -7,15 +7,14 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
 
+/**
+ * Handles the display of the Sustainable Development Goals directory.
+ */
 final class SdgController extends AbstractController
 {
     #[Route('/sdgs', name: 'app_sdgs')]
     public function index(SdgRepository $sdgRepository): Response
     {
-        /*
-         * Fetches only active SDGs to pass their IDs to the template
-         * to evaluate which SDG cards should be highlighted or visible by default.
-         */
         $activeSdgs = $sdgRepository->findBy(['isActive' => true]);
         $activeSdgIds = array_map(fn($sdg) => $sdg->getId(), $activeSdgs);
 
@@ -25,13 +24,11 @@ final class SdgController extends AbstractController
         ]);
     }
 
+    /**
+     * Provides comprehensive static data definitions for all 17 Sustainable Development Goals.
+     */
     private function getAllSdgsData(): array
     {
-        /*
-         * Provides static data definitions for all 17 Sustainable Development Goals.
-         * The 'desc' key holds a brief summary, while the 'long_desc' key holds
-         * a comprehensive explanation for dedicated details pages and modals.
-         */
         return [
             [
                 'num' => 1, 

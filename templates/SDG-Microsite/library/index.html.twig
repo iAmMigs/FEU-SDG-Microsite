@@ -8,12 +8,6 @@
 {% block title %}Library - FEU SDG Microsite{% endblock %}
 
 {% block body %}
-    {% set sdg_colors = {
-    1: '#E5243B', 2: '#DDA63A', 3: '#4C9F38', 4: '#C5192D', 5: '#FF3A21', 6: '#26BDE2',
-    7: '#FCC30B', 8: '#A21942', 9: '#FD6925', 10: '#DD1367', 11: '#FD9D24', 12: '#BF8B2E',
-    13: '#3F7E44', 14: '#0A97D9', 15: '#56C02B', 16: '#00689D', 17: '#19486A'
-    } %}
-
     <section class="bg-feu-green-900 py-16 px-6 text-center border-b-4 border-feu-gold-400">
         <div class="max-w-4xl mx-auto">
             <h1 class="text-4xl md:text-5xl font-bold text-white mb-4 font-bebas tracking-wide">Project Library</h1>
@@ -92,7 +86,6 @@
                         <div class="flex flex-col gap-3">
                             <p class="text-gray-600 font-medium font-work">Showing <span class="font-bold text-feu-green-900">{{ total_count|default(0) }}</span> studies found.</p>
                             
-                            {# Evaluate if any goals are filtered and append visual labels #}
                             {% if selected_goals is defined and selected_goals|length > 0 %}
                                 <div class="flex flex-wrap items-center gap-2 mt-1">
                                     <span class="text-xs font-bold text-gray-400 font-work uppercase tracking-wider">Filtered by:</span>
@@ -109,7 +102,6 @@
                             {% endif %}
                         </div>
 
-                        {# The pagination controls (preserved exactly as you had them for the library) #}
                         {% if total_pages|default(1) > 1 %}
                             <div class="flex items-center gap-2 text-sm font-work text-gray-700 bg-white px-3 py-1.5 rounded-lg border border-gray-200 shadow-sm shrink-0">
                                 <span class="hidden sm:inline font-medium mr-1">Page</span>
@@ -158,21 +150,18 @@
                                 </div>
                                 
                                 <h3 class="text-2xl font-bold text-gray-900 hover:text-feu-green-700 transition font-bebas tracking-wide">
-                                    {# FIXED ROUTE NAME HERE #}
                                     <a href="{{ path('app_library_show', {id: thesis.id}) }}" data-turbo-frame="_top">{{ thesis.title }}</a>
                                 </h3>
                                 
-                                <div class="mt-2 relative">
-                                    <div id="abstract-wrapper-{{ thesis.id }}" class="thesis-abstract-wrapper overflow-hidden transition-[max-height] duration-500 ease-in-out max-h-[4.25rem]">
-                                        <p class="text-gray-800 font-medium text-sm leading-relaxed font-work whitespace-pre-line">
+                                {% if thesis.description|trim is not empty %}
+                                    <div id="abstract-wrapper-{{ thesis.id }}" class="mt-4 hidden bg-gray-50 p-6 md:p-8 rounded-xl border border-gray-200">
+                                        <p class="text-gray-800 font-medium text-sm leading-relaxed font-work whitespace-pre-wrap break-words text-justify">
                                             {{ thesis.description }}
                                         </p>
                                     </div>
-                                    <div id="abstract-fade-{{ thesis.id }}" class="thesis-abstract-fade absolute bottom-0 left-0 w-full h-8 bg-gradient-to-t from-white to-transparent transition-opacity duration-500 pointer-events-none"></div>
-                                </div>
+                                {% endif %}
                                 
                                 <div class="flex flex-col xl:flex-row xl:items-center justify-between mt-4 pt-4 border-t border-gray-100 gap-4">
-                                    
                                     <div class="flex flex-wrap items-center gap-4 text-sm font-work">
                                         <span class="font-bold text-gray-600">By {{ thesis.authors|replace({';': ', '}) }}</span>
                                         <div class="flex items-center text-feu-green-700 font-bold gap-1 bg-feu-green-50 px-2 py-1 rounded-md">
@@ -182,10 +171,12 @@
                                     </div>
                                     
                                     <div class="flex flex-wrap items-center gap-2">
-                                        <button type="button" onclick="toggleAbstract('{{ thesis.id }}')" class="px-4 py-2.5 bg-gray-100 hover:bg-gray-200 text-gray-800 font-bold rounded-lg transition text-xs flex items-center gap-1.5 border border-gray-200 font-work cursor-pointer">
-                                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h7"></path></svg>
-                                            Abstract
-                                        </button>
+                                        {% if thesis.description|trim is not empty %}
+                                            <button type="button" onclick="document.getElementById('abstract-wrapper-{{ thesis.id }}').classList.toggle('hidden')" class="px-4 py-2.5 bg-gray-100 hover:bg-gray-200 text-gray-800 font-bold rounded-lg transition text-xs flex items-center gap-1.5 border border-gray-200 font-work cursor-pointer">
+                                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h7"></path></svg>
+                                                Abstract
+                                            </button>
+                                        {% endif %}
 
                                         {% if thesis.documentFile %}
                                             <a href="{{ asset('uploads/theses/' ~ thesis.documentFile) }}" target="_blank" class="px-4 py-2.5 bg-red-50 hover:bg-red-100 text-red-700 font-bold rounded-lg transition text-xs flex items-center gap-1.5 border border-red-200 font-work">
@@ -194,7 +185,6 @@
                                             </a>
                                         {% endif %}
 
-                                        {# FIXED ROUTE NAME HERE #}
                                         <a href="{{ path('app_library_show', {id: thesis.id}) }}" data-turbo-frame="_top" class="px-5 py-2.5 bg-feu-green-900 hover:bg-feu-green-800 text-white font-bold rounded-lg transition text-xs flex items-center gap-1.5 shadow-sm font-work">
                                             View Article &rarr;
                                         </a>
@@ -213,36 +203,4 @@
             </main>
         </div>
     </section>
-
-    <script>
-        /**
-         * Documentation: Toggles the abstract expansion state.
-         * Resets other abstracts to collapsed when one is opened.
-         */
-        function toggleAbstract(thesisId) {
-            const targetWrapperId = 'abstract-wrapper-' + thesisId;
-            const targetFadeId = 'abstract-fade-' + thesisId;
-            
-            const allWrappers = document.querySelectorAll('.thesis-abstract-wrapper');
-            const allFades = document.querySelectorAll('.thesis-abstract-fade');
-
-            allWrappers.forEach(wrapper => {
-                if (wrapper.id === targetWrapperId) {
-                    wrapper.classList.toggle('max-h-[4.25rem]');
-                    wrapper.classList.toggle('max-h-[100rem]');
-                } else {
-                    wrapper.classList.add('max-h-[4.25rem]');
-                    wrapper.classList.remove('max-h-[100rem]');
-                }
-            });
-
-            allFades.forEach(fade => {
-                if (fade.id === targetFadeId) {
-                    fade.classList.toggle('opacity-0');
-                } else {
-                    fade.classList.remove('opacity-0');
-                }
-            });
-        }
-    </script>
 {% endblock %}

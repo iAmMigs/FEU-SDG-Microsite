@@ -8,6 +8,9 @@ use EasyCorp\Bundle\EasyAdminBundle\Field\IntegerField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\TextField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\BooleanField;
 
+/**
+ * Manages the Sustainable Development Goals (SDG) categories and their visibility across the platform.
+ */
 class SdgCrudController extends AbstractCrudController
 {
     public static function getEntityFqcn(): string
@@ -24,5 +27,4 @@ class SdgCrudController extends AbstractCrudController
                 ->setHelp('Enable this to unlock the SDG in the Library and on the Home page buttons.'),
         ];
     }
-
 }

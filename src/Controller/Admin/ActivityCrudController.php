@@ -8,7 +8,6 @@ use EasyCorp\Bundle\EasyAdminBundle\Config\Crud;
 use EasyCorp\Bundle\EasyAdminBundle\Controller\AbstractCrudController;
 use EasyCorp\Bundle\EasyAdminBundle\Field\AssociationField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\BooleanField;
-use EasyCorp\Bundle\EasyAdminBundle\Field\ChoiceField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\DateTimeField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\ImageField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\TextareaField;
@@ -37,7 +36,9 @@ class ActivityCrudController extends AbstractCrudController
             ->addHtmlContentToBody("
                 <script>
                     document.addEventListener('DOMContentLoaded', function() {
-                        // --- 1. TINYMCE INITIALIZATION ---
+                        /**
+                         * Initializes the TinyMCE rich text editor and configures the backend image upload endpoint.
+                         */
                         if (typeof tinymce !== 'undefined') {
                             tinymce.init({
                                 selector: '.tinymce-wrapper textarea',
@@ -76,19 +77,20 @@ class ActivityCrudController extends AbstractCrudController
                             });
                         }
 
-                        // --- 2. ACTIVE SWITCH VS. SCHEDULED DATE TOGGLE LOGIC ---
+                        /**
+                         * Attaches listeners to the DOM to ensure logical parity between the 'Active' toggle 
+                         * and the 'Scheduled Release' date parameters before form submission.
+                         */
                         ['change', 'input'].forEach(evt => {
                             document.body.addEventListener(evt, function(e) {
                                 if (!e.target || !e.target.name) return;
 
-                                // SCENARIO A: Admin turns ON the Active switch -> Clear the Date inputs
                                 if (e.target.name.includes('[isActive]') && e.target.checked) {
                                     document.querySelectorAll('input[name*=\"[publishAt]\"]').forEach(input => {
                                         input.value = '';
                                     });
                                 }
 
-                                // SCENARIO B: Admin types a Date -> Force the Active switch OFF
                                 if (e.target.name.includes('[publishAt]') && e.target.value !== '') {
                                     const activeSwitch = document.querySelector('input[type=\"checkbox\"][name*=\"[isActive]\"]');
                                     if (activeSwitch && activeSwitch.checked) {
@@ -159,14 +161,14 @@ class ActivityCrudController extends AbstractCrudController
     }
 
     /**
-     * Documentation: Intelligently synchronizes the Active switch and the Scheduled Release date.
+     * Synchronizes the Active toggle and Scheduled Release date fields prior to database operations.
+     * Prevents conflicts where an entity is active but has a future release timestamp.
      */
     private function applyPublishLogic(Activity $activity, ?EntityManagerInterface $em): void
     {
         $now = new \DateTime();
 
         if ($em && $activity->getId()) {
-            // Get the original data from the DB before the Admin made their current edits
             $originalData = $em->getUnitOfWork()->getOriginalEntityData($activity);
             
             $wasActive = $originalData['isActive'] ?? false;
@@ -175,18 +177,11 @@ class ActivityCrudController extends AbstractCrudController
             $isNowActive = $activity->isActive();
             $newPublishAt = $activity->getPublishAt();
 
-            // RULE 1: Admin manually toggled "Active" from OFF to ON.
-            // Fixes the bug: We clear the scheduled release by setting it to NOW so it appears instantly on the frontend.
             if (!$wasActive && $isNowActive) {
                 $activity->setPublishAt($now);
-            }
-            // RULE 2: Admin manually changed the date to a FUTURE schedule.
-            // Automatically turn OFF the active switch because it is waiting for its scheduled time.
-            elseif ($newPublishAt && $newPublishAt > $now && $oldPublishAt != $newPublishAt) {
+            } elseif ($newPublishAt && $newPublishAt > $now && $oldPublishAt != $newPublishAt) {
                 $activity->setIsActive(false);
-            }
-            // RULE 3: Consistency fallback (Catch-all if both were altered strangely)
-            else {
+            } else {
                 if ($isNowActive && (!$newPublishAt || $newPublishAt > $now)) {
                     $activity->setPublishAt($now);
                 } elseif ($newPublishAt && $newPublishAt > $now) {
@@ -194,13 +189,11 @@ class ActivityCrudController extends AbstractCrudController
                 }
             }
         } else {
-            // RULE 4: Logic for creating a brand NEW Activity
             if ($activity->getPublishAt() && $activity->getPublishAt() > $now) {
-                $activity->setIsActive(false); // Scheduled for later
+                $activity->setIsActive(false); 
             } elseif ($activity->isActive()) {
-                $activity->setPublishAt($now); // Force publish now
+                $activity->setPublishAt($now); 
             }
         }
     }
-    
 }

@@ -12,6 +12,9 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
 
+/**
+ * Handles the Project Library search, filtering, and view counter logic.
+ */
 final class ThesisController extends AbstractController
 {
     #[Route('/library', name: 'app_library')]
@@ -26,7 +29,6 @@ final class ThesisController extends AbstractController
         $page = max(1, $request->query->getInt('page', 1));
         $limit = 10;
 
-        // ONLY FETCH ACTIVE THESES
         $qb = $thesisRepository->createQueryBuilder('t')
             ->where('t.isActive = :active')
             ->setParameter('active', true)
@@ -70,8 +72,6 @@ final class ThesisController extends AbstractController
            ->setMaxResults($limit);
 
         $theses = $qb->getQuery()->getResult();
-
-        // Fetches ONLY the SDGs that are toggled on in the database for the Library filter
         $activeSdgs = $sdgRepository->findBy(['isActive' => true], ['id' => 'ASC']);
 
         return $this->render('SDG-Microsite/library/index.html.twig', [
@@ -89,16 +89,26 @@ final class ThesisController extends AbstractController
     }
 
     #[Route('/library/thesis/{id}', name: 'app_library_show')]
-    public function show(Thesis $thesis, EntityManagerInterface $em): Response
+    public function show(Request $request, Thesis $thesis, EntityManagerInterface $em): Response
     {
-        // Block direct URL access if the thesis is hidden
         if (!$thesis->isActive()) {
             throw $this->createNotFoundException('This thesis is no longer available.');
         }
 
-        // Increment the view counter directly
-        $thesis->incrementViews();
-        $em->flush();
+        /**
+         * Session-based view counter logic.
+         * Prevents manipulation by recording accessed project IDs in the active user session.
+         */
+        $session = $request->getSession();
+        $viewedTheses = $session->get('viewed_theses', []);
+
+        if (!in_array($thesis->getId(), $viewedTheses)) {
+            $thesis->incrementViews();
+            $em->flush();
+
+            $viewedTheses[] = $thesis->getId();
+            $session->set('viewed_theses', $viewedTheses);
+        }
 
         return $this->render('SDG-Microsite/library/show.html.twig', [
             'thesis' => $thesis,

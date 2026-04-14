@@ -18,15 +18,14 @@
         </div>
     </section>
 
-    <section class="relative py-16 px-6 bg-feu-green-900 min-h-screen overflow-hidden">
+    <section class="relative py-24 px-6 bg-feu-green-900 overflow-hidden">
         
         <div class="absolute inset-0 z-0 pointer-events-none">
             <img src="{{ asset('images/library.jpg') }}" alt="Background" class="absolute inset-0 w-full h-full object-cover">
             <div class="absolute inset-0 bg-feu-green-900/50 mix-blend-multiply"></div>
         </div>
 
-        <div class="max-w-7xl mx-auto">
-            
+        <div class="max-w-7xl mx-auto relative z-10">
             <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
                 {% for thesis in theses %}
                     <article class="bg-white rounded-2xl p-8 border border-gray-200 shadow-md hover:shadow-xl transition duration-300 relative overflow-hidden group flex flex-col">

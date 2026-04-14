@@ -5,10 +5,12 @@ namespace App\Controller\Admin;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\String\Slugger\SluggerInterface;
 
-// THE FIX: Added the "er" so it perfectly matches your filename!
+/**
+ * Handles asynchronous image uploads from the TinyMCE rich text editor.
+ */
 class ImageUploaderController extends AbstractController
 {
     #[Route('/admin/upload-image', name: 'admin_upload_image', methods: ['POST'])]
