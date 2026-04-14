@@ -22,11 +22,15 @@ final class NewsController extends AbstractController
         $selectedSdgs = $request->query->all('goals');
         $dateRange = $request->query->get('date_range');
         
-        // Prevent negative pagination offsets
         $page = max(1, $request->query->getInt('page', 1));
         $limit = 12;
 
+        /**
+         * leftJoin and addSelect pre-fetches all associated SDGs in the initial query
+         */
         $qb = $activityRepository->createQueryBuilder('a')
+            ->leftJoin('a.sdgs', 'all_sdgs')
+            ->addSelect('all_sdgs')
             ->where('a.isActive = :active')
             ->andWhere('a.publishAt IS NULL OR a.publishAt <= :now')
             ->setParameter('active', true)
@@ -53,7 +57,7 @@ final class NewsController extends AbstractController
                ->setParameter('sdgs', $selectedSdgs);
         }
 
-        $paginator = new Paginator($qb);
+        $paginator = new Paginator($qb, true);
         $totalCount = count($paginator);
         $totalPages = max(1, ceil($totalCount / $limit));
 

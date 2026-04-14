@@ -29,7 +29,12 @@ final class ThesisController extends AbstractController
         $page = max(1, $request->query->getInt('page', 1));
         $limit = 10;
 
+        /**
+         * leftJoin and addSelect pre-fetches all associated SDGs in the initial query.
+         */
         $qb = $thesisRepository->createQueryBuilder('t')
+            ->leftJoin('t.sdgs', 'all_sdgs')
+            ->addSelect('all_sdgs')
             ->where('t.isActive = :active')
             ->setParameter('active', true)
             ->orderBy('t.createdAt', 'DESC');
@@ -64,7 +69,7 @@ final class ThesisController extends AbstractController
             }
         }
 
-        $paginator = new Paginator($qb);
+        $paginator = new Paginator($qb, true);
         $totalCount = count($paginator);
         $totalPages = max(1, ceil($totalCount / $limit));
 
