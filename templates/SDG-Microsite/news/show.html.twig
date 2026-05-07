@@ -1,6 +1,6 @@
 {% extends 'SDG-Microsite/base.html.twig' %}
 
-{% block title %}{{ activity.title }} - FEU SDG Microsite{% endblock %}
+{% block title %}{{ activity.title }} - FEU Tech SDG Microsite{% endblock %}
 
 {% block body %}
 {# Calculate Estimated Reading Time (Average 200 words per minute) #}
@@ -30,7 +30,7 @@
                 {% if activity.image %}
                     <img src="{{ asset('uploads/activities/' ~ activity.image) }}" alt="{{ activity.title }}" class="absolute inset-0 w-full h-full object-cover">
                 {% else %}
-                    <img src="{{ asset('images/hero-3.jpg') }}" alt="FEU Event" class="absolute inset-0 w-full h-full object-cover opacity-90">
+                    <img src="{{ asset('images/hero-3.jpg') }}" alt="FEU Tech Event" class="absolute inset-0 w-full h-full object-cover opacity-90">
                 {% endif %}
                 <div class="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent"></div>
             </div>
