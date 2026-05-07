@@ -72,7 +72,273 @@
         </div>
     </div>
 
+    {# Advanced Batch Management Modal #}
+    <div class="modal fade" id="advancedBatchModal" tabindex="-1" aria-labelledby="advancedBatchModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-xl modal-dialog-centered">
+            <div class="modal-content overflow-hidden" style="border-radius: 16px; border: none; box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.35);">
+                <div class="modal-header border-bottom py-3" style="background-color: #f0fdf4;">
+                    <h5 class="modal-title fw-bold" id="advancedBatchModalLabel" style="color: #166534;">
+                        <i class="fas fa-tasks me-2"></i> Advanced Batch Project Management
+                    </h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body p-0 bg-white">
+                    {# Filter Bar #}
+                    <div class="bg-white border-bottom p-4">
+                        <div class="row g-3">
+                            <div class="col-md-3">
+                                <label class="form-label small fw-bold text-uppercase text-muted mb-2" style="letter-spacing: 0.5px;">SDG Category</label>
+                                <select class="form-select shadow-sm border-light" id="batchFilterSdg" style="border-radius: 8px;">
+                                    <option value="">All SDGs</option>
+                                </select>
+                            </div>
+                            <div class="col-md-3">
+                                <label class="form-label small fw-bold text-uppercase text-muted mb-2" style="letter-spacing: 0.5px;">Year</label>
+                                <select class="form-select shadow-sm border-light" id="batchFilterYear" style="border-radius: 8px;">
+                                    <option value="">All Years</option>
+                                </select>
+                            </div>
+                            <div class="col-md-3">
+                                <label class="form-label small fw-bold text-uppercase text-muted mb-2" style="letter-spacing: 0.5px;">Project Type</label>
+                                <select class="form-select shadow-sm border-light" id="batchFilterType" style="border-radius: 8px;">
+                                    <option value="">All Types</option>
+                                </select>
+                            </div>
+                            <div class="col-md-3">
+                                <label class="form-label small fw-bold text-uppercase text-muted mb-2" style="letter-spacing: 0.5px;">Current Status</label>
+                                <select class="form-select shadow-sm border-light" id="batchFilterStatus" style="border-radius: 8px;">
+                                    <option value="">All Statuses</option>
+                                    <option value="1">Active Only</option>
+                                    <option value="0">Inactive Only</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+
+                    {# Dual Table Container #}
+                    <div class="row g-0" style="height: 520px;">
+                        {# Available Projects (Left) #}
+                        <div class="col-md-5 border-end d-flex flex-column h-100 bg-light bg-opacity-10">
+                            <div class="p-3 bg-white border-bottom d-flex justify-content-between align-items-center">
+                                <span class="small fw-bold text-muted text-uppercase" style="letter-spacing: 1px;">Available Projects (<span id="availableCount">0</span>)</span>
+                                <button class="btn btn-sm btn-outline-primary fw-bold" style="font-size: 11px; border-radius: 6px;" onclick="batchManager.targetAll()">TARGET ALL</button>
+                            </div>
+                            <div class="overflow-auto flex-grow-1" id="availableListContainer" style="background-color: #f8fafc;">
+                                <table class="table table-sm table-hover mb-0" style="font-size: 13px;">
+                                    <tbody id="availableTableBody">
+                                        {# Dynamic Content #}
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+
+                        {# Middle Divider #}
+                        <div class="col-md-2 d-flex flex-column align-items-center justify-content-center bg-white border-end shadow-sm z-1">
+                            <div class="text-center p-4">
+                                <div class="bg-light rounded-circle d-inline-flex align-items-center justify-content-center mb-3" style="width: 60px; height: 60px;">
+                                    <i class="fas fa-exchange-alt fa-lg text-muted opacity-50"></i>
+                                </div>
+                                <p class="small text-muted fw-bold mb-0">Use arrows to target</p>
+                            </div>
+                        </div>
+
+                        {# Targeted Projects (Right) #}
+                        <div class="col-md-5 d-flex flex-column h-100" style="background-color: #fefce8;"> {# FEU Gold Tint #}
+                            <div class="p-3 bg-white border-bottom d-flex justify-content-between align-items-center">
+                                <span class="small fw-bold text-warning text-uppercase" style="letter-spacing: 1px; color: #a16207 !important;">Targeted for Update (<span id="targetedCount">0</span>)</span>
+                                <button class="btn btn-sm btn-outline-danger fw-bold" style="font-size: 11px; border-radius: 6px;" onclick="batchManager.clearTargeted()">CLEAR ALL</button>
+                            </div>
+                            <div class="overflow-auto flex-grow-1" id="targetedListContainer">
+                                <table class="table table-sm table-hover mb-0" style="font-size: 13px;">
+                                    <tbody id="targetedTableBody">
+                                        {# Dynamic Content #}
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer bg-white border-top p-4">
+                    <div class="me-auto text-muted small">
+                        <i class="fas fa-info-circle me-1 text-primary"></i> Updates will be applied globally across all pages.
+                    </div>
+                    <button type="button" class="btn btn-link text-muted fw-bold text-decoration-none px-4" data-bs-dismiss="modal">Cancel</button>
+                    <div class="btn-group gap-2">
+                        <button type="button" class="btn btn-warning fw-bold px-4 shadow-sm" style="border-radius: 8px !important; background-color: #FCC30B; border: none;" onclick="batchManager.execute(0)" id="btnDeactivateBatch" disabled>
+                            <i class="fas fa-times-circle me-2"></i> DEACTIVATE
+                        </button>
+                        <button type="button" class="btn btn-success fw-bold px-4 shadow-sm" style="border-radius: 8px !important; background-color: #166534; border: none;" onclick="batchManager.execute(1)" id="btnActivateBatch" disabled>
+                            <i class="fas fa-check-circle me-2"></i> ACTIVATE
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <style>
+        .btn-xs { padding: 0.1rem 0.4rem; font-size: 0.75rem; line-height: 1.5; border-radius: 0.2rem; }
+        #availableListContainer::-webkit-scrollbar, #targetedListContainer::-webkit-scrollbar { width: 6px; }
+        #availableListContainer::-webkit-scrollbar-thumb, #targetedListContainer::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
+        #availableTableBody tr td, #targetedTableBody tr td { border-bottom: 1px solid rgba(0,0,0,0.03); }
+        .target-btn { transition: all 0.2s ease; }
+        .target-btn:hover { transform: translateX(3px); }
+    </style>
+
     <script>
+        const batchManager = {
+            availableProjects: [],
+            targetedProjects: [],
+            
+            init: async function() {
+                this.setupEventListeners();
+                await this.loadFilterData();
+                this.search();
+            },
+
+            setupEventListeners: function() {
+                ['batchFilterSdg', 'batchFilterYear', 'batchFilterType', 'batchFilterStatus'].forEach(id => {
+                    document.getElementById(id).addEventListener('change', () => this.search());
+                });
+            },
+
+            loadFilterData: async function() {
+                try {
+                    const response = await fetch('{{ path('admin_project_batch_filter_data') }}');
+                    const data = await response.json();
+                    
+                    const sdgSelect = document.getElementById('batchFilterSdg');
+                    data.sdgs.forEach(s => {
+                        const opt = new Option(`SDG ${s.number}: ${s.name}`, s.id);
+                        sdgSelect.add(opt);
+                    });
+
+                    const yearSelect = document.getElementById('batchFilterYear');
+                    data.years.forEach(y => {
+                        const opt = new Option(y, y);
+                        yearSelect.add(opt);
+                    });
+
+                    const typeSelect = document.getElementById('batchFilterType');
+                    data.types.forEach(t => {
+                        const opt = new Option(t.name, t.id);
+                        typeSelect.add(opt);
+                    });
+                } catch (e) {
+                    console.error("Failed to load filter data", e);
+                }
+            },
+
+            search: async function() {
+                const filters = {
+                    sdgId: document.getElementById('batchFilterSdg').value,
+                    year: document.getElementById('batchFilterYear').value,
+                    typeId: document.getElementById('batchFilterType').value,
+                    isActive: document.getElementById('batchFilterStatus').value
+                };
+
+                try {
+                    const response = await fetch('{{ path('admin_project_batch_search') }}', {
+                        method: 'POST',
+                        body: JSON.stringify(filters),
+                        headers: { 'Content-Type': 'application/json' }
+                    });
+                    this.availableProjects = await response.json();
+                    this.render();
+                } catch (e) {
+                    console.error("Search failed", e);
+                }
+            },
+
+            render: function() {
+                const availableBody = document.getElementById('availableTableBody');
+                const targetedBody = document.getElementById('targetedTableBody');
+                
+                // Filter out already targeted ones from available list
+                const targetedIds = new Set(this.targetedProjects.map(p => p.id));
+                const filteredAvailable = this.availableProjects.filter(p => !targetedIds.has(p.id));
+
+                availableBody.innerHTML = filteredAvailable.map(p => `
+                    <tr>
+                        <td class="ps-3 py-2">
+                            <div class="fw-bold text-truncate" style="max-width: 300px;">${p.title}</div>
+                            <div class="text-muted" style="font-size: 11px;">${p.year} • ${p.isActive ? '<span class="text-success">Active</span>' : '<span class="text-danger">Inactive</span>'}</div>
+                        </td>
+                        <td class="text-end pe-3 align-middle">
+                            <button class="btn btn-outline-primary btn-xs" onclick="batchManager.target(${p.id})"><i class="fas fa-plus"></i></button>
+                        </td>
+                    </tr>
+                `).join('') || '<tr><td colspan="2" class="text-center py-4 text-muted">No projects found matching filters</td></tr>';
+
+                targetedBody.innerHTML = this.targetedProjects.map(p => `
+                    <tr>
+                        <td class="ps-3 py-2">
+                            <div class="fw-bold text-truncate" style="max-width: 300px;">${p.title}</div>
+                            <div class="text-muted" style="font-size: 11px;">${p.year}</div>
+                        </td>
+                        <td class="text-end pe-3 align-middle">
+                            <button class="btn btn-outline-danger btn-xs" onclick="batchManager.untarget(${p.id})"><i class="fas fa-times"></i></button>
+                        </td>
+                    </tr>
+                `).join('') || '<tr><td colspan="2" class="text-center py-4 text-muted small">No projects targeted yet</td></tr>';
+
+                document.getElementById('availableCount').textContent = filteredAvailable.length;
+                document.getElementById('targetedCount').textContent = this.targetedProjects.length;
+                
+                const hasTargets = this.targetedProjects.length > 0;
+                document.getElementById('btnActivateBatch').disabled = !hasTargets;
+                document.getElementById('btnDeactivateBatch').disabled = !hasTargets;
+            },
+
+            target: function(id) {
+                const project = this.availableProjects.find(p => p.id === id);
+                if (project && !this.targetedProjects.find(p => p.id === id)) {
+                    this.targetedProjects.push(project);
+                    this.render();
+                }
+            },
+
+            untarget: function(id) {
+                this.targetedProjects = this.targetedProjects.filter(p => p.id !== id);
+                this.render();
+            },
+
+            targetAll: function() {
+                const targetedIds = new Set(this.targetedProjects.map(p => p.id));
+                const newTargets = this.availableProjects.filter(p => !targetedIds.has(p.id));
+                this.targetedProjects.push(...newTargets);
+                this.render();
+            },
+
+            clearTargeted: function() {
+                this.targetedProjects = [];
+                this.render();
+            },
+
+            execute: async function(status) {
+                const ids = this.targetedProjects.map(p => p.id);
+                if (!confirm(`Are you sure you want to ${status ? 'ACTIVATE' : 'DEACTIVATE'} these ${ids.length} projects?`)) return;
+
+                try {
+                    const response = await fetch('{{ path('admin_project_batch_execute_toggle') }}', {
+                        method: 'POST',
+                        body: JSON.stringify({ ids, targetStatus: !!status }),
+                        headers: { 'Content-Type': 'application/json' }
+                    });
+                    const result = await response.json();
+                    if (result.success) {
+                        alert(`${result.count} projects updated successfully!`);
+                        location.reload();
+                    }
+                } catch (e) {
+                    alert("Execution failed. Please try again.");
+                    console.error(e);
+                }
+            }
+        };
+
+        document.getElementById('advancedBatchModal').addEventListener('show.bs.modal', () => batchManager.init());
+
         document.addEventListener('DOMContentLoaded', function() {
             const fileInput = document.getElementById('csvFileInput');
             const confirmBtn = document.getElementById('confirmImportBtn');
@@ -97,8 +363,6 @@
                     const text = event.target.result;
                     const firstLine = text.split('\n')[0].toLowerCase(); 
                     
-                    // Loose validation: Just make sure it at least contains 'title' and 'authors' 
-                    // since our new PHP backend parser is highly dynamic.
                     if (firstLine.includes('title') && (firstLine.includes('author') || firstLine.includes('authors'))) {
                         feedback.style.display = 'none';
                         confirmBtn.disabled = false;

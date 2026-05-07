@@ -34,6 +34,7 @@ use Symfony\Component\HttpFoundation\Request;
 use EasyCorp\Bundle\EasyAdminBundle\Collection\FieldCollection;
 use EasyCorp\Bundle\EasyAdminBundle\Collection\FilterCollection;
 use EasyCorp\Bundle\EasyAdminBundle\Dto\SearchDto;
+use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
 use Doctrine\ORM\QueryBuilder;
@@ -82,6 +83,15 @@ class ThesisCrudController extends AbstractCrudController
             ])
             ->createAsGlobalAction();
 
+        $batchManageAction = Action::new('batchManagement', 'Activate/Disable by Batch', 'fas fa-tasks')
+            ->linkToUrl('#')
+            ->setHtmlAttributes([
+                'data-bs-toggle' => 'modal',
+                'data-bs-target' => '#advancedBatchModal',
+                'class' => 'btn btn-primary'
+            ])
+            ->createAsGlobalAction();
+
         $batchActivate = Action::new('batchActivate', 'Activate Selected', 'fas fa-check-circle')
             ->linkToRoute('admin_project_batch_activate')
             ->addCssClass('btn btn-success');
@@ -92,6 +102,7 @@ class ThesisCrudController extends AbstractCrudController
 
         return $actions
             ->add(Crud::PAGE_INDEX, $importAction)
+            ->add(Crud::PAGE_INDEX, $batchManageAction)
             ->addBatchAction($batchActivate)
             ->addBatchAction($batchDeactivate);
     }
@@ -146,6 +157,94 @@ class ThesisCrudController extends AbstractCrudController
         $this->addFlash('warning', sprintf('%d project(s) deactivated.', count($ids)));
 
         return $this->redirect($adminUrlGenerator->setController(self::class)->setAction(Action::INDEX)->generateUrl());
+    }
+
+    /**
+     * Fetches all necessary data to populate the advanced batch management filters.
+     */
+    #[Route('/admin/projects/batch-filter-data', name: 'admin_project_batch_filter_data', methods: ['GET'])]
+    public function fetchBatchFilterData(EntityManagerInterface $entityManager): JsonResponse
+    {
+        $sdgs = $entityManager->getRepository(\App\Entity\Sdg::class)->findBy([], ['id' => 'ASC']);
+        $types = $entityManager->getRepository(\App\Entity\ProjectType::class)->findBy([], ['name' => 'ASC']);
+        
+        $years = $entityManager->createQueryBuilder()
+            ->select('DISTINCT t.researchDate')
+            ->from(Thesis::class, 't')
+            ->where('t.researchDate IS NOT NULL')
+            ->orderBy('t.researchDate', 'DESC')
+            ->getQuery()
+            ->getSingleColumnResult();
+
+        return new JsonResponse([
+            'sdgs' => array_map(fn($s) => ['id' => $s->getId(), 'name' => $s->getName(), 'number' => $s->getId()], $sdgs),
+            'types' => array_map(fn($t) => ['id' => $t->getId(), 'name' => $t->getName()], $types),
+            'years' => $years
+        ]);
+    }
+
+    /**
+     * Searches for projects matching advanced filter criteria for the batch tool.
+     */
+    #[Route('/admin/projects/batch-search', name: 'admin_project_batch_search', methods: ['POST'])]
+    public function searchBatchProjects(Request $request, EntityManagerInterface $entityManager): JsonResponse
+    {
+        $data = json_decode($request->getContent(), true);
+        $sdgId = $data['sdgId'] ?? null;
+        $year = $data['year'] ?? null;
+        $typeId = $data['typeId'] ?? null;
+        $isActive = $data['isActive'] ?? null;
+
+        $qb = $entityManager->getRepository(Thesis::class)->createQueryBuilder('t')
+            ->select('t.id', 't.title', 't.researchDate as year', 't.isActive');
+
+        if ($sdgId) {
+            $qb->join('t.sdgs', 's')
+               ->andWhere('s.id = :sdgId')
+               ->setParameter('sdgId', $sdgId);
+        }
+        if ($year) {
+            $qb->andWhere('t.researchDate = :year')
+               ->setParameter('year', $year);
+        }
+        if ($typeId) {
+            $qb->andWhere('t.type = :typeId')
+               ->setParameter('typeId', $typeId);
+        }
+        if ($isActive !== null && $isActive !== '') {
+            $qb->andWhere('t.isActive = :isActive')
+               ->setParameter('isActive', (bool)$isActive);
+        }
+
+        $projects = $qb->orderBy('t.researchDate', 'DESC')->addOrderBy('t.title', 'ASC')->getQuery()->getArrayResult();
+
+        return new JsonResponse($projects);
+    }
+
+    /**
+     * Executes the bulk activation/deactivation of targeted projects.
+     */
+    #[Route('/admin/projects/batch-execute-toggle', name: 'admin_project_batch_execute_toggle', methods: ['POST'])]
+    public function executeBatchStatusUpdate(Request $request, EntityManagerInterface $entityManager): JsonResponse
+    {
+        $data = json_decode($request->getContent(), true);
+        $ids = $data['ids'] ?? [];
+        $targetStatus = $data['targetStatus'] ?? false;
+
+        if (empty($ids)) {
+            return new JsonResponse(['success' => false, 'message' => 'No projects selected.'], 400);
+        }
+
+        $entityManager->createQueryBuilder()
+            ->update(Thesis::class, 't')
+            ->set('t.isActive', ':status')
+            ->where('t.id IN (:ids)')
+            ->setParameter('status', (bool)$targetStatus)
+            ->setParameter('ids', $ids)
+            ->getQuery()
+            ->execute();
+
+        return new JsonResponse(['success' => true, 'count' => count($ids)]);
     }
 
     /**
