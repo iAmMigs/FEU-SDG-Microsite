@@ -20,10 +20,12 @@ final class NewsController extends AbstractController
     public function index(Request $request, ActivityRepository $activityRepository, SdgRepository $sdgRepository): Response
     {
         $selectedSdgs = $request->query->all('goals');
-        $dateRange = $request->query->get('date_range');
+        $dateFilter = $request->query->get('date_filter', 'all');
+        $startDate = $request->query->get('start_date');
+        $endDate = $request->query->get('end_date');
         
         $page = max(1, $request->query->getInt('page', 1));
-        $limit = 12;
+        $limit = 5;
 
         /**
          * leftJoin and addSelect pre-fetches all associated SDGs in the initial query
@@ -37,18 +39,28 @@ final class NewsController extends AbstractController
             ->setParameter('now', new \DateTime())
             ->orderBy('a.eventDate', 'DESC');
 
-        if ($dateRange) {
+        if ($dateFilter && $dateFilter !== 'all' && $dateFilter !== 'date_range') {
             $dateLimit = new \DateTime();
-            if ($dateRange === '1_day') {
+            if ($dateFilter === '1_day') {
                 $dateLimit->modify('-1 day');
-            } elseif ($dateRange === '7_days') {
+            } elseif ($dateFilter === '7_days') {
                 $dateLimit->modify('-7 days');
-            } elseif ($dateRange === '30_days') {
+            } elseif ($dateFilter === '30_days') {
                 $dateLimit->modify('-30 days');
             }
             
             $qb->andWhere('a.eventDate >= :dateLimit')
                ->setParameter('dateLimit', $dateLimit);
+        }
+
+        if ($startDate) {
+            $qb->andWhere('a.eventDate >= :startDate')
+               ->setParameter('startDate', new \DateTime($startDate));
+        }
+
+        if ($endDate) {
+            $qb->andWhere('a.eventDate <= :endDate')
+               ->setParameter('endDate', new \DateTime($endDate . ' 23:59:59'));
         }
 
         if (!empty($selectedSdgs)) {
@@ -74,7 +86,9 @@ final class NewsController extends AbstractController
         return $this->render('SDG-Microsite/news.html.twig', [
             'activities' => $activities,
             'selected_goals' => $selectedSdgs,
-            'date_range' => $dateRange,
+            'date_filter' => $dateFilter,
+            'start_date' => $startDate,
+            'end_date' => $endDate,
             'current_page' => $page,
             'total_pages' => $totalPages,
             'total_count' => $totalCount,

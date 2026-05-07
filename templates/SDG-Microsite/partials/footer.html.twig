@@ -12,7 +12,7 @@
             <div>
                 <h3 class="text-sm font-bold text-feu-gold-400 uppercase tracking-wider mb-4">Explore</h3>
                 <ul class="space-y-3 text-sm text-feu-green-100">
-                    <li><a href="{{ path('app_sdgs') }}" class="hover:text-feu-gold-300 transition flex items-center gap-2">&rarr; Our Focused Areas</a></li>
+                    <li><a href="{{ path('app_sdgs') }}" class="hover:text-feu-gold-300 transition flex items-center gap-2">&rarr; Our Focus Areas</a></li>
                     <li><a href="{{ path('app_library') }}" class="hover:text-feu-gold-300 transition flex items-center gap-2">&rarr; Project Library</a></li>
                 </ul>
             </div>
@@ -42,12 +42,19 @@
             
         </div>
         
-        <div class="pt-8 border-t border-feu-green-800 flex flex-col md:flex-row justify-between items-center gap-4 text-xs text-feu-green-200">
-            <p>&copy; {{ 'now'|date('Y') }} FEU Institute of Technology. All rights reserved.</p>
-            <div class="flex gap-6">
-                <a href="#" class="hover:text-feu-gold-300 transition">Privacy Policy</a>
-                <a href="#" class="hover:text-feu-gold-300 transition">Terms of Service</a>
-                <a href="{{ path('app_admin_login') }}" class="hover:text-feu-gold-300 transition">Admin Login</a>
+        <div class="pt-8 border-t border-feu-green-800 flex flex-col md:flex-row justify-between items-center gap-6">
+            <div class="flex flex-col gap-2">
+                <p class="text-xs text-feu-green-200">&copy; {{ 'now'|date('Y') }} FEU Institute of Technology. All rights reserved.</p>
+                <div class="flex gap-6 text-xs text-feu-green-200">
+                    <a href="{{ path('app_privacy') }}" class="hover:text-feu-gold-300 transition font-bold">Privacy Policy</a>
+                    <a href="{{ path('app_terms') }}" class="hover:text-feu-gold-300 transition font-bold">Terms of Service</a>
+                    <a href="{{ path('app_admin_login') }}" class="hover:text-feu-gold-300 transition">Admin Login</a>
+                </div>
+            </div>
+            
+            {# DPO Footer Image #}
+            <div class="shrink-0">
+                <img src="{{ asset('images/DPO_Footer.png') }}" alt="Data Privacy Office" class="h-20 object-contain transition-opacity">
             </div>
         </div>
     </div>

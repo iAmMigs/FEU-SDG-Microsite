@@ -14,9 +14,13 @@ use EasyCorp\Bundle\EasyAdminBundle\Controller\AbstractCrudController;
 use EasyCorp\Bundle\EasyAdminBundle\Field\BooleanField;
 use EasyCorp\Bundle\EasyAdminBundle\Config\KeyValueStore;
 use EasyCorp\Bundle\EasyAdminBundle\Context\AdminContext;
+use EasyCorp\Bundle\EasyAdminBundle\Config\Option\EA;
+use EasyCorp\Bundle\EasyAdminBundle\Dto\BatchActionDto;
 use EasyCorp\Bundle\EasyAdminBundle\Dto\EntityDto;
 use EasyCorp\Bundle\EasyAdminBundle\Field\AssociationField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\DateTimeField;
+use EasyCorp\Bundle\EasyAdminBundle\Field\ChoiceField;
+use EasyCorp\Bundle\EasyAdminBundle\Field\DateField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\IdField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\ImageField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\IntegerField;
@@ -27,12 +31,31 @@ use EasyCorp\Bundle\EasyAdminBundle\Form\Type\FileUploadType;
 use EasyCorp\Bundle\EasyAdminBundle\Router\AdminUrlGenerator;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\HttpFoundation\Request;
+use EasyCorp\Bundle\EasyAdminBundle\Collection\FieldCollection;
+use EasyCorp\Bundle\EasyAdminBundle\Collection\FilterCollection;
+use EasyCorp\Bundle\EasyAdminBundle\Dto\SearchDto;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
 use Doctrine\ORM\QueryBuilder;
 
 class ThesisCrudController extends AbstractCrudController
 {
+
+    public function createIndexQueryBuilder(SearchDto $searchDto, EntityDto $entityDto, FieldCollection $fields, FilterCollection $filters): QueryBuilder
+    {
+        $qb = parent::createIndexQueryBuilder($searchDto, $entityDto, $fields, $filters);
+        
+        $request = $this->getContext()->getRequest();
+        $researchYear = $request->query->get('researchYear');
+        
+        if ($researchYear) {
+            $qb->andWhere('entity.researchDate = :year')
+               ->setParameter('year', (int)$researchYear);
+        }
+        
+        return $qb;
+    }
+
     public static function getEntityFqcn(): string
     {
         return Thesis::class;
@@ -43,7 +66,7 @@ class ThesisCrudController extends AbstractCrudController
         return $crud
             ->setEntityLabelInSingular('Project')
             ->setEntityLabelInPlural('Projects')
-            ->setPaginatorPageSize(20)
+            ->setPaginatorPageSize(10)
             ->setDefaultSort(['createdAt' => 'DESC'])
             ->overrideTemplate('crud/index', 'Admin-Microsite/thesis_index.html.twig');
     }
@@ -59,7 +82,70 @@ class ThesisCrudController extends AbstractCrudController
             ])
             ->createAsGlobalAction();
 
-        return $actions->add(Crud::PAGE_INDEX, $importAction);
+        $batchActivate = Action::new('batchActivate', 'Activate Selected', 'fas fa-check-circle')
+            ->linkToRoute('admin_project_batch_activate')
+            ->addCssClass('btn btn-success');
+
+        $batchDeactivate = Action::new('batchDeactivate', 'Deactivate Selected', 'fas fa-times-circle')
+            ->linkToRoute('admin_project_batch_deactivate')
+            ->addCssClass('btn btn-warning');
+
+        return $actions
+            ->add(Crud::PAGE_INDEX, $importAction)
+            ->addBatchAction($batchActivate)
+            ->addBatchAction($batchDeactivate);
+    }
+
+    /**
+     * Batch-activates all selected thesis/project records.
+     */
+    #[Route('/admin/projects/batch-activate', name: 'admin_project_batch_activate', methods: ['POST'])]
+    public function batchActivateAction(AdminContext $context, EntityManagerInterface $entityManager, AdminUrlGenerator $adminUrlGenerator): Response
+    {
+        $batchActionDto = new BatchActionDto(
+            $context->getRequest()->request->get(EA::BATCH_ACTION_NAME),
+            $context->getRequest()->request->all()[EA::BATCH_ACTION_ENTITY_IDS] ?? [],
+            $context->getRequest()->request->get(EA::ENTITY_FQCN),
+            $context->getRequest()->request->get(EA::BATCH_ACTION_CSRF_TOKEN)
+        );
+
+        $ids = $batchActionDto->getEntityIds();
+        foreach ($ids as $id) {
+            $thesis = $entityManager->getRepository(Thesis::class)->find($id);
+            if ($thesis) {
+                $thesis->setIsActive(true);
+            }
+        }
+        $entityManager->flush();
+        $this->addFlash('success', sprintf('%d project(s) activated successfully.', count($ids)));
+
+        return $this->redirect($adminUrlGenerator->setController(self::class)->setAction(Action::INDEX)->generateUrl());
+    }
+
+    /**
+     * Batch-deactivates all selected thesis/project records.
+     */
+    #[Route('/admin/projects/batch-deactivate', name: 'admin_project_batch_deactivate', methods: ['POST'])]
+    public function batchDeactivateAction(AdminContext $context, EntityManagerInterface $entityManager, AdminUrlGenerator $adminUrlGenerator): Response
+    {
+        $batchActionDto = new BatchActionDto(
+            $context->getRequest()->request->get(EA::BATCH_ACTION_NAME),
+            $context->getRequest()->request->all()[EA::BATCH_ACTION_ENTITY_IDS] ?? [],
+            $context->getRequest()->request->get(EA::ENTITY_FQCN),
+            $context->getRequest()->request->get(EA::BATCH_ACTION_CSRF_TOKEN)
+        );
+
+        $ids = $batchActionDto->getEntityIds();
+        foreach ($ids as $id) {
+            $thesis = $entityManager->getRepository(Thesis::class)->find($id);
+            if ($thesis) {
+                $thesis->setIsActive(false);
+            }
+        }
+        $entityManager->flush();
+        $this->addFlash('warning', sprintf('%d project(s) deactivated.', count($ids)));
+
+        return $this->redirect($adminUrlGenerator->setController(self::class)->setAction(Action::INDEX)->generateUrl());
     }
 
     /**
@@ -70,6 +156,7 @@ class ThesisCrudController extends AbstractCrudController
     public function importCsvAction(Request $request, EntityManagerInterface $entityManager, SdgRepository $sdgRepository, AdminUrlGenerator $adminUrlGenerator): Response
     {
         $file = $request->files->get('csv_file');
+        $researchYear = $request->request->get('research_year');
         
         if ($file && $file->isValid() && strtolower($file->getClientOriginalExtension()) === 'csv') {
             
@@ -131,6 +218,7 @@ class ThesisCrudController extends AbstractCrudController
                         $project->setIsActive(false); 
                         $project->setViews(0);
                         $project->setRegionViews([]);
+                        $project->setResearchDate((int) $researchYear);
 
                         if ($typeIdx !== -1 && !empty(trim($data[$typeIdx] ?? ''))) {
                             $typeStr = trim($data[$typeIdx]);
@@ -231,13 +319,18 @@ class ThesisCrudController extends AbstractCrudController
             BooleanField::new('isActive', 'Active'),
             TextField::new('title', 'Thesis Title'),
             TextField::new('authors', 'Authors')
-                ->setHelp('Separate multiple authors with a semicolon (;) to match our dataset format.'),
+                ->setHelp('Separate multiple authors with a semicolon (;) to match our dataset format.')
+                ->hideOnIndex(),
             
-            AssociationField::new('type', 'Type')->setRequired(false),
+            AssociationField::new('type', 'Type')
+                ->setRequired(false)
+                ->formatValue(function ($value) {
+                    return $value ?: '<span class="text-muted small">Not Specified</span>';
+                }),
             AssociationField::new('college', 'College')->setRequired(false)
                 ->hideOnIndex(),
             
-            TextareaField::new('description', 'Abstract')->setNumOfRows(6)->hideOnIndex(),
+            TextareaField::new('description', 'Abstract')->setNumOfRows(6)->hideOnIndex()->setRequired(false),
             
             AssociationField::new('sdgs', 'Targeted SDGs')
                 ->setTemplatePath('Admin-Microsite/fields/sdg_tags.html.twig')
@@ -249,7 +342,23 @@ class ThesisCrudController extends AbstractCrudController
             TextField::new('doi', 'DOI')
                 ->setHelp('Provide the Digital Object Identifier. (e.g. 10.1234/5678)')->setRequired(false),
             UrlField::new('publicationLink', 'External Publication Link')
-                ->setHelp('Paste the URL to an external journal or publication if applicable')->setRequired(false),
+                ->setHelp('Paste the URL to an external journal or publication if applicable')->setRequired(false)
+                ->hideOnIndex(),
+            
+            ChoiceField::new('researchMonth', 'Date of Research')
+                ->setChoices([
+                    'January' => 1, 'February' => 2, 'March' => 3, 'April' => 4,
+                    'May' => 5, 'June' => 6, 'July' => 7, 'August' => 8,
+                    'September' => 9, 'October' => 10, 'November' => 11, 'December' => 12,
+                ])
+                ->setHelp('Optional: Select a specific month (e.g., for manual entries).')
+                ->setRequired(false)
+                ->hideOnIndex(),
+            
+            ChoiceField::new('researchDate', 'Year of Research')
+                ->setChoices(array_combine(range(date('Y'), 1990), range(date('Y'), 1990)))
+                ->setHelp('Required: Select the year the research was conducted.')
+                ->setRequired(true),
                 
             TextField::new('documentFile', 'PDF Document')
                 ->setFormType(FileUploadType::class)
@@ -266,7 +375,8 @@ class ThesisCrudController extends AbstractCrudController
                 ->setRequired(false)
                 ->setFormTypeOptions(['attr' => ['accept' => 'image/jpeg, image/png, image/webp']]),
             IntegerField::new('views')->hideOnForm(),
-            DateTimeField::new('createdAt', 'Date Added')->hideOnForm(),
+            DateField::new('createdAt', 'Date Added')->hideOnForm()->hideOnIndex(),
         ];
     }
+
 }

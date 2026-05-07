@@ -24,7 +24,7 @@ class Thesis
     #[ORM\Column(length: 255)]
     private ?string $title = null;
 
-    #[ORM\Column(type: Types::TEXT)]
+    #[ORM\Column(type: Types::TEXT, nullable: true)]
     private ?string $description = null;
 
     #[ORM\Column(length: 255)]
@@ -57,6 +57,12 @@ class Thesis
     #[ORM\Column(length: 255, nullable: true)]
     private ?string $publicationLink = null;
 
+    #[ORM\Column(type: Types::INTEGER, nullable: true)]
+    private ?int $researchMonth = null;
+
+    #[ORM\Column(type: Types::INTEGER, nullable: true)]
+    private ?int $researchDate = null;
+
     #[ORM\Column(type: 'boolean', options: ['default' => false])]
     private ?bool $isActive = false;
 
@@ -79,7 +85,7 @@ class Thesis
     public function setTitle(string $title): static { $this->title = $title; return $this; }
 
     public function getDescription(): ?string { return $this->description; }
-    public function setDescription(string $description): static { $this->description = $description; return $this; }
+    public function setDescription(?string $description): static { $this->description = $description; return $this; }
 
     public function getAuthors(): ?string { return $this->authors; }
     public function setAuthors(string $authors): static { $this->authors = $authors; return $this; }
@@ -132,6 +138,12 @@ class Thesis
 
     public function getPublicationLink(): ?string { return $this->publicationLink; }
     public function setPublicationLink(?string $publicationLink): static { $this->publicationLink = $publicationLink; return $this; }
+
+    public function getResearchMonth(): ?int { return $this->researchMonth; }
+    public function setResearchMonth(?int $researchMonth): static { $this->researchMonth = $researchMonth; return $this; }
+
+    public function getResearchDate(): ?int { return $this->researchDate; }
+    public function setResearchDate(?int $researchDate): static { $this->researchDate = $researchDate; return $this; }
 
     /** @return Collection<int, Sdg> */
     public function getSdgs(): Collection { return $this->sdgs; }

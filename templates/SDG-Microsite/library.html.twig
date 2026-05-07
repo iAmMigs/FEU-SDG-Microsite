@@ -41,8 +41,13 @@
                         </div>
 
                         <div>
-                            <label for="keyword" class="block text-sm font-semibold text-gray-700 mb-2 font-work">Search Abstract</label>
-                            <input type="text" id="keyword" name="keyword" value="{{ search_keyword|default('') }}" placeholder="Specific terms..." class="w-full rounded-lg border-gray-300 shadow-sm focus:border-feu-green-700 focus:ring-feu-green-700 px-4 py-2 border font-work">
+                            <label for="year" class="block text-sm font-semibold text-gray-700 mb-2 font-work">Research Year</label>
+                            <select id="year" name="year" class="w-full rounded-lg border-gray-300 shadow-sm focus:border-feu-green-700 focus:ring-feu-green-700 px-4 py-2 border font-work">
+                                <option value="">All Years</option>
+                                {% for year in range("now"|date("Y"), 1990) %}
+                                    <option value="{{ year }}" {% if selected_year|default('') == year %}selected{% endif %}>{{ year }}</option>
+                                {% endfor %}
+                            </select>
                         </div>
 
                         <div>
@@ -140,18 +145,21 @@
                     <div id="theses-results" class="space-y-6">
                         {% for thesis in theses %}
                             <article class="bg-white rounded-2xl p-8 border border-gray-100 shadow-sm hover:shadow-lg transition flex flex-col gap-4 relative">
-                                
-                                <div class="flex flex-wrap gap-2 mb-1">
+                                <h3 class="text-2xl font-bold text-gray-900 hover:text-feu-green-700 transition font-bebas tracking-wide">
+                                    <a href="{{ path('app_library_show', {id: thesis.id}) }}" data-turbo-frame="_top">{{ thesis.title }}</a>
+                                </h3>
+
+                                <div class="flex flex-wrap gap-2">
                                     {% for sdg in thesis.sdgs %}
                                         <span class="text-white text-xs font-bold px-3 py-1 rounded-full font-work uppercase tracking-wider shadow-sm" style="background-color: {{ sdg_colors[sdg.id]|default('#166534') }}; text-shadow: 0px 1px 2px rgba(0,0,0,0.2);">
                                             SDG {{ sdg.id }}
                                         </span>
+                                    {% else %}
+                                        <span class="text-gray-400 text-[10px] font-bold px-3 py-1.5 rounded-full font-work uppercase tracking-wider border border-gray-200 bg-gray-50">
+                                            No Specified SDG
+                                        </span>
                                     {% endfor %}
                                 </div>
-                                
-                                <h3 class="text-2xl font-bold text-gray-900 hover:text-feu-green-700 transition font-bebas tracking-wide">
-                                    <a href="{{ path('app_library_show', {id: thesis.id}) }}" data-turbo-frame="_top">{{ thesis.title }}</a>
-                                </h3>
                                 
                                 {% if thesis.description|trim is not empty %}
                                     <div id="abstract-wrapper-{{ thesis.id }}" class="mt-4 hidden bg-gray-50 p-6 md:p-8 rounded-xl border border-gray-200">
@@ -161,16 +169,31 @@
                                     </div>
                                 {% endif %}
                                 
-                                <div class="flex flex-col xl:flex-row xl:items-center justify-between mt-4 pt-4 border-t border-gray-100 gap-4">
-                                    <div class="flex flex-wrap items-center gap-4 text-sm font-work">
-                                        <span class="font-bold text-gray-600">By {{ thesis.authors|replace({';': ', '}) }}</span>
-                                        <div class="flex items-center text-feu-green-700 font-bold gap-1 bg-feu-green-50 px-2 py-1 rounded-md">
-                                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path></svg>
-                                            {{ thesis.views|number_format }} Views
+                                <div class="flex flex-col lg:flex-row lg:items-center justify-between mt-4 pt-4 border-t border-gray-100 gap-6">
+                                    <div class="flex-1 min-w-0">
+                                        <div class="text-sm font-work">
+                                            <div class="font-bold text-gray-600 mb-2 leading-relaxed">
+                                                By {{ thesis.authors|replace({';': ', '}) }}
+                                            </div>
+                                            <div class="inline-flex items-center text-feu-green-700 font-bold gap-1 bg-feu-green-50 px-2 py-1 rounded-md">
+                                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path></svg>
+                                                {{ thesis.views|number_format }} Views
+                                            </div>
+                                            {% if thesis.researchDate %}
+                                                <div class="inline-flex items-center text-gray-600 font-bold gap-1 bg-gray-50 px-2 py-1 rounded-md ml-2 border border-gray-100">
+                                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>
+                                                    {% set months = ['', 'January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'] %}
+                                                    {% if thesis.researchMonth %}
+                                                        {{ months[thesis.researchMonth] }} {{ thesis.researchDate }}
+                                                    {% else %}
+                                                        {{ thesis.researchDate }}
+                                                    {% endif %}
+                                                </div>
+                                            {% endif %}
                                         </div>
                                     </div>
                                     
-                                    <div class="flex flex-wrap items-center gap-2">
+                                    <div class="flex flex-wrap items-center gap-2 shrink-0">
                                         {% if thesis.description|trim is not empty %}
                                             <button type="button" onclick="document.getElementById('abstract-wrapper-{{ thesis.id }}').classList.toggle('hidden')" class="px-4 py-2.5 bg-gray-100 hover:bg-gray-200 text-gray-800 font-bold rounded-lg transition text-xs flex items-center gap-1.5 border border-gray-200 font-work cursor-pointer">
                                                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h7"></path></svg>

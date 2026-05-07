@@ -4,27 +4,47 @@
 
 {% block main %}
     <div class="row">
-        <div class="col-lg-6 col-md-6 col-sm-12 mb-4">
-            <div class="card shadow-sm border-0 stat-card-primary" style="border-radius: 12px;">
+        <div class="col-lg-4 col-md-4 col-sm-12 mb-4">
+            <div class="card shadow-sm border-0 stat-card-success" style="border-radius: 12px; background: linear-gradient(135deg, #059669 0%, #10b981 100%); color: white;">
                 <div class="card-body p-4">
                     <div class="d-flex justify-content-between align-items-center">
                         <div>
-                            <h6 class="text-uppercase mb-2 stat-title" style="font-weight: bold; letter-spacing: 1px;">Total Published Theses</h6>
-                            <h2 class="display-4 fw-bold mb-0 stat-value">{{ theses_count }}</h2>
+                            <h6 class="text-uppercase mb-2" style="font-weight: bold; letter-spacing: 1px; color: rgba(255,255,255,0.8);">Active Projects</h6>
+                            <h2 class="display-4 fw-bold mb-0">{{ active_projects_count }}</h2>
                         </div>
-                        <i class="fas fa-book fa-3x" style="opacity: 0.3;"></i>
+                        <i class="fas fa-check-circle fa-3x" style="opacity: 0.2;"></i>
                     </div>
                 </div>
-                <div class="card-footer stat-footer" style="border-top: none; border-radius: 0 0 12px 12px;">
-                    <a href="{{ ea_url().setController('App\\Controller\\Admin\\ThesisCrudController').generateUrl() }}" class="text-decoration-none d-flex justify-content-between align-items-center stretched-link stat-link">
-                        <span style="font-weight: 500;">Manage Projects</span>
+                <div class="card-footer" style="border-top: none; border-radius: 0 0 12px 12px; background: rgba(0,0,0,0.1);">
+                    <a href="{{ ea_url().setController('App\\Controller\\Admin\\ThesisCrudController').set('isActive', 1).generateUrl() }}" class="text-decoration-none d-flex justify-content-between align-items-center stretched-link text-white">
+                        <span style="font-weight: 500;">View Active</span>
                         <i class="fas fa-arrow-right"></i>
                     </a>
                 </div>
             </div>
         </div>
 
-        <div class="col-lg-6 col-md-6 col-sm-12 mb-4">
+        <div class="col-lg-4 col-md-4 col-sm-12 mb-4">
+            <div class="card shadow-sm border-0 stat-card-primary" style="border-radius: 12px;">
+                <div class="card-body p-4">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <h6 class="text-uppercase mb-2 stat-title" style="font-weight: bold; letter-spacing: 1px;">Total Published Projects</h6>
+                            <h2 class="display-4 fw-bold mb-0 stat-value">{{ total_projects_count }}</h2>
+                        </div>
+                        <i class="fas fa-project-diagram fa-3x" style="opacity: 0.3;"></i>
+                    </div>
+                </div>
+                <div class="card-footer stat-footer" style="border-top: none; border-radius: 0 0 12px 12px;">
+                    <a href="{{ ea_url().setController('App\\Controller\\Admin\\ThesisCrudController').generateUrl() }}" class="text-decoration-none d-flex justify-content-between align-items-center stretched-link stat-link">
+                        <span style="font-weight: 500;">Manage Library</span>
+                        <i class="fas fa-arrow-right"></i>
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-lg-4 col-md-4 col-sm-12 mb-4">
             <div class="card shadow-sm border-0 stat-card-warning" style="border-radius: 12px;">
                 <div class="card-body p-4">
                     <div class="d-flex justify-content-between align-items-center">
@@ -50,7 +70,7 @@
         <div class="col-lg-6 mb-4">
             <div class="card shadow-sm border-0 h-100" style="border-radius: 12px;">
                 <div class="card-header bg-transparent border-0 pt-4 pb-0">
-                    <h6 class="fw-bold mb-0 text-secondary text-uppercase" style="letter-spacing: 1px;">Thesis Submissions (Last 6 Months)</h6>
+                    <h6 class="fw-bold mb-0 text-secondary text-uppercase" style="letter-spacing: 1px;">Project Submissions (Last 6 Months)</h6>
                 </div>
                 <div class="card-body">
                     <div style="height: 300px;">
@@ -102,7 +122,7 @@
                 data: {
                     labels: {{ chart_months_labels|raw }},
                     datasets: [{
-                        label: 'Submitted Theses',
+                        label: 'Submitted Projects',
                         data: {{ chart_months_data|raw }},
                         borderColor: '#10b981',       // Softer Green for visibility
                         backgroundColor: 'rgba(16, 185, 129, 0.1)',

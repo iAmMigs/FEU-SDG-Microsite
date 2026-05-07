@@ -1,7 +1,32 @@
 {% extends '@EasyAdmin/crud/index.html.twig' %}
 
+{% block page_actions %}
+    <div class="d-flex align-items-center gap-2 me-2">
+        <select class="form-select" id="yearFilter" onchange="applyYearFilter(this.value)" style="width: auto; height: 38px;">
+            <option value="">Filter by Year</option>
+            {% for year in range("now"|date("Y"), 1990) %}
+                <option value="{{ year }}" {% if app.request.query.get('researchYear') == year %}selected{% endif %}>{{ year }}</option>
+            {% endfor %}
+        </select>
+    </div>
+    {{ parent() }}
+{% endblock %}
+
 {% block body_javascript %}
     {{ parent() }}
+    <script>
+        function applyYearFilter(year) {
+            const url = new URL(window.location.href);
+            if (year) {
+                url.searchParams.set('researchYear', year);
+            } else {
+                url.searchParams.delete('researchYear');
+            }
+            // Reset to page 1 when filtering
+            url.searchParams.delete('page');
+            window.location.href = url.toString();
+        }
+    </script>
     
     <div class="modal fade" id="csvImportModal" tabindex="-1" aria-labelledby="csvImportModalLabel" aria-hidden="true">
         <div class="modal-dialog modal-dialog-centered">
@@ -19,6 +44,17 @@
                             <strong>Note:</strong> Make sure your data exactly matches the format of the project table. The first row must be the headers:
                             <br><br>
                             <code>Authors, Title, Abstract, DOI, Type, College, SDG</code>
+                        </div>
+                        
+                        <div class="mb-4">
+                            <label for="researchYearSelect" class="form-label">Year of Research</label>
+                            <select class="form-select" id="researchYearSelect" name="research_year" required>
+                                <option value="" selected disabled>Select a Year</option>
+                                {% for year in range("now"|date("Y"), 1990) %}
+                                    <option value="{{ year }}">{{ year }}</option>
+                                {% endfor %}
+                            </select>
+                            <div class="form-text">This year will be applied to all projects in the uploaded CSV.</div>
                         </div>
                         
                         <div class="mb-3">

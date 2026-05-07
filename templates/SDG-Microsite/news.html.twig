@@ -35,15 +35,45 @@
                     {# Hidden page input for pagination logic #}
                     <input type="hidden" name="page" data-autosubmit-target="page" value="{{ current_page|default(1) }}" data-max="{{ total_pages|default(1) }}">
 
-                    <div class="flex flex-col lg:flex-row gap-8 items-start lg:items-center">
+                    <div class="flex flex-col gap-8">
+                        {# Row 1: Date Filters #}
+                        <div class="grid grid-cols-1 md:grid-cols-3 gap-6 pb-8 border-b border-gray-100">
+                            <div class="w-full">
+                                <label for="date_filter" class="block text-xs font-bold text-gray-400 mb-2 font-work uppercase tracking-widest">Timeframe</label>
+                                <select id="date_filter" name="date_filter" class="w-full rounded-xl border-gray-200 shadow-sm focus:border-feu-green-700 focus:ring-feu-green-700 px-4 py-3 bg-gray-50 font-work text-gray-800 font-bold cursor-pointer transition hover:bg-gray-100"
+                                        data-autosubmit-target="dateFilter"
+                                        onchange="document.getElementById('start_date_container').style.display = this.value === 'date_range' ? 'block' : 'none'; document.getElementById('end_date_container').style.display = this.value === 'date_range' ? 'block' : 'none';"
+                                        data-action="change->autosubmit#toggleDateRange">
+                                    <option value="all" {% if date_filter is defined and (date_filter == 'all' or date_filter is empty) %}selected{% endif %}>Default</option>
+                                    <option value="date_range" {% if date_filter is defined and date_filter == 'date_range' %}selected{% endif %}>Date Range</option>
+                                    <option value="1_day" {% if date_filter is defined and date_filter == '1_day' %}selected{% endif %}>Past 24 Hours</option>
+                                    <option value="7_days" {% if date_filter is defined and date_filter == '7_days' %}selected{% endif %}>Past 7 Days</option>
+                                    <option value="30_days" {% if date_filter is defined and date_filter == '30_days' %}selected{% endif %}>Past Month</option>
+                                </select>
+                            </div>
 
+                            <div class="w-full" id="start_date_container" data-autosubmit-target="dateRangeField" style="display: {% if date_filter is defined and date_filter == 'date_range' %}block{% else %}none{% endif %};">
+                                <label for="start_date" class="block text-xs font-bold text-gray-400 mb-2 font-work uppercase tracking-widest">From</label>
+                                <input type="date" id="start_date" name="start_date" value="{{ start_date|default('') }}" 
+                                       data-autosubmit-target="startDate"
+                                       class="w-full rounded-xl border-gray-200 shadow-sm focus:border-feu-green-700 focus:ring-feu-green-700 px-4 py-3 bg-gray-50 font-work text-gray-800 font-bold transition hover:bg-gray-100">
+                            </div>
+
+                            <div class="w-full" id="end_date_container" data-autosubmit-target="dateRangeField" style="display: {% if date_filter is defined and date_filter == 'date_range' %}block{% else %}none{% endif %};">
+                                <label for="end_date" class="block text-xs font-bold text-gray-400 mb-2 font-work uppercase tracking-widest">To</label>
+                                <input type="date" id="end_date" name="end_date" value="{{ end_date|default('') }}" 
+                                       data-autosubmit-target="endDate"
+                                       class="w-full rounded-xl border-gray-200 shadow-sm focus:border-feu-green-700 focus:ring-feu-green-700 px-4 py-3 bg-gray-50 font-work text-gray-800 font-bold transition hover:bg-gray-100">
+                            </div>
+                        </div>
+
+                        {# Row 2: SDG Goals #}
                         <div class="w-full">
-                            <label class="block text-xs font-bold text-gray-400 mb-2 font-work uppercase tracking-widest">Filter by Goal</label>
+                            <label class="block text-xs font-bold text-gray-400 mb-2 font-work uppercase tracking-widest">Filter by Focus Area</label>
                             <div class="flex flex-wrap gap-3">
                                 {% for sdg in all_sdgs %}
                                     {% set formatted_num = '%02d'|format(sdg.id) %}
                                     
-                                    {# Library Style Filter: Inverted vs Normal Images #}
                                     <label for="sdg-filter-{{ sdg.id }}" class="cursor-pointer relative block w-14 h-14 rounded-md overflow-hidden shadow-sm hover:shadow-md transition group border border-gray-100 bg-white shrink-0">
                                         <input type="checkbox" id="sdg-filter-{{ sdg.id }}" name="goals[]" value="{{ sdg.id }}" class="peer sr-only" 
                                                {% if selected_goals is defined and sdg.id ~ '' in selected_goals %}checked{% endif %}>

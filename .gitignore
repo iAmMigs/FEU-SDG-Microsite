@@ -17,4 +17,5 @@
 ###> symfony/asset-mapper ###
 /public/assets/
 /assets/vendor/
+/Debugging_Folder
 ###< symfony/asset-mapper ###

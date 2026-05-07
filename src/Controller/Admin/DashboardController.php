@@ -83,7 +83,8 @@ class DashboardController extends AbstractDashboardController
         }
 
         return $this->render('Admin-Microsite/dashboard.html.twig', [
-            'theses_count' => $this->thesisRepository->count([]),
+            'total_projects_count' => $this->thesisRepository->count([]),
+            'active_projects_count' => $this->thesisRepository->count(['isActive' => true]),
             'activities_count' => $this->activityRepository->count([]),
             
             'chart_months_labels' => json_encode($monthsLabels),
@@ -115,7 +116,7 @@ class DashboardController extends AbstractDashboardController
         yield MenuItem::linkToDashboard('Dashboard Overview', 'fa fa-chart-pie');
 
         yield MenuItem::section('Content Management');
-        yield MenuItem::linkTo(ThesisCrudController::class, 'Theses & Studies', 'fas fa-book-bookmark');
+        yield MenuItem::linkTo(ThesisCrudController::class, 'Project Library', 'fas fa-book-bookmark');
         yield MenuItem::linkTo(ActivityCrudController::class, 'Activities & Events', 'fas fa-newspaper');
         
         yield MenuItem::section('Data Management');

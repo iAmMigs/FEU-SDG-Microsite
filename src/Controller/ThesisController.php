@@ -22,7 +22,7 @@ final class ThesisController extends AbstractController
     {
         $searchAuthor = $request->query->get('author', '');
         $searchTitle = $request->query->get('title', '');
-        $searchKeyword = $request->query->get('keyword', '');
+        $searchYear = $request->query->get('year', '');
         $selectedSdgs = $request->query->all('goals');
         $isExclusive = $request->query->getBoolean('exclusive', false);
         
@@ -47,9 +47,9 @@ final class ThesisController extends AbstractController
             $qb->andWhere('t.title LIKE :title')
                ->setParameter('title', '%' . $searchTitle . '%');
         }
-        if ($searchKeyword) {
-            $qb->andWhere('t.description LIKE :keyword OR t.title LIKE :keyword OR t.authors LIKE :keyword')
-               ->setParameter('keyword', '%' . $searchKeyword . '%');
+        if ($searchYear) {
+            $qb->andWhere('t.researchDate = :year')
+               ->setParameter('year', (int)$searchYear);
         }
 
         if (!empty($selectedSdgs)) {
@@ -90,7 +90,7 @@ final class ThesisController extends AbstractController
             'theses' => $theses,
             'search_author' => $searchAuthor,
             'search_title' => $searchTitle,
-            'search_keyword' => $searchKeyword,
+            'selected_year' => $searchYear,
             'selected_goals' => $selectedSdgs,
             'is_exclusive' => $isExclusive,
             'current_page' => $page,

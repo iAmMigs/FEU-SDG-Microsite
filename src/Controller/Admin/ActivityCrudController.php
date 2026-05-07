@@ -25,7 +25,7 @@ class ActivityCrudController extends AbstractCrudController
     public function configureCrud(Crud $crud): Crud
     {
         return $crud
-            ->setPaginatorPageSize(20)
+            ->setPaginatorPageSize(10)
             ->setDefaultSort(['createdAt' => 'DESC']);
     }
 
