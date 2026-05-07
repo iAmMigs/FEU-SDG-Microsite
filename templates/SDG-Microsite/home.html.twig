@@ -1,34 +1,33 @@
 {% extends 'SDG-Microsite/base.html.twig' %}
 
-{% block title %}FEU Tech SDG Microsite - Advancing Sustainability{% endblock %}
+{% block title %}FEU Institute of Technology SDG Microsite - Advancing Sustainability{% endblock %}
 
 {% block body %}
     <section class="relative h-screen w-full bg-feu-green-900 text-white overflow-hidden" data-controller="carousel">
         <div class="absolute inset-0 z-0 pointer-events-none">
-            <img data-carousel-target="slide" src="{{ asset('images/hero-1.jpg') }}" class="absolute inset-0 w-full h-full object-cover transition-opacity duration-1000 opacity-0" alt="FEU Tech Campus 1">
-            <img data-carousel-target="slide" src="{{ asset('images/hero-2.jpg') }}" class="absolute inset-0 w-full h-full object-cover transition-opacity duration-1000 opacity-0" alt="FEU Tech Campus 2">
-            <img data-carousel-target="slide" src="{{ asset('images/hero-3.jpg') }}" class="absolute inset-0 w-full h-full object-cover transition-opacity duration-1000 opacity-0" alt="FEU Tech Campus 3">
-            <img data-carousel-target="slide" src="{{ asset('images/hero-4.jpg') }}" class="absolute inset-0 w-full h-full object-cover transition-opacity duration-1000 opacity-0" alt="FEU Tech Campus 4">
+            <img data-carousel-target="slide" src="{{ asset('images/hero-1.png') }}" class="absolute inset-0 w-full h-full object-cover transition-opacity duration-1000 opacity-0" alt="FEU Institute of Technology Campus 1">
+            <img data-carousel-target="slide" src="{{ asset('images/hero-2.jpg') }}" class="absolute inset-0 w-full h-full object-cover transition-opacity duration-1000 opacity-0" alt="FEU Institute of Technology Campus 2">
+            <img data-carousel-target="slide" src="{{ asset('images/hero-3.jpg') }}" class="absolute inset-0 w-full h-full object-cover transition-opacity duration-1000 opacity-0" alt="FEU Institute of Technology Campus 3">
             <div class="absolute inset-0 bg-feu-green-900/70 mix-blend-multiply"></div>
         </div>
 
         <div class="relative h-full max-w-7xl mx-auto flex flex-col items-center justify-center text-center z-10 px-6">
             <h1 class="text-5xl md:text-7xl font-bold tracking-tight mb-6 font-bebas">
-                Driving Sustainable Impact at FEU Tech
+                Driving Sustainable Impact at FEU Institute of Technology
             </h1>
             <p class="text-lg md:text-2xl max-w-3xl mb-10 text-feu-green-50 font-work">
                 Explore our research, student capstone and thesis projects, and community initiatives dedicated to solving global challenges through local action.
             </p>
             <a href="#goals" class="bg-[#FCC30B] text-feu-green-900 px-10 py-4 rounded-full font-bold text-lg hover:bg-yellow-300 transition duration-300 shadow-xl">
-                Explore Our Focus Goals
+                Explore Our Focus Areas
             </a>
         </div>
     </section>
 
     <section id="goals" class="py-20 px-6 bg-gray-50">
         <div class="max-w-7xl mx-auto text-center mb-16">
-            <h2 class="text-3xl font-bold text-gray-900 mb-4 font-bebas tracking-wide">Our SDG Focus Areas</h2>
-            <p class="text-gray-600 max-w-2xl mx-auto font-work">FEU Tech aligns its academic research, student theses, and institutional projects specifically toward these key Sustainable Development Goals.</p>
+            <h2 class="text-3xl font-bold text-gray-900 mb-4 font-bebas tracking-wide">Our Focused Areas</h2>
+            <p class="text-gray-600 max-w-2xl mx-auto font-work">FEU Institute of Technology aligns its academic research, student theses, and institutional projects specifically toward these key Sustainable Development Goals.</p>
         </div>
 
         <div data-controller="modal" class="max-w-7xl mx-auto">
@@ -39,7 +38,7 @@
                             id="btn-focused-sdgs"
                             onclick="filterSdgs('focused')"
                             class="px-6 py-2 rounded-full text-sm font-bold font-work transition-all duration-300 bg-feu-green-900 text-white shadow-md cursor-pointer">
-                        Focus
+                        Focused
                     </button>
                     <button type="button"
                             id="btn-all-sdgs"
@@ -154,14 +153,14 @@
 
     <section class="relative py-24 px-6 overflow-hidden border-y-4 border-feu-gold-400">
         <div class="absolute inset-0 z-0">
-            <img src="{{ asset('images/hero-2.jpg') }}" alt="FEU Tech Campus" class="w-full h-full object-cover">
+            <img src="{{ asset('images/hero-2.jpg') }}" alt="FEU Institute of Technology Campus" class="w-full h-full object-cover">
             <div class="absolute inset-0 bg-feu-green-900/80 mix-blend-multiply"></div>
         </div>
         <div class="relative z-10 max-w-7xl mx-auto">
             <div class="text-center mb-16">
-                <h2 class="text-4xl md:text-5xl font-bold text-white font-bebas tracking-wide mb-3">Leading Voices in Research</h2>
+                <h2 class="text-4xl md:text-5xl font-bold text-white font-bebas tracking-wide mb-3">Featured voices in research</h2>
                 <p class="text-feu-green-50 font-medium text-lg font-work max-w-2xl mx-auto">
-                    Meet the dedicated students and faculty members driving sustainable innovation and impactful solutions at FEU Tech.
+                    Meet the dedicated students and faculty members driving sustainable innovation and impactful solutions at FEU Institute of Technology.
                 </p>
             </div>
             
@@ -182,7 +181,7 @@
                             
                             {# Image / Initials Fallback #}
                             {% if voice.image %}
-                                {# UPDATED: Changed border color to #FCC30B (FEU Tech Gold) #}
+                                {# UPDATED: Changed border color to #FCC30B (FEU Institute of Technology Gold) #}
                                 <img src="{{ asset('uploads/voices/' ~ voice.image) }}" alt="{{ voice.name }}" class="w-20 h-20 mx-auto rounded-full object-cover mb-4 border-4 border-[#FCC30B] shadow-sm transition group-hover:scale-110">
                             {% else %}
                                 {% set name_parts = voice.name|split(' ') %}
@@ -225,18 +224,21 @@
                  * Limits the loop to a maximum of 3 items using the slice filter.
                  #}
                 {% for activity in latest_activities|slice(0, 3) %}
-                    <article class="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden flex flex-col hover:shadow-xl transition duration-300 group">
+                    <article class="bg-white rounded-2xl shadow-sm border border-gray-100 flex flex-col hover:shadow-xl transition duration-300 group relative">
                         <div class="h-56 relative bg-gray-100 overflow-hidden shrink-0">
                             {% if activity.image %}
                                 <img src="{{ asset('uploads/activities/' ~ activity.image) }}" alt="{{ activity.title }}" class="absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition duration-500">
                             {% else %}
-                                <img src="{{ asset('images/hero-3.jpg') }}" alt="FEU Tech Event" class="absolute inset-0 w-full h-full object-cover opacity-90 group-hover:scale-105 transition duration-500">
+                                <img src="{{ asset('images/hero-3.jpg') }}" alt="FEU Institute of Technology Event" class="absolute inset-0 w-full h-full object-cover opacity-90 group-hover:scale-105 transition duration-500">
                             {% endif %}
                         </div>
   
                         <div class="p-8 flex flex-col flex-grow">
-                            <div class="flex items-center gap-3 mb-4">
-                                <span class="bg-feu-green-100 text-feu-green-800 text-[10px] font-bold px-3 py-1 rounded-full uppercase tracking-widest">{{ activity.category }}</span>
+                             <div class="mb-4">
+                                <div class="flex flex-wrap items-center gap-2 mb-3">
+                                    <span class="bg-feu-green-900 text-white text-[10px] font-bold px-3 py-1.5 rounded-full uppercase tracking-widest shadow-sm">{{ activity.category }}</span>
+                                    {% include 'SDG-Microsite/partials/sdg_tags.html.twig' with { 'tags': activity.sdgs, 'limit': 2 } %}
+                                </div>
                                 <span class="text-gray-400 text-xs font-medium">{{ activity.eventDate|date('M j, Y') }}</span>
                             </div>
                             

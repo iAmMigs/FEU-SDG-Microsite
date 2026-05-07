@@ -54,18 +54,24 @@ final class ThesisController extends AbstractController
 
         if (!empty($selectedSdgs)) {
             if ($isExclusive) {
-                foreach ($selectedSdgs as $index => $sdgId) {
-                    $alias = 's' . $index;
-                    $qb->join('t.sdgs', $alias)
-                       ->andWhere($alias . '.id = :sdg' . $index)
-                       ->setParameter('sdg' . $index, $sdgId);
-                }
-                $qb->andWhere('SIZE(t.sdgs) = :count')
-                   ->setParameter('count', count($selectedSdgs));
+                // Precision search: Must have EXACTLY these SDGs and NO OTHERS
+                $qb->andWhere('t.id IN (
+                    SELECT t_sub.id FROM App\Entity\Thesis t_sub
+                    JOIN t_sub.sdgs s_sub
+                    WHERE s_sub.id IN (:sdgs)
+                    GROUP BY t_sub.id
+                    HAVING COUNT(s_sub.id) = :count AND SIZE(t_sub.sdgs) = :count
+                )')
+                ->setParameter('sdgs', $selectedSdgs)
+                ->setParameter('count', count($selectedSdgs));
             } else {
-                $qb->join('t.sdgs', 's')
-                   ->andWhere('s.id IN (:sdgs)')
-                   ->setParameter('sdgs', $selectedSdgs);
+                // Standard search: Must have AT LEAST ONE of these SDGs
+                $qb->andWhere('EXISTS (
+                    SELECT 1 FROM App\Entity\Sdg s_sub2 
+                    JOIN s_sub2.theses t_sub2 
+                    WHERE t_sub2.id = t.id AND s_sub2.id IN (:sdgs)
+                )')
+                ->setParameter('sdgs', $selectedSdgs);
             }
         }
 
@@ -73,13 +79,14 @@ final class ThesisController extends AbstractController
         $totalCount = count($paginator);
         $totalPages = max(1, ceil($totalCount / $limit));
 
-        $qb->setFirstResult(($page - 1) * $limit)
-           ->setMaxResults($limit);
+        $paginator->getQuery()
+            ->setFirstResult(($page - 1) * $limit)
+            ->setMaxResults($limit);
 
-        $theses = $qb->getQuery()->getResult();
-        $activeSdgs = $sdgRepository->findBy(['isActive' => true], ['id' => 'ASC']);
+        $theses = iterator_to_array($paginator);
+        $allSdgs = $sdgRepository->findBy([], ['id' => 'ASC']);
 
-        return $this->render('SDG-Microsite/library/index.html.twig', [
+        return $this->render('SDG-Microsite/library.html.twig', [
             'theses' => $theses,
             'search_author' => $searchAuthor,
             'search_title' => $searchTitle,
@@ -89,7 +96,7 @@ final class ThesisController extends AbstractController
             'current_page' => $page,
             'total_pages' => $totalPages,
             'total_count' => $totalCount,
-            'active_sdgs' => $activeSdgs,
+            'all_sdgs' => $allSdgs,
         ]);
     }
 
@@ -115,7 +122,7 @@ final class ThesisController extends AbstractController
             $session->set('viewed_theses', $viewedTheses);
         }
 
-        return $this->render('SDG-Microsite/library/show.html.twig', [
+        return $this->render('SDG-Microsite/project_view.html.twig', [
             'thesis' => $thesis,
         ]);
     }

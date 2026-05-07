@@ -18,7 +18,7 @@ final class SdgController extends AbstractController
         $activeSdgs = $sdgRepository->findBy(['isActive' => true]);
         $activeSdgIds = array_map(fn($sdg) => $sdg->getId(), $activeSdgs);
 
-        return $this->render('SDG-Microsite/sdg/index.html.twig', [
+        return $this->render('SDG-Microsite/sdg.html.twig', [
             'active_sdg_ids' => $activeSdgIds,
             'all_sdgs' => $this->getAllSdgsData(), 
         ]);

@@ -1,0 +1,16 @@
+{% set sdg_colors = {
+    1: '#E5243B', 2: '#DDA63A', 3: '#4C9F38', 4: '#C5192D', 5: '#FF3A21', 6: '#26BDE2',
+    7: '#FCC30B', 8: '#A21942', 9: '#FD6925', 10: '#DD1367', 11: '#FD9D24', 12: '#BF8B2E',
+    13: '#3F7E44', 14: '#0A97D9', 15: '#56C02B', 16: '#00689D', 17: '#19486A'
+} %}
+
+<div class="d-flex flex-wrap gap-1">
+    {% for sdg in field.value %}
+        <span class="badge" style="background-color: {{ sdg_colors[sdg.id]|default('#166534') }}; color: #fff; font-size: 11px; padding: 4px 8px; border-radius: 4px; font-weight: bold; text-shadow: 0px 1px 1px rgba(0,0,0,0.2);">
+            SDG {{ sdg.id }}
+        </span>
+    {% endfor %}
+    {% if field.value is empty %}
+        <span class="text-muted small">None</span>
+    {% endif %}
+</div>

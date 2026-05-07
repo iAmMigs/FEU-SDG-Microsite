@@ -121,7 +121,7 @@ class DashboardController extends AbstractDashboardController
         yield MenuItem::section('Data Management');
         yield MenuItem::linkTo(SdgCrudController::class, 'SDG Categories', 'fas fa-bullseye');
         yield MenuItem::linkTo(ActivityCategoryCrudController::class, 'Activity Categories', 'fas fa-tags');
-        yield MenuItem::linkTo(LeadingVoiceCrudController::class, 'Featured Voices', 'fas fa-users');
+        yield MenuItem::linkTo(LeadingVoiceCrudController::class, 'Featured voices in research', 'fas fa-users');
         yield MenuItem::linkTo(ProjectTypeCrudController::class, 'Project Types', 'fas fa-tags');
         yield MenuItem::linkTo(CollegeCrudController::class, 'Colleges', 'fas fa-school');
 

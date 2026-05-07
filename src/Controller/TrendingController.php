@@ -17,7 +17,7 @@ final class TrendingController extends AbstractController
     {
         $trendingTheses = $thesisRepository->findBy(['isActive' => true], ['views' => 'DESC'], 6);
 
-        return $this->render('SDG-Microsite/trending/index.html.twig', [
+        return $this->render('SDG-Microsite/trending.html.twig', [
             'theses' => $trendingTheses,
         ]);
     }

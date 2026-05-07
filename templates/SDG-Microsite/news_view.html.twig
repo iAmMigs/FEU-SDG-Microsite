@@ -1,17 +1,12 @@
 {% extends 'SDG-Microsite/base.html.twig' %}
 
-{% block title %}{{ activity.title }} - FEU Tech SDG Microsite{% endblock %}
+{% block title %}{{ activity.title }} - FEU Institute of Technology SDG Microsite{% endblock %}
 
 {% block body %}
 {# Calculate Estimated Reading Time (Average 200 words per minute) #}
 {% set word_count = activity.content|striptags|split(' ')|length %}
 {% set reading_time = (word_count / 200)|round(0, 'ceil') %}
 
-{% set sdg_colors = {
-    1: '#E5243B', 2: '#DDA63A', 3: '#4C9F38', 4: '#C5192D', 5: '#FF3A21', 6: '#26BDE2',
-    7: '#FCC30B', 8: '#A21942', 9: '#FD6925', 10: '#DD1367', 11: '#FD9D24', 12: '#BF8B2E',
-    13: '#3F7E44', 14: '#0A97D9', 15: '#56C02B', 16: '#00689D', 17: '#19486A'
-    } %}
 
 <section class="bg-gray-50 py-12 px-6 min-h-screen">
     <div class="max-w-4xl mx-auto">
@@ -30,7 +25,7 @@
                 {% if activity.image %}
                     <img src="{{ asset('uploads/activities/' ~ activity.image) }}" alt="{{ activity.title }}" class="absolute inset-0 w-full h-full object-cover">
                 {% else %}
-                    <img src="{{ asset('images/hero-3.jpg') }}" alt="FEU Tech Event" class="absolute inset-0 w-full h-full object-cover opacity-90">
+                    <img src="{{ asset('images/hero-3.jpg') }}" alt="FEU Institute of Technology Event" class="absolute inset-0 w-full h-full object-cover opacity-90">
                 {% endif %}
                 <div class="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent"></div>
             </div>
@@ -44,11 +39,7 @@
                     </span>
                     
                     {# The Colored SDG Tags right next to the category #}
-                    {% for sdg in activity.sdgs %}
-                        <span class="text-white text-[10px] font-bold px-3 py-1.5 rounded-full font-work uppercase tracking-wider shadow-sm" style="background-color: {{ sdg_colors[sdg.id]|default('#166534') }}; text-shadow: 0px 1px 2px rgba(0,0,0,0.2);">
-                            SDG {{ sdg.id }}: {{ sdg.name }}
-                        </span>
-                    {% endfor %}
+                    {% include 'SDG-Microsite/partials/sdg_tags.html.twig' with { 'tags': activity.sdgs, 'limit': 8 } %}
                     
                     <div class="h-4 w-px bg-gray-300 hidden sm:block ml-1"></div>
                     

@@ -14,7 +14,7 @@ final class AboutController extends AbstractController
     #[Route('/about', name: 'app_about')]
     public function index(): Response
     {
-        return $this->render('SDG-Microsite/about/index.html.twig', [
+        return $this->render('SDG-Microsite/about.html.twig', [
             'controller_name' => 'AboutController',
         ]);
     }

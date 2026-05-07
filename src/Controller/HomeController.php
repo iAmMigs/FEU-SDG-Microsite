@@ -26,7 +26,7 @@ final class HomeController extends AbstractController
         
         $leadingVoices = $leadingVoiceRepository->findBy([], null, 4);
 
-        return $this->render('SDG-Microsite/home/index.html.twig', [
+        return $this->render('SDG-Microsite/home.html.twig', [
             'latest_activities' => $latestActivities,
             'total_theses' => $totalTheses,
             'active_sdg_ids' => $activeSdgIds,

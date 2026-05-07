@@ -52,8 +52,11 @@ final class NewsController extends AbstractController
         }
 
         if (!empty($selectedSdgs)) {
-            $qb->join('a.sdgs', 's')
-               ->andWhere('s.id IN (:sdgs)')
+            $qb->andWhere('EXISTS (
+                SELECT 1 FROM App\Entity\Sdg s_sub 
+                JOIN s_sub.activities a_sub 
+                WHERE a_sub.id = a.id AND s_sub.id IN (:sdgs)
+            )')
                ->setParameter('sdgs', $selectedSdgs);
         }
 
@@ -61,13 +64,14 @@ final class NewsController extends AbstractController
         $totalCount = count($paginator);
         $totalPages = max(1, ceil($totalCount / $limit));
 
-        $qb->setFirstResult(($page - 1) * $limit)
-           ->setMaxResults($limit);
+        $paginator->getQuery()
+            ->setFirstResult(($page - 1) * $limit)
+            ->setMaxResults($limit);
 
-        $activities = $qb->getQuery()->getResult();
+        $activities = iterator_to_array($paginator);
         $allSdgs = $sdgRepository->findBy([], ['id' => 'ASC']);
 
-        return $this->render('SDG-Microsite/news/index.html.twig', [
+        return $this->render('SDG-Microsite/news.html.twig', [
             'activities' => $activities,
             'selected_goals' => $selectedSdgs,
             'date_range' => $dateRange,
@@ -85,7 +89,7 @@ final class NewsController extends AbstractController
             throw $this->createNotFoundException('This article is not available.');
         }
 
-        return $this->render('SDG-Microsite/news/show.html.twig', [
+        return $this->render('SDG-Microsite/news_view.html.twig', [
             'activity' => $activity,
         ]);
     }

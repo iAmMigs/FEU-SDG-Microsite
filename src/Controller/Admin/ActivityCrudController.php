@@ -127,11 +127,11 @@ class ActivityCrudController extends AbstractCrudController
             DateTimeField::new('eventDate', 'Event Date')->setFormat('yyyy-MM-dd HH:mm'),
             AssociationField::new('sdgs', 'Focus SDGs')
                 ->setQueryBuilder(function (QueryBuilder $qb) {
-                    return $qb->andWhere('entity.isActive = :active')
-                            ->setParameter('active', true);
+                    return $qb->orderBy('entity.id', 'ASC');
                 })
+                ->setTemplatePath('Admin-Microsite/fields/sdg_tags.html.twig')
                 ->setFormTypeOptions(['by_reference' => false])
-                ->setHelp('Only active SDGs currently focused by the University are available.'),
+                ->setHelp('Select the Sustainable Development Goals associated with this activity.'),
             BooleanField::new('isActive', 'Active'),
             DateTimeField::new('publishAt', 'Schedule Release')
                 ->hideOnIndex()

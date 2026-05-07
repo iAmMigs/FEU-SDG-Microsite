@@ -24,7 +24,7 @@ class SdgCrudController extends AbstractCrudController
             IntegerField::new('id', 'SDG Number'),
             TextField::new('name', 'SDG Title'),
             BooleanField::new('isActive', 'Active Focus Area')
-                ->setHelp('Enable this to unlock the SDG in the Library and on the Home page buttons.'),
+                ->setHelp('Enable this to include the SDG in the "Focused Areas" view on the Home page.'),
         ];
     }
 }

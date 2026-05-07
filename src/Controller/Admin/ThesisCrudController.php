@@ -240,6 +240,7 @@ class ThesisCrudController extends AbstractCrudController
             TextareaField::new('description', 'Abstract')->setNumOfRows(6)->hideOnIndex(),
             
             AssociationField::new('sdgs', 'Targeted SDGs')
+                ->setTemplatePath('Admin-Microsite/fields/sdg_tags.html.twig')
                 ->setFormTypeOptions(['by_reference' => false])
                 ->setQueryBuilder(function (QueryBuilder $queryBuilder) {
                     return $queryBuilder->orderBy('entity.id', 'ASC');
