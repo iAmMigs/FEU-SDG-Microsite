@@ -23,23 +23,27 @@
         {% endblock %}
     </head>
     
-    <body class="flex flex-col min-h-screen font-sans text-gray-900 bg-white overflow-x-hidden">
+    <body class="flex flex-col min-h-screen font-sans text-gray-900 bg-white overflow-x-hidden" data-controller="submission-modal">
 
-        {# Page Loader Overlay #}
-        <div id="page-loader" class="fixed inset-0 z-[99999] bg-[#FCFCFC] flex flex-col items-center justify-center transition-opacity duration-500">
-            <img src="{{ asset('images/loader.gif') }}" alt="Loading..." class="w-30 h-30 object-contain">
-            <p class="mt-6 text-feu-green-800 font-bold tracking-widest uppercase text-sm animate-pulse">Loading...</p>
-        </div>
+            {# Page Loader Overlay #}
+            <div id="page-loader" class="fixed inset-0 z-[99999] bg-[#FCFCFC] flex flex-col items-center justify-center transition-opacity duration-500">
+                <img src="{{ asset('images/loader.gif') }}" alt="Loading..." class="w-30 h-30 object-contain">
+                <p class="mt-6 text-feu-green-800 font-bold tracking-widest uppercase text-sm animate-pulse">Loading...</p>
+            </div>
+            
+            {# 1. Include Header #}
+            {% include 'SDG-Microsite/partials/header.html.twig' %}
+
+            {# 2. Main Content Area #}
+            <main class="flex-grow">
+                {% block body %}{% endblock %}
+            </main>
+
+            {# 3. Include Footer #}
+            {% include 'SDG-Microsite/partials/footer.html.twig' %}
+
+            {# 4. Global Modal #}
+            {% include 'SDG-Microsite/partials/submission_modal.html.twig' %}
         
-        {# 1. Include Header #}
-        {% include 'SDG-Microsite/partials/header.html.twig' %}
-
-        {# 2. Main Content Area #}
-        <main class="flex-grow">
-            {% block body %}{% endblock %}
-        </main>
-
-        {# 3. Include Footer #}
-        {% include 'SDG-Microsite/partials/footer.html.twig' %}
     </body>
 </html>

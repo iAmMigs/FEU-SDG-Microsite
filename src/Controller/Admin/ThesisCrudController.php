@@ -190,6 +190,7 @@ class ThesisCrudController extends AbstractCrudController
     public function searchBatchProjects(Request $request, EntityManagerInterface $entityManager): JsonResponse
     {
         $data = json_decode($request->getContent(), true);
+        $keyword = $data['keyword'] ?? null;
         $sdgId = $data['sdgId'] ?? null;
         $year = $data['year'] ?? null;
         $typeId = $data['typeId'] ?? null;
@@ -198,6 +199,10 @@ class ThesisCrudController extends AbstractCrudController
         $qb = $entityManager->getRepository(Thesis::class)->createQueryBuilder('t')
             ->select('t.id', 't.title', 't.researchDate as year', 't.isActive');
 
+        if ($keyword) {
+            $qb->andWhere('t.title LIKE :keyword')
+               ->setParameter('keyword', '%' . $keyword . '%');
+        }
         if ($sdgId) {
             $qb->join('t.sdgs', 's')
                ->andWhere('s.id = :sdgId')
