@@ -126,7 +126,12 @@ class DashboardController extends AbstractDashboardController
         yield MenuItem::linkTo(ProjectTypeCrudController::class, 'Project Types', 'fas fa-tags');
         yield MenuItem::linkTo(CollegeCrudController::class, 'Colleges', 'fas fa-school');
 
+        yield MenuItem::section('ADMIN');
+        yield MenuItem::linkTo(AdminCrudController::class, 'Administrators', 'fas fa-user-shield');
+
         yield MenuItem::section('Public Portal');
         yield MenuItem::linkToRoute('View Site', 'fas fa-arrow-right-from-bracket', 'app_home');
+
+        
     }
 }

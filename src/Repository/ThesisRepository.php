@@ -15,4 +15,22 @@ class ThesisRepository extends ServiceEntityRepository
     {
         parent::__construct($registry, Thesis::class);
     }
+
+    /**
+     * Finds the most viewed active theses that have at least one view.
+     * 
+     * @param int $limit
+     * @return Thesis[]
+     */
+    public function findTrending(int $limit = 6): array
+    {
+        return $this->createQueryBuilder('t')
+            ->where('t.isActive = :active')
+            ->andWhere('t.views > 0')
+            ->setParameter('active', true)
+            ->orderBy('t.views', 'DESC')
+            ->setMaxResults($limit)
+            ->getQuery()
+            ->getResult();
+    }
 }

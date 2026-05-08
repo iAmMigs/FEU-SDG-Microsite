@@ -18,8 +18,6 @@ use EasyCorp\Bundle\EasyAdminBundle\Config\Option\EA;
 use EasyCorp\Bundle\EasyAdminBundle\Dto\BatchActionDto;
 use EasyCorp\Bundle\EasyAdminBundle\Dto\EntityDto;
 use EasyCorp\Bundle\EasyAdminBundle\Field\AssociationField;
-use EasyCorp\Bundle\EasyAdminBundle\Field\DateTimeField;
-use EasyCorp\Bundle\EasyAdminBundle\Field\ChoiceField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\DateField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\IdField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\ImageField;
@@ -50,8 +48,10 @@ class ThesisCrudController extends AbstractCrudController
         $researchYear = $request->query->get('researchYear');
         
         if ($researchYear) {
-            $qb->andWhere('entity.researchDate = :year')
-               ->setParameter('year', (int)$researchYear);
+            $qb->andWhere('entity.researchDate >= :yearStart')
+               ->andWhere('entity.researchDate <= :yearEnd')
+               ->setParameter('yearStart', new \DateTimeImmutable($researchYear . '-01-01 00:00:00'))
+               ->setParameter('yearEnd', new \DateTimeImmutable($researchYear . '-12-31 23:59:59'));
         }
         
         return $qb;
@@ -168,13 +168,21 @@ class ThesisCrudController extends AbstractCrudController
         $sdgs = $entityManager->getRepository(\App\Entity\Sdg::class)->findBy([], ['id' => 'ASC']);
         $types = $entityManager->getRepository(\App\Entity\ProjectType::class)->findBy([], ['name' => 'ASC']);
         
-        $years = $entityManager->createQueryBuilder()
+        $dates = $entityManager->createQueryBuilder()
             ->select('DISTINCT t.researchDate')
             ->from(Thesis::class, 't')
             ->where('t.researchDate IS NOT NULL')
-            ->orderBy('t.researchDate', 'DESC')
             ->getQuery()
             ->getSingleColumnResult();
+
+        $years = [];
+        foreach ($dates as $date) {
+            if ($date instanceof \DateTimeInterface) {
+                $years[] = $date->format('Y');
+            }
+        }
+        $years = array_values(array_unique($years));
+        rsort($years);
 
         return new JsonResponse([
             'sdgs' => array_map(fn($s) => ['id' => $s->getId(), 'name' => $s->getName(), 'number' => $s->getId()], $sdgs),
@@ -190,22 +198,29 @@ class ThesisCrudController extends AbstractCrudController
     public function searchBatchProjects(Request $request, EntityManagerInterface $entityManager): JsonResponse
     {
         $data = json_decode($request->getContent(), true);
+        $keyword = $data['keyword'] ?? null;
         $sdgId = $data['sdgId'] ?? null;
         $year = $data['year'] ?? null;
         $typeId = $data['typeId'] ?? null;
         $isActive = $data['isActive'] ?? null;
 
         $qb = $entityManager->getRepository(Thesis::class)->createQueryBuilder('t')
-            ->select('t.id', 't.title', 't.researchDate as year', 't.isActive');
+            ->select('t.id', 't.title', 't.researchDate', 't.isActive');
 
+        if ($keyword) {
+            $qb->andWhere('t.title LIKE :keyword')
+               ->setParameter('keyword', '%' . $keyword . '%');
+        }
         if ($sdgId) {
             $qb->join('t.sdgs', 's')
                ->andWhere('s.id = :sdgId')
                ->setParameter('sdgId', $sdgId);
         }
         if ($year) {
-            $qb->andWhere('t.researchDate = :year')
-               ->setParameter('year', $year);
+            $qb->andWhere('t.researchDate >= :startDate')
+               ->andWhere('t.researchDate <= :endDate')
+               ->setParameter('startDate', new \DateTimeImmutable($year . '-01-01 00:00:00'))
+               ->setParameter('endDate', new \DateTimeImmutable($year . '-12-31 23:59:59'));
         }
         if ($typeId) {
             $qb->andWhere('t.type = :typeId')
@@ -217,6 +232,12 @@ class ThesisCrudController extends AbstractCrudController
         }
 
         $projects = $qb->orderBy('t.researchDate', 'DESC')->addOrderBy('t.title', 'ASC')->getQuery()->getArrayResult();
+
+        foreach ($projects as &$project) {
+            $project['year'] = $project['researchDate'] instanceof \DateTimeInterface 
+                ? $project['researchDate']->format('Y') 
+                : null;
+        }
 
         return new JsonResponse($projects);
     }
@@ -317,7 +338,8 @@ class ThesisCrudController extends AbstractCrudController
                         $project->setIsActive(false); 
                         $project->setViews(0);
                         $project->setRegionViews([]);
-                        $project->setResearchDate((int) $researchYear);
+                        
+                        $project->setResearchDate(new \DateTimeImmutable($researchYear . '-01-01'));
 
                         if ($typeIdx !== -1 && !empty(trim($data[$typeIdx] ?? ''))) {
                             $typeStr = trim($data[$typeIdx]);
@@ -444,19 +466,8 @@ class ThesisCrudController extends AbstractCrudController
                 ->setHelp('Paste the URL to an external journal or publication if applicable')->setRequired(false)
                 ->hideOnIndex(),
             
-            ChoiceField::new('researchMonth', 'Date of Research')
-                ->setChoices([
-                    'January' => 1, 'February' => 2, 'March' => 3, 'April' => 4,
-                    'May' => 5, 'June' => 6, 'July' => 7, 'August' => 8,
-                    'September' => 9, 'October' => 10, 'November' => 11, 'December' => 12,
-                ])
-                ->setHelp('Optional: Select a specific month (e.g., for manual entries).')
-                ->setRequired(false)
-                ->hideOnIndex(),
-            
-            ChoiceField::new('researchDate', 'Year of Research')
-                ->setChoices(array_combine(range(date('Y'), 1990), range(date('Y'), 1990)))
-                ->setHelp('Required: Select the year the research was conducted.')
+            DateField::new('researchDate', 'Date of Research')
+                ->setHelp('Required: Select the specific date or year the research was conducted. (January 1 will be displayed simply as the Year).')
                 ->setRequired(true),
                 
             TextField::new('documentFile', 'PDF Document')

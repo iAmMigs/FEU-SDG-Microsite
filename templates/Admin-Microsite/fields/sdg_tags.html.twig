@@ -4,13 +4,37 @@
     13: '#3F7E44', 14: '#0A97D9', 15: '#56C02B', 16: '#00689D', 17: '#19486A'
 } %}
 
-<div class="d-flex flex-wrap gap-1">
-    {% for sdg in field.value %}
-        <span class="badge" style="background-color: {{ sdg_colors[sdg.id]|default('#166534') }}; color: #fff; font-size: 11px; padding: 4px 8px; border-radius: 4px; font-weight: bold; text-shadow: 0px 1px 1px rgba(0,0,0,0.2);">
+{% set limit = 3 %}
+{% set total = field.value|length %}
+
+<div class="d-flex flex-wrap gap-2 align-items-center">
+    {% for sdg in field.value|slice(0, limit) %}
+        <span class="badge d-inline-flex align-items-center justify-content-center m-0" style="min-width: 80px; background-color: {{ sdg_colors[sdg.id]|default('#166534') }}; color: #fff; font-size: 11px; padding: 4px 8px; border-radius: 4px; font-weight: bold; text-shadow: 0px 1px 1px rgba(0,0,0,0.2);">
             SDG {{ sdg.id }}
         </span>
     {% endfor %}
+    
+    {% if total > limit %}
+        <div class="position-relative" style="cursor: help;">
+            <span class="badge bg-light text-dark border d-inline-flex align-items-center justify-content-center m-0 hover-trigger" style="min-width: 38px; font-size: 11px; padding: 4px 8px; border-radius: 4px; font-weight: bold;">
+                +{{ total - limit }}
+            </span>
+            <div class="position-absolute bg-white border rounded shadow p-2 d-none custom-tooltip" style="z-index: 1050; top: 100%; left: 0; min-width: 200px; margin-top: 6px;">
+                <div class="text-uppercase text-muted mb-2" style="font-size: 9px; font-weight: bold; letter-spacing: 0.5px; border-bottom: 1px solid #eee; padding-bottom: 4px;">Associated Focus Areas</div>
+                {% for sdg in field.value|slice(limit) %}
+                    <div class="d-flex align-items-center gap-2 mb-1">
+                        <div style="width: 10px; height: 10px; border-radius: 50%; background-color: {{ sdg_colors[sdg.id]|default('#166534') }}; flex-shrink: 0;"></div>
+                        <span style="font-size: 11px; color: #333; font-weight: bold; line-height: 1.2;">SDG {{ sdg.id }}: {{ sdg.name }}</span>
+                    </div>
+                {% endfor %}
+            </div>
+            <style>
+                .position-relative:hover .custom-tooltip { display: block !important; }
+            </style>
+        </div>
+    {% endif %}
+
     {% if field.value is empty %}
-        <span class="text-muted small">None</span>
+        <span class="text-muted small m-0">None</span>
     {% endif %}
 </div>

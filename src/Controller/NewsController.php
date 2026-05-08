@@ -47,6 +47,8 @@ final class NewsController extends AbstractController
                 $dateLimit->modify('-7 days');
             } elseif ($dateFilter === '30_days') {
                 $dateLimit->modify('-30 days');
+            } elseif ($dateFilter === 'past_year') {
+                $dateLimit->modify('-1 year');
             }
             
             $qb->andWhere('a.eventDate >= :dateLimit')

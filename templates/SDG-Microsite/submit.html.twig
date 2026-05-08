@@ -1,0 +1,170 @@
+{% extends 'SDG-Microsite/base.html.twig' %}
+
+{% block title %}Submit a Project - FEU Institute of Technology SDG Microsite{% endblock %}
+
+{% block body %}
+    <section class="bg-feu-green-900 py-16 px-6 text-center border-b-4 border-feu-gold-400">
+        <div class="max-w-4xl mx-auto">
+            <h1 class="text-4xl md:text-5xl font-bold text-white mb-4 font-bebas tracking-wide">Submit a Project</h1>
+            <p class="text-lg text-feu-green-50 font-medium font-work max-w-2xl mx-auto">
+                Join our mission to showcase innovation and sustainability. Follow the guidelines below to submit your project for the SDG Library.
+            </p>
+        </div>
+    </section>
+
+    <section class="py-24 px-6 bg-gray-50">
+        <div class="max-w-6xl mx-auto">
+            
+            {# The Single Card #}
+            <div class="bg-white rounded-3xl shadow-2xl shadow-gray-200/50 border border-gray-100 overflow-hidden">
+                <div class="grid grid-cols-1 md:grid-cols-2 divide-y md:divide-y-0 md:divide-x divide-gray-100">
+                    
+                    {# Column 1: Required Details #}
+                    <div class="p-8 md:p-12 lg:p-16">
+                        <div class="mb-12">
+                            <h2 class="text-4xl font-bold text-gray-900 mb-4 font-bebas tracking-wide uppercase">Required Details</h2>
+                            <div class="w-16 h-1.5 bg-feu-gold-400"></div>
+                        </div>
+
+                        <ul class="space-y-10">
+                            <li class="flex items-start gap-8">
+                                <div class="mt-1 w-7 h-7 bg-feu-gold-400 rounded-full flex items-center justify-center shrink-0 shadow-sm">
+                                    <svg class="w-4 h-4 text-feu-green-900" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"></path></svg>
+                                </div>
+                                <div>
+                                    <h3 class="font-bold text-gray-900 text-xl font-bebas tracking-wide mb-1 uppercase">Title of Event/Project</h3>
+                                    <p class="text-gray-600 font-medium text-base font-work leading-relaxed italic">The official name of your project or sustainable initiative.</p>
+                                </div>
+                            </li>
+
+                            <li class="flex items-start gap-8">
+                                <div class="mt-1 w-7 h-7 bg-feu-gold-400 rounded-full flex items-center justify-center shrink-0 shadow-sm">
+                                    <svg class="w-4 h-4 text-feu-green-900" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"></path></svg>
+                                </div>
+                                <div>
+                                    <h3 class="font-bold text-gray-900 text-xl font-bebas tracking-wide mb-1 uppercase">Department/Office in Charge</h3>
+                                    <p class="text-gray-600 font-medium text-base font-work leading-relaxed italic">The department, office, or student organization leading the project.</p>
+                                </div>
+                            </li>
+
+                            <li class="flex items-start gap-8">
+                                <div class="mt-1 w-7 h-7 bg-feu-gold-400 rounded-full flex items-center justify-center shrink-0 shadow-sm">
+                                    <svg class="w-4 h-4 text-feu-green-900" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"></path></svg>
+                                </div>
+                                <div>
+                                    <h3 class="font-bold text-gray-900 text-xl font-bebas tracking-wide mb-1 uppercase">Date and Location</h3>
+                                    <p class="text-gray-600 font-medium text-base font-work leading-relaxed italic">When and where the project took place or is currently being implemented.</p>
+                                </div>
+                            </li>
+
+                            <li class="flex items-start gap-8">
+                                <div class="mt-1 w-7 h-7 bg-feu-gold-400 rounded-full flex items-center justify-center shrink-0 shadow-sm">
+                                    <svg class="w-4 h-4 text-feu-green-900" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"></path></svg>
+                                </div>
+                                <div>
+                                    <h3 class="font-bold text-gray-900 text-xl font-bebas tracking-wide mb-1 uppercase">Caption or Description</h3>
+                                    <p class="text-gray-600 font-medium text-base font-work leading-relaxed italic">A concise summary or detailed description of the project's purpose and activities.</p>
+                                </div>
+                            </li>
+
+                            <li class="flex items-start gap-8">
+                                <div class="mt-1 w-7 h-7 bg-feu-gold-400 rounded-full flex items-center justify-center shrink-0 shadow-sm">
+                                    <svg class="w-4 h-4 text-feu-green-900" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"></path></svg>
+                                </div>
+                                <div>
+                                    <h3 class="font-bold text-gray-900 text-xl font-bebas tracking-wide mb-1 uppercase">Photos or Promotional Materials</h3>
+                                    <p class="text-gray-600 font-medium text-base font-work leading-relaxed italic">High-quality documentation, posters, or videos related to the initiative.</p>
+                                </div>
+                            </li>
+
+                            <li class="flex items-start gap-8">
+                                <div class="mt-1 w-7 h-7 bg-feu-gold-400 rounded-full flex items-center justify-center shrink-0 shadow-sm">
+                                    <svg class="w-4 h-4 text-feu-green-900" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"></path></svg>
+                                </div>
+                                <div>
+                                    <h3 class="font-bold text-gray-900 text-xl font-bebas tracking-wide mb-1 uppercase">SDG Goal(s) Addressed</h3>
+                                    <p class="text-gray-600 font-medium text-base font-work leading-relaxed italic">Specific Sustainable Development Goals that the project aims to fulfill.</p>
+                                </div>
+                            </li>
+                        </ul>
+                    </div>
+
+                    {# Column 2: Impact Information #}
+                    <div class="p-8 md:p-12 lg:p-16 bg-gray-50/30">
+                        <div class="mb-12">
+                            <h2 class="text-4xl font-bold text-gray-900 mb-4 font-bebas tracking-wide uppercase">Impact Information</h2>
+                            <div class="w-16 h-1.5 bg-feu-gold-400"></div>
+                        </div>
+
+                        <ul class="space-y-10">
+                            <li class="flex items-start gap-8">
+                                <div class="mt-1 w-7 h-7 bg-feu-gold-400 rounded-full flex items-center justify-center shrink-0 shadow-sm">
+                                    <svg class="w-4 h-4 text-feu-green-900" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"></path></svg>
+                                </div>
+                                <div>
+                                    <h3 class="font-bold text-gray-900 text-xl font-bebas tracking-wide mb-1 uppercase">Objectives</h3>
+                                    <p class="text-gray-600 font-medium text-base font-work leading-relaxed italic">What are the primary goals and intended results of this project?</p>
+                                </div>
+                            </li>
+
+                            <li class="flex items-start gap-8">
+                                <div class="mt-1 w-7 h-7 bg-feu-gold-400 rounded-full flex items-center justify-center shrink-0 shadow-sm">
+                                    <svg class="w-4 h-4 text-feu-green-900" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"></path></svg>
+                                </div>
+                                <div>
+                                    <h3 class="font-bold text-gray-900 text-xl font-bebas tracking-wide mb-1 uppercase">Target Beneficiaries</h3>
+                                    <p class="text-gray-600 font-medium text-base font-work leading-relaxed italic">Who is directly or indirectly helped by this initiative?</p>
+                                </div>
+                            </li>
+
+                            <li class="flex items-start gap-8">
+                                <div class="mt-1 w-7 h-7 bg-feu-gold-400 rounded-full flex items-center justify-center shrink-0 shadow-sm">
+                                    <svg class="w-4 h-4 text-feu-green-900" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"></path></svg>
+                                </div>
+                                <div>
+                                    <h3 class="font-bold text-gray-900 text-xl font-bebas tracking-wide mb-1 uppercase">Number of Participants</h3>
+                                    <p class="text-gray-600 font-medium text-base font-work leading-relaxed italic">How many people were involved or reached by the project?</p>
+                                </div>
+                            </li>
+
+                            <li class="flex items-start gap-8">
+                                <div class="mt-1 w-7 h-7 bg-feu-gold-400 rounded-full flex items-center justify-center shrink-0 shadow-sm">
+                                    <svg class="w-4 h-4 text-feu-green-900" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"></path></svg>
+                                </div>
+                                <div>
+                                    <h3 class="font-bold text-gray-900 text-xl font-bebas tracking-wide mb-1 uppercase">Key Outcomes or Impact</h3>
+                                    <p class="text-gray-600 font-medium text-base font-work leading-relaxed italic">What measurable impact was achieved? Share specific results or success stories.</p>
+                                </div>
+                            </li>
+                        </ul>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="py-20 px-6 bg-feu-green-900 text-center relative overflow-hidden border-t-4 border-feu-gold-400">
+        <div class="max-w-3xl mx-auto relative z-10">
+            <div class="mb-8 flex justify-center">
+                <div class="w-16 h-16 bg-white/10 rounded-full flex items-center justify-center backdrop-blur-sm">
+                    <svg class="w-8 h-8 text-feu-gold-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path></svg>
+                </div>
+            </div>
+            <h2 class="text-3xl font-bold text-white mb-6 font-bebas tracking-wide uppercase">Ready to submit?</h2>
+            <p class="text-feu-green-50 font-medium text-xl mb-10 font-work leading-relaxed">
+                Kindly send all submissions and inquiries to:
+            </p>
+            <a href="mailto:innovate@fit.edu.ph" class="inline-block bg-feu-gold-400 hover:bg-feu-gold-500 text-feu-green-950 text-2xl font-bold py-4 px-10 rounded-full transition shadow-xl font-work transform hover:scale-105">
+                innovate@fit.edu.ph
+            </a>
+            <p class="mt-8 text-feu-green-200 text-sm font-work italic">
+                Our team will review your submission and get back to you shortly.
+            </p>
+        </div>
+        
+        {# Decorative Elements #}
+        <div class="absolute -bottom-24 -left-24 w-64 h-64 bg-feu-gold-400/10 rounded-full blur-3xl"></div>
+        <div class="absolute -top-24 -right-24 w-64 h-64 bg-feu-green-400/10 rounded-full blur-3xl"></div>
+    </section>
+{% endblock %}

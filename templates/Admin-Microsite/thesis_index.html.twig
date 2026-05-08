@@ -85,6 +85,13 @@
                 <div class="modal-body p-0 bg-white">
                     {# Filter Bar #}
                     <div class="bg-white border-bottom p-4">
+                        <div class="mb-4">
+                            <label class="form-label small fw-bold text-uppercase text-muted mb-2" style="letter-spacing: 0.5px;">Search Projects</label>
+                            <div class="position-relative shadow-sm" style="border-radius: 8px; overflow: hidden;">
+                                <i class="fas fa-search position-absolute" style="left: 15px; top: 50%; transform: translateY(-50%); z-index: 10; color: #166534; opacity: 0.7;"></i>
+                                <input type="text" class="form-control border-0 bg-light" id="batchFilterKeyword" placeholder="Search by Title..." style="font-size: 14px; padding: 12px 15px 12px 45px; color: #1a1a1a; font-weight: 500; background-color: #f8fafc !important;">
+                            </div>
+                        </div>
                         <div class="row g-3">
                             <div class="col-md-3">
                                 <label class="form-label small fw-bold text-uppercase text-muted mb-2" style="letter-spacing: 0.5px;">SDG Category</label>
@@ -116,7 +123,7 @@
                     </div>
 
                     {# Dual Table Container #}
-                    <div class="row g-0" style="height: 520px;">
+                    <div class="row g-0" style="height: 420px;">
                         {# Available Projects (Left) #}
                         <div class="col-md-5 border-end d-flex flex-column h-100 bg-light bg-opacity-10">
                             <div class="p-3 bg-white border-bottom d-flex justify-content-between align-items-center">
@@ -138,14 +145,14 @@
                                 <div class="bg-light rounded-circle d-inline-flex align-items-center justify-content-center mb-3" style="width: 60px; height: 60px;">
                                     <i class="fas fa-exchange-alt fa-lg text-muted opacity-50"></i>
                                 </div>
-                                <p class="small text-muted fw-bold mb-0">Use arrows to target</p>
+                                <p class="small text-muted fw-bold mb-0">Use arrows to move</p>
                             </div>
                         </div>
 
                         {# Targeted Projects (Right) #}
                         <div class="col-md-5 d-flex flex-column h-100" style="background-color: #fefce8;"> {# FEU Gold Tint #}
                             <div class="p-3 bg-white border-bottom d-flex justify-content-between align-items-center">
-                                <span class="small fw-bold text-warning text-uppercase" style="letter-spacing: 1px; color: #a16207 !important;">Targeted for Update (<span id="targetedCount">0</span>)</span>
+                                <span class="small fw-bold text-warning text-uppercase" style="letter-spacing: 1px; color: #a16207 !important;">List of Projects to Update (<span id="targetedCount">0</span>)</span>
                                 <button class="btn btn-sm btn-outline-danger fw-bold" style="font-size: 11px; border-radius: 6px;" onclick="batchManager.clearTargeted()">CLEAR ALL</button>
                             </div>
                             <div class="overflow-auto flex-grow-1" id="targetedListContainer">
@@ -200,6 +207,10 @@
                 ['batchFilterSdg', 'batchFilterYear', 'batchFilterType', 'batchFilterStatus'].forEach(id => {
                     document.getElementById(id).addEventListener('change', () => this.search());
                 });
+                document.getElementById('batchFilterKeyword').addEventListener('input', () => {
+                    clearTimeout(this.searchTimeout);
+                    this.searchTimeout = setTimeout(() => this.search(), 300);
+                });
             },
 
             loadFilterData: async function() {
@@ -231,6 +242,7 @@
 
             search: async function() {
                 const filters = {
+                    keyword: document.getElementById('batchFilterKeyword').value,
                     sdgId: document.getElementById('batchFilterSdg').value,
                     year: document.getElementById('batchFilterYear').value,
                     typeId: document.getElementById('batchFilterType').value,
@@ -280,7 +292,7 @@
                             <button class="btn btn-outline-danger btn-xs" onclick="batchManager.untarget(${p.id})"><i class="fas fa-times"></i></button>
                         </td>
                     </tr>
-                `).join('') || '<tr><td colspan="2" class="text-center py-4 text-muted small">No projects targeted yet</td></tr>';
+                `).join('') || '<tr><td colspan="2" class="text-center py-4 text-muted small">No Projects Yet</td></tr>';
 
                 document.getElementById('availableCount').textContent = filteredAvailable.length;
                 document.getElementById('targetedCount').textContent = this.targetedProjects.length;

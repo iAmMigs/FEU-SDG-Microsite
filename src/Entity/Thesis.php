@@ -57,11 +57,12 @@ class Thesis
     #[ORM\Column(length: 255, nullable: true)]
     private ?string $publicationLink = null;
 
-    #[ORM\Column(type: Types::INTEGER, nullable: true)]
-    private ?int $researchMonth = null;
-
-    #[ORM\Column(type: Types::INTEGER, nullable: true)]
-    private ?int $researchDate = null;
+    /*
+     * Consolidates both month and year into a single date object.
+     * Defaults to January 1 for records where only the year is known.
+     */
+    #[ORM\Column(type: Types::DATE_IMMUTABLE, nullable: true)]
+    private ?\DateTimeImmutable $researchDate = null;
 
     #[ORM\Column(type: 'boolean', options: ['default' => false])]
     private ?bool $isActive = false;
@@ -139,11 +140,8 @@ class Thesis
     public function getPublicationLink(): ?string { return $this->publicationLink; }
     public function setPublicationLink(?string $publicationLink): static { $this->publicationLink = $publicationLink; return $this; }
 
-    public function getResearchMonth(): ?int { return $this->researchMonth; }
-    public function setResearchMonth(?int $researchMonth): static { $this->researchMonth = $researchMonth; return $this; }
-
-    public function getResearchDate(): ?int { return $this->researchDate; }
-    public function setResearchDate(?int $researchDate): static { $this->researchDate = $researchDate; return $this; }
+    public function getResearchDate(): ?\DateTimeImmutable { return $this->researchDate; }
+    public function setResearchDate(?\DateTimeImmutable $researchDate): static { $this->researchDate = $researchDate; return $this; }
 
     /** @return Collection<int, Sdg> */
     public function getSdgs(): Collection { return $this->sdgs; }
