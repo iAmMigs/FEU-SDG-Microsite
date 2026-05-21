@@ -24,12 +24,14 @@ export default class extends Controller {
             this.actionPromptTarget.textContent = 'Which would you like to visit?';
             this.buttonsContainerTarget.style.display = 'flex';
             
-            // --- THE REDIRECT LOGIC ---
-            // If your library route is /library or /thesis, make sure this matches
-            this.libraryBtnTarget.href = `/library?goals[]=${goalNum}`; 
+            // Use base URLs from data attributes or fallback to hardcoded paths
+            const libraryBaseUrl = this.libraryBtnTarget.dataset.baseUrl || '/library';
+            const activityBaseUrl = this.activityBtnTarget.dataset.baseUrl || '/news';
+            
+            this.libraryBtnTarget.href = `${libraryBaseUrl}?goals[]=${goalNum}`; 
             
             // This safely directs to the News Controller and applies the checkbox filter
-            this.activityBtnTarget.href = `/news?goals[]=${goalNum}`;
+            this.activityBtnTarget.href = `${activityBaseUrl}?goals[]=${goalNum}`;
         } else {
             this.actionPromptTarget.textContent = 'SDG is currently not actively focused.';
             this.buttonsContainerTarget.style.display = 'none';
