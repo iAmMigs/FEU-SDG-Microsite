@@ -171,6 +171,9 @@
                     </div>
                     <button type="button" class="btn btn-link text-muted fw-bold text-decoration-none px-4" data-bs-dismiss="modal">Cancel</button>
                     <div class="btn-group gap-2">
+                        <button type="button" class="btn btn-danger fw-bold px-4 shadow-sm" style="border-radius: 8px !important; border: none;" onclick="batchManager.executeDelete()" id="btnDeleteBatch" disabled>
+                            <i class="fas fa-trash-alt me-2"></i> DELETE
+                        </button>
                         <button type="button" class="btn btn-warning fw-bold px-4 shadow-sm" style="border-radius: 8px !important; background-color: #FCC30B; border: none;" onclick="batchManager.execute(0)" id="btnDeactivateBatch" disabled>
                             <i class="fas fa-times-circle me-2"></i> DEACTIVATE
                         </button>
@@ -300,6 +303,7 @@
                 const hasTargets = this.targetedProjects.length > 0;
                 document.getElementById('btnActivateBatch').disabled = !hasTargets;
                 document.getElementById('btnDeactivateBatch').disabled = !hasTargets;
+                document.getElementById('btnDeleteBatch').disabled = !hasTargets;
             },
 
             target: function(id) {
@@ -340,6 +344,27 @@
                     const result = await response.json();
                     if (result.success) {
                         alert(`${result.count} projects updated successfully!`);
+                        location.reload();
+                    }
+                } catch (e) {
+                    alert("Execution failed. Please try again.");
+                    console.error(e);
+                }
+            },
+
+            executeDelete: async function() {
+                const ids = this.targetedProjects.map(p => p.id);
+                if (!confirm(`WARNING: This action is irreversible. Are you sure you want to PERMANENTLY DELETE these ${ids.length} projects?`)) return;
+
+                try {
+                    const response = await fetch('{{ path('admin_project_batch_execute_delete') }}', {
+                        method: 'POST',
+                        body: JSON.stringify({ ids }),
+                        headers: { 'Content-Type': 'application/json' }
+                    });
+                    const result = await response.json();
+                    if (result.success) {
+                        alert(`${result.count} projects deleted successfully!`);
                         location.reload();
                     }
                 } catch (e) {

@@ -167,22 +167,10 @@ class ThesisCrudController extends AbstractCrudController
     {
         $sdgs = $entityManager->getRepository(\App\Entity\Sdg::class)->findBy([], ['id' => 'ASC']);
         $types = $entityManager->getRepository(\App\Entity\ProjectType::class)->findBy([], ['name' => 'ASC']);
-        
-        $dates = $entityManager->createQueryBuilder()
-            ->select('DISTINCT t.researchDate')
-            ->from(Thesis::class, 't')
-            ->where('t.researchDate IS NOT NULL')
-            ->getQuery()
-            ->getSingleColumnResult();
-
-        $years = [];
-        foreach ($dates as $date) {
-            if ($date instanceof \DateTimeInterface) {
-                $years[] = $date->format('Y');
-            }
-        }
-        $years = array_values(array_unique($years));
-        rsort($years);
+        $conn = $entityManager->getConnection();
+        $years = $conn->fetchFirstColumn(
+            'SELECT DISTINCT YEAR(research_date) AS yr FROM thesis WHERE research_date IS NOT NULL ORDER BY yr DESC'
+        );
 
         return new JsonResponse([
             'sdgs' => array_map(fn($s) => ['id' => $s->getId(), 'name' => $s->getName(), 'number' => $s->getId()], $sdgs),
@@ -261,6 +249,29 @@ class ThesisCrudController extends AbstractCrudController
             ->set('t.isActive', ':status')
             ->where('t.id IN (:ids)')
             ->setParameter('status', (bool)$targetStatus)
+            ->setParameter('ids', $ids)
+            ->getQuery()
+            ->execute();
+
+        return new JsonResponse(['success' => true, 'count' => count($ids)]);
+    }
+
+    /**
+     * Executes the bulk deletion of targeted projects.
+     */
+    #[Route('/admin/projects/batch-execute-delete', name: 'admin_project_batch_execute_delete', methods: ['POST'])]
+    public function executeBatchDelete(Request $request, EntityManagerInterface $entityManager): JsonResponse
+    {
+        $data = json_decode($request->getContent(), true);
+        $ids = $data['ids'] ?? [];
+
+        if (empty($ids)) {
+            return new JsonResponse(['success' => false, 'message' => 'No projects selected.'], 400);
+        }
+
+        $entityManager->createQueryBuilder()
+            ->delete(Thesis::class, 't')
+            ->where('t.id IN (:ids)')
             ->setParameter('ids', $ids)
             ->getQuery()
             ->execute();
