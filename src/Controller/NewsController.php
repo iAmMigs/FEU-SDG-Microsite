@@ -40,19 +40,28 @@ final class NewsController extends AbstractController
             ->orderBy('a.eventDate', 'DESC');
 
         if ($dateFilter && $dateFilter !== 'all' && $dateFilter !== 'date_range') {
-            $dateLimit = new \DateTime();
-            if ($dateFilter === '1_day') {
-                $dateLimit->modify('-1 day');
-            } elseif ($dateFilter === '7_days') {
-                $dateLimit->modify('-7 days');
-            } elseif ($dateFilter === '30_days') {
-                $dateLimit->modify('-30 days');
-            } elseif ($dateFilter === 'past_year') {
-                $dateLimit->modify('-1 year');
+            if ($dateFilter === 'past_year') {
+                $pastYear = (int) (new \DateTime())->format('Y') - 1;
+                $startOfYear = new \DateTime("$pastYear-01-01 00:00:00");
+                $endOfYear = new \DateTime("$pastYear-12-31 23:59:59");
+                
+                $qb->andWhere('a.eventDate >= :pastYearStart')
+                   ->andWhere('a.eventDate <= :pastYearEnd')
+                   ->setParameter('pastYearStart', $startOfYear)
+                   ->setParameter('pastYearEnd', $endOfYear);
+            } else {
+                $dateLimit = new \DateTime();
+                if ($dateFilter === '1_day') {
+                    $dateLimit->modify('-1 day');
+                } elseif ($dateFilter === '7_days') {
+                    $dateLimit->modify('-7 days');
+                } elseif ($dateFilter === '30_days') {
+                    $dateLimit->modify('-30 days');
+                }
+                
+                $qb->andWhere('a.eventDate >= :dateLimit')
+                   ->setParameter('dateLimit', $dateLimit);
             }
-            
-            $qb->andWhere('a.eventDate >= :dateLimit')
-               ->setParameter('dateLimit', $dateLimit);
         }
 
         if ($startDate) {

@@ -48,8 +48,14 @@ final class ThesisController extends AbstractController
                ->setParameter('title', '%' . $searchTitle . '%');
         }
         if ($searchYear) {
-            $qb->andWhere('t.researchDate = :year')
-               ->setParameter('year', (int)$searchYear);
+            $yearInt = (int) $searchYear;
+            $startOfYear = new \DateTimeImmutable("$yearInt-01-01 00:00:00");
+            $endOfYear = new \DateTimeImmutable("$yearInt-12-31 23:59:59");
+            
+            $qb->andWhere('t.researchDate >= :yearStart')
+               ->andWhere('t.researchDate <= :yearEnd')
+               ->setParameter('yearStart', $startOfYear)
+               ->setParameter('yearEnd', $endOfYear);
         }
 
         if (!empty($selectedSdgs)) {
