@@ -118,6 +118,7 @@ class DashboardController extends AbstractDashboardController
         yield MenuItem::section('Content Management');
         yield MenuItem::linkTo(ThesisCrudController::class, 'Project Library', 'fas fa-book-bookmark');
         yield MenuItem::linkTo(ActivityCrudController::class, 'Activities & Events', 'fas fa-newspaper');
+        yield MenuItem::linkTo(SubmissionRequirementCrudController::class, 'Submission Requirements', 'fas fa-list-check');
         
         yield MenuItem::section('Data Management');
         yield MenuItem::linkTo(SdgCrudController::class, 'SDG Categories', 'fas fa-bullseye');

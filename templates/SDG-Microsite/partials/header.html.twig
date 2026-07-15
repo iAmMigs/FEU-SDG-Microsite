@@ -3,26 +3,26 @@
 <header class="bg-white shadow-sm sticky top-0 z-50 transition-all duration-300" data-controller="mobile-menu">
     
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative bg-white z-20">
-        <div class="flex items-center justify-between h-20 gap-2 md:gap-4 w-full">
+        <div class="flex items-center justify-between h-20 w-full">
             
-            <div class="flex-shrink flex items-center justify-start min-w-0">
-                <a href="{{ path('app_home') }}" class="flex items-center group min-w-0">
+            <div class="flex-shrink-0 flex items-center justify-start">
+                <a href="{{ path('app_home') }}" class="flex items-center group">
                     <img class="h-8 lg:h-10 xl:h-12 w-auto max-w-full object-contain transition-transform duration-300 group-hover:scale-105" 
                          src="{{ asset('images/Tech_Banner.png') }}" 
                          alt="FEU Institute of Technology"> 
                 </a>
             </div>
             
-            <nav class="hidden md:flex flex-shrink-0 justify-center items-center gap-3 lg:gap-6 xl:gap-10">
-                <a href="{{ path('app_home') }}" class="whitespace-nowrap transition px-2 lg:px-3 py-2 text-[12px] lg:text-[14px] xl:text-base font-coolvetica {{ current_route == 'app_home' ? 'text-feu-green-800 font-bold border-b-2 border-feu-gold-500' : 'text-gray-600 hover:text-feu-green-700 font-medium' }}">Home</a>
-                <a href="{{ path('app_sdgs') }}" class="whitespace-nowrap transition px-2 lg:px-3 py-2 text-[12px] lg:text-[14px] xl:text-base font-work {{ current_route == 'app_sdgs' ? 'text-feu-green-800 font-bold border-b-2 border-feu-gold-500' : 'text-gray-600 hover:text-feu-green-700 font-medium' }}">The SDGs</a>
-                <a href="{{ path('app_about') }}" class="whitespace-nowrap transition px-2 lg:px-3 py-2 text-[12px] lg:text-[14px] xl:text-base font-work {{ current_route == 'app_about' ? 'text-feu-green-800 font-bold border-b-2 border-feu-gold-500' : 'text-gray-600 hover:text-feu-green-700 font-medium' }}">About</a>
-                <a href="{{ path('app_trending') }}" class="whitespace-nowrap transition px-2 lg:px-3 py-2 text-[12px] lg:text-[14px] xl:text-base font-work {{ current_route == 'app_trending' ? 'text-feu-green-800 font-bold border-b-2 border-feu-gold-500' : 'text-gray-600 hover:text-feu-green-700 font-medium' }}">Trending Studies</a>
-                <a href="{{ path('app_news') }}" class="whitespace-nowrap transition px-2 lg:px-3 py-2 text-[12px] lg:text-[14px] xl:text-base font-work {{ current_route == 'app_news' ? 'text-feu-green-800 font-bold border-b-2 border-feu-gold-500' : 'text-gray-600 hover:text-feu-green-700 font-medium' }}">News & Activities</a>
-            </nav>
+            <div class="flex items-center gap-4 lg:gap-8 xl:gap-10">
+                <nav class="hidden md:flex items-center gap-4 lg:gap-6 xl:gap-8">
+                    <a href="{{ path('app_home') }}" class="whitespace-nowrap transition px-2 py-2 text-[12px] lg:text-[14px] xl:text-base font-coolvetica {{ current_route == 'app_home' ? 'text-feu-green-800 font-bold border-b-2 border-feu-gold-500' : 'text-gray-600 hover:text-feu-green-700 font-medium' }}">Home</a>
+                    <a href="{{ path('app_sdgs') }}" class="whitespace-nowrap transition px-2 py-2 text-[12px] lg:text-[14px] xl:text-base font-work {{ current_route == 'app_sdgs' ? 'text-feu-green-800 font-bold border-b-2 border-feu-gold-500' : 'text-gray-600 hover:text-feu-green-700 font-medium' }}">The SDGs</a>
+                    <a href="{{ path('app_about') }}" class="whitespace-nowrap transition px-2 py-2 text-[12px] lg:text-[14px] xl:text-base font-work {{ current_route == 'app_about' ? 'text-feu-green-800 font-bold border-b-2 border-feu-gold-500' : 'text-gray-600 hover:text-feu-green-700 font-medium' }}">About</a>
+                    <a href="{{ path('app_trending') }}" class="whitespace-nowrap transition px-2 py-2 text-[12px] lg:text-[14px] xl:text-base font-work {{ current_route == 'app_trending' ? 'text-feu-green-800 font-bold border-b-2 border-feu-gold-500' : 'text-gray-600 hover:text-feu-green-700 font-medium' }}">Trending Studies</a>
+                    <a href="{{ path('app_news') }}" class="whitespace-nowrap transition px-2 py-2 text-[12px] lg:text-[14px] xl:text-base font-work {{ current_route == 'app_news' ? 'text-feu-green-800 font-bold border-b-2 border-feu-gold-500' : 'text-gray-600 hover:text-feu-green-700 font-medium' }}">News & Activities</a>
+                </nav>
 
-            <div class="flex-shrink flex items-center justify-end min-w-0">
-                <a href="{{ path('app_library') }}" class="hidden md:inline-flex whitespace-nowrap items-center justify-center px-4 lg:px-6 py-2 lg:py-2.5 text-[11px] lg:text-[14px] xl:text-base font-bold rounded-full text-feu-green-950 bg-feu-gold-400 hover:bg-feu-gold-500 hover:shadow-md transition-all duration-300 font-work flex-shrink-0">
+                <a href="{{ path('app_library') }}" class="hidden md:inline-flex whitespace-nowrap items-center justify-center px-4 lg:px-6 py-2 lg:py-2.5 text-[12px] lg:text-[14px] xl:text-base font-bold rounded-full text-feu-green-950 bg-feu-gold-400 hover:bg-feu-gold-500 hover:shadow-md transition-all duration-300 font-work flex-shrink-0">
                     Browse the Library
                 </a>
                 
@@ -30,7 +30,7 @@
                     <button type="button" data-action="click->mobile-menu#toggle" class="text-gray-500 hover:text-feu-green-800 focus:outline-none p-2 transition-colors rounded-md bg-gray-50 hover:bg-gray-100" aria-expanded="false">
                         <span class="sr-only">Open main menu</span>
                         <svg data-mobile-menu-target="openIcon" class="h-6 w-6 block" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
+                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
                         </svg>
                         <svg data-mobile-menu-target="closeIcon" class="h-6 w-6 hidden" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
