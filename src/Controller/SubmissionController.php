@@ -2,7 +2,7 @@
 
 namespace App\Controller;
 
-use App\Entity\SubmissionRequirement;
+use App\Entity\SubmissionCategory;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
@@ -16,21 +16,12 @@ final class SubmissionController extends AbstractController
     #[Route('/submit-project', name: 'app_submit_project')]
     public function index(EntityManagerInterface $entityManager): Response
     {
-        $requirementRepository = $entityManager->getRepository(SubmissionRequirement::class);
+        $categoryRepository = $entityManager->getRepository(SubmissionCategory::class);
 
-        $projectRequirements = $requirementRepository->findBy(
-            ['type' => 'project'],
-            ['sortOrder' => 'ASC']
-        );
-
-        $eventRequirements = $requirementRepository->findBy(
-            ['type' => 'event'],
-            ['sortOrder' => 'ASC']
-        );
+        $categories = $categoryRepository->findBy([], ['id' => 'ASC']);
 
         return $this->render('SDG-Microsite/submit.html.twig', [
-            'projectRequirements' => $projectRequirements,
-            'eventRequirements' => $eventRequirements,
+            'categories' => $categories,
         ]);
     }
 }

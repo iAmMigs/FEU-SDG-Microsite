@@ -4,9 +4,13 @@ namespace App\Controller\Admin;
 
 use App\Repository\ActivityRepository;
 use App\Repository\SdgRepository;
+use App\Repository\SiteVisitRepository;
 use App\Repository\ThesisRepository;
 use EasyCorp\Bundle\EasyAdminBundle\Attribute\AdminDashboard;
+use EasyCorp\Bundle\EasyAdminBundle\Config\Action;
+use EasyCorp\Bundle\EasyAdminBundle\Config\Actions;
 use EasyCorp\Bundle\EasyAdminBundle\Config\Assets;
+use EasyCorp\Bundle\EasyAdminBundle\Config\Crud;
 use EasyCorp\Bundle\EasyAdminBundle\Config\Dashboard;
 use EasyCorp\Bundle\EasyAdminBundle\Config\MenuItem;
 use EasyCorp\Bundle\EasyAdminBundle\Controller\AbstractDashboardController;
@@ -22,7 +26,8 @@ class DashboardController extends AbstractDashboardController
     public function __construct(
         private ThesisRepository $thesisRepository,
         private ActivityRepository $activityRepository,
-        private SdgRepository $sdgRepository 
+        private SdgRepository $sdgRepository,
+        private \App\Repository\CountryVisitRepository $countryVisitRepository
     ) {
     }
 
@@ -60,7 +65,7 @@ class DashboardController extends AbstractDashboardController
             }
         }
 
-        $selectedSdg = $request->query->get('sdg');
+        $selectedSdg = $request?->query->get('sdg');
 
         $qb = $this->thesisRepository->createQueryBuilder('t')
             ->orderBy('t.views', 'DESC')
@@ -82,6 +87,10 @@ class DashboardController extends AbstractDashboardController
             $topData[] = $t->getViews();
         }
 
+        // Fetch aggregated country visits metrics for high-level security & privacy compliance
+        $countryVisits = $this->countryVisitRepository->getVisitsByCountrySummary();
+        $totalVisitsCount = $this->countryVisitRepository->getTotalVisitsCount();
+
         return $this->render('Admin-Microsite/dashboard.html.twig', [
             'total_projects_count' => $this->thesisRepository->count([]),
             'active_projects_count' => $this->thesisRepository->count(['isActive' => true]),
@@ -94,7 +103,10 @@ class DashboardController extends AbstractDashboardController
             'chart_top_data' => json_encode($topData),
             
             'sdgs' => $this->sdgRepository->findBy([], ['id' => 'ASC']),
-            'selected_sdg' => $selectedSdg
+            'selected_sdg' => $selectedSdg,
+
+            'country_visits' => $countryVisits,
+            'total_visits_count' => $totalVisitsCount
         ]);
     }
 
@@ -103,6 +115,19 @@ class DashboardController extends AbstractDashboardController
         return Dashboard::new()
             ->setTitle('<div class="flex items-center gap-2"><img src="/images/Tech_Logo.png" style="max-height: 28px;"><span style="font-family: \'Montserrat\', sans-serif; font-weight: 700; letter-spacing: -0.5px; color: #166534; font-size: 1.2rem; padding-top: 2px;"> Admin Console</span></div>')
             ->setFaviconPath('/images/Tech_Logo.png');
+    }
+
+    public function configureActions(): Actions
+    {
+        return parent::configureActions()
+            ->add(Crud::PAGE_EDIT, Action::INDEX)
+            ->update(Crud::PAGE_EDIT, Action::INDEX, function (Action $action) {
+                return $action->setIcon('fas fa-times')->setLabel('Cancel')->setCssClass('btn btn-secondary');
+            })
+            ->add(Crud::PAGE_NEW, Action::INDEX)
+            ->update(Crud::PAGE_NEW, Action::INDEX, function (Action $action) {
+                return $action->setIcon('fas fa-times')->setLabel('Cancel')->setCssClass('btn btn-secondary');
+            });
     }
 
     public function configureAssets(): Assets
@@ -117,8 +142,8 @@ class DashboardController extends AbstractDashboardController
 
         yield MenuItem::section('Content Management');
         yield MenuItem::linkTo(ThesisCrudController::class, 'Project Library', 'fas fa-book-bookmark');
-        yield MenuItem::linkTo(ActivityCrudController::class, 'Activities & Events', 'fas fa-newspaper');
-        yield MenuItem::linkTo(SubmissionRequirementCrudController::class, 'Submission Requirements', 'fas fa-list-check');
+        yield MenuItem::linkTo(ActivityCrudController::class, 'News & Activities', 'fas fa-newspaper');
+        yield MenuItem::linkTo(SubmissionCategoryCrudController::class, 'Requirement Categories', 'fas fa-list-check');
         
         yield MenuItem::section('Data Management');
         yield MenuItem::linkTo(SdgCrudController::class, 'SDG Categories', 'fas fa-bullseye');
@@ -132,7 +157,5 @@ class DashboardController extends AbstractDashboardController
 
         yield MenuItem::section('Public Portal');
         yield MenuItem::linkToRoute('View Site', 'fas fa-arrow-right-from-bracket', 'app_home');
-
-        
     }
 }

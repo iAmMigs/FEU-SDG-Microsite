@@ -12,70 +12,65 @@
         </div>
     </section>
 
-    <section class="py-24 px-6 bg-gray-50">
-        <div class="max-w-6xl mx-auto">
+    <section class="py-20 px-6 bg-gray-50 min-h-[500px]">
+        <div class="max-w-5xl mx-auto">
             
-            <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-12">
-                {# Card 1: Project Submission #}
-                <div class="bg-white rounded-3xl shadow-2xl shadow-gray-200/50 border border-gray-100 overflow-hidden flex flex-col justify-between hover:shadow-3xl transition duration-300">
-                    <div class="p-8 md:p-12">
-                        <div class="mb-10">
-                            <span class="text-xs font-bold text-feu-green-800 uppercase tracking-widest bg-feu-green-50 px-3 py-1.5 rounded-full inline-block mb-3">Option A</span>
-                            <h2 class="text-3xl md:text-4xl font-bold text-gray-900 mb-4 font-bebas tracking-wide uppercase">Project Submission</h2>
-                            <p class="text-gray-500 font-medium text-sm font-work leading-relaxed">For researchers, students, and faculty members wishing to feature their academic and practical research in the global library.</p>
-                            <div class="w-16 h-1.5 bg-feu-gold-400 mt-4"></div>
-                        </div>
-
-                        <ul class="space-y-8">
-                            {% for req in projectRequirements %}
-                                <li class="flex items-start gap-5">
-                                    <div class="mt-1 w-6 h-6 bg-feu-gold-400 rounded-full flex items-center justify-center shrink-0 shadow-sm">
-                                        <svg class="w-3.5 h-3.5 text-feu-green-900" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"></path></svg>
-                                    </div>
-                                    <div>
-                                        <h3 class="font-bold text-gray-900 text-lg font-bebas tracking-wide mb-0.5 uppercase">{{ req.title }}</h3>
-                                        {% if req.description %}
-                                            <p class="text-gray-600 font-medium text-sm font-work leading-relaxed italic">{{ req.description }}</p>
-                                        {% endif %}
-                                    </div>
-                                </li>
-                            {% else %}
-                                <p class="text-gray-400 italic">No requirements defined yet.</p>
-                            {% endfor %}
-                        </ul>
-                    </div>
+            {% if categories is empty %}
+                <div class="bg-white rounded-3xl p-12 text-center shadow-lg border border-gray-100">
+                    <p class="text-gray-500 italic text-lg font-work">No requirement categories have been added yet.</p>
+                </div>
+            {% else %}
+                {# Tab Category Buttons Navigation #}
+                <div class="flex flex-wrap justify-center gap-3 mb-10 border-b border-gray-200 pb-6">
+                    {% for cat in categories %}
+                        <button 
+                            type="button"
+                            onclick="switchCategoryTab('category-tab-{{ cat.id }}', this)"
+                            class="req-tab-btn px-6 py-3.5 rounded-full font-bold text-sm md:text-base tracking-wide transition duration-300 font-bebas uppercase flex items-center gap-2 shadow-sm border cursor-pointer {% if loop.first %}bg-feu-green-900 text-feu-gold-400 border-feu-green-900 shadow-md active-tab{% else %}bg-white text-gray-700 border-gray-200 hover:bg-gray-100 hover:text-gray-900{% endif %}"
+                        >
+                            <span class="w-2.5 h-2.5 rounded-full {% if loop.first %}bg-feu-gold-400{% else %}bg-gray-300{% endif %} tab-dot shrink-0"></span>
+                            <span>{{ cat.name }}</span>
+                        </button>
+                    {% endfor %}
                 </div>
 
-                {# Card 2: Event/Activity Request #}
-                <div class="bg-white rounded-3xl shadow-2xl shadow-gray-200/50 border border-gray-100 overflow-hidden flex flex-col justify-between hover:shadow-3xl transition duration-300">
-                    <div class="p-8 md:p-12">
-                        <div class="mb-10">
-                            <span class="text-xs font-bold text-feu-green-800 uppercase tracking-widest bg-feu-green-50 px-3 py-1.5 rounded-full inline-block mb-3">Option B</span>
-                            <h2 class="text-3xl md:text-4xl font-bold text-gray-900 mb-4 font-bebas tracking-wide uppercase">Event / Activity Request</h2>
-                            <p class="text-gray-500 font-medium text-sm font-work leading-relaxed">For booking and requesting events or activities on campus related to sustainable development goals.</p>
-                            <div class="w-16 h-1.5 bg-feu-gold-400 mt-4"></div>
-                        </div>
+                {# Tab Contents #}
+                <div class="tab-contents-wrapper">
+                    {% for cat in categories %}
+                        <div 
+                            id="category-tab-{{ cat.id }}" 
+                            class="req-tab-pane bg-white rounded-3xl shadow-xl border border-gray-100 p-8 md:p-12 transition-all duration-300 {% if not loop.first %}hidden{% endif %}"
+                        >
+                            <div class="mb-8 border-b border-gray-100 pb-6">
+                                <span class="text-xs font-bold text-feu-green-800 uppercase tracking-widest bg-feu-green-50 px-3 py-1.5 rounded-full inline-block mb-3">Requirement Category</span>
+                                <h2 class="text-3xl md:text-4xl font-bold text-gray-900 font-bebas tracking-wide uppercase mb-2">{{ cat.name }}</h2>
+                                {% if cat.description %}
+                                    <p class="text-gray-600 font-medium text-sm md:text-base font-work leading-relaxed">{{ cat.description }}</p>
+                                {% endif %}
+                                <div class="w-16 h-1.5 bg-feu-gold-400 mt-4"></div>
+                            </div>
 
-                        <ul class="space-y-8">
-                            {% for req in eventRequirements %}
-                                <li class="flex items-start gap-5">
-                                    <div class="mt-1 w-6 h-6 bg-feu-gold-400 rounded-full flex items-center justify-center shrink-0 shadow-sm">
-                                        <svg class="w-3.5 h-3.5 text-feu-green-900" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"></path></svg>
-                                    </div>
-                                    <div>
-                                        <h3 class="font-bold text-gray-900 text-lg font-bebas tracking-wide mb-0.5 uppercase">{{ req.title }}</h3>
-                                        {% if req.description %}
-                                            <p class="text-gray-600 font-medium text-sm font-work leading-relaxed italic">{{ req.description }}</p>
-                                        {% endif %}
-                                    </div>
-                                </li>
-                            {% else %}
-                                <p class="text-gray-400 italic">No requirements defined yet.</p>
-                            {% endfor %}
-                        </ul>
-                    </div>
+                            <ul class="space-y-6">
+                                {% for step in cat.steps %}
+                                    <li class="flex items-start gap-5 p-4 rounded-2xl hover:bg-gray-50/80 transition border border-transparent hover:border-gray-100">
+                                        <div class="mt-1 w-8 h-8 bg-feu-gold-400 text-feu-green-950 rounded-full flex items-center justify-center font-bold font-bebas shrink-0 shadow-sm text-base">
+                                            {{ loop.index }}
+                                        </div>
+                                        <div class="pt-0.5">
+                                            <h3 class="font-bold text-gray-900 text-lg md:text-xl font-bebas tracking-wide mb-1 uppercase">{{ step.title }}</h3>
+                                            {% if step.description %}
+                                                <p class="text-gray-600 font-medium text-sm md:text-base font-work leading-relaxed italic">{{ step.description }}</p>
+                                            {% endif %}
+                                        </div>
+                                    </li>
+                                {% else %}
+                                    <li class="text-gray-400 italic font-work py-4">No specific steps or guidelines added for this category yet.</li>
+                                {% endfor %}
+                            </ul>
+                        </div>
+                    {% endfor %}
                 </div>
-            </div>
+            {% endif %}
 
         </div>
     </section>
@@ -103,4 +98,45 @@
         <div class="absolute -bottom-24 -left-24 w-64 h-64 bg-feu-gold-400/10 rounded-full blur-3xl"></div>
         <div class="absolute -top-24 -right-24 w-64 h-64 bg-feu-green-400/10 rounded-full blur-3xl"></div>
     </section>
+
+    <script>
+        function switchCategoryTab(targetId, clickedBtn) {
+            if (!clickedBtn) return;
+            
+            const tabButtons = document.querySelectorAll('.req-tab-btn');
+            const tabPanes = document.querySelectorAll('.req-tab-pane');
+
+            // 1. Reset all tab buttons styling
+            tabButtons.forEach(btn => {
+                btn.classList.remove('bg-feu-green-900', 'text-feu-gold-400', 'border-feu-green-900', 'shadow-md', 'active-tab');
+                btn.classList.add('bg-white', 'text-gray-700', 'border-gray-200', 'hover:bg-gray-100', 'hover:text-gray-900');
+                
+                const dot = btn.querySelector('.tab-dot');
+                if (dot) {
+                    dot.classList.remove('bg-feu-gold-400');
+                    dot.classList.add('bg-gray-300');
+                }
+            });
+
+            // 2. Highlight clicked tab button
+            clickedBtn.classList.remove('bg-white', 'text-gray-700', 'border-gray-200', 'hover:bg-gray-100', 'hover:text-gray-900');
+            clickedBtn.classList.add('bg-feu-green-900', 'text-feu-gold-400', 'border-feu-green-900', 'shadow-md', 'active-tab');
+            
+            const activeDot = clickedBtn.querySelector('.tab-dot');
+            if (activeDot) {
+                activeDot.classList.remove('bg-gray-300');
+                activeDot.classList.add('bg-feu-gold-400');
+            }
+
+            // 3. Hide all panes and display the target tab pane
+            tabPanes.forEach(pane => {
+                pane.classList.add('hidden');
+            });
+
+            const targetPane = document.getElementById(targetId);
+            if (targetPane) {
+                targetPane.classList.remove('hidden');
+            }
+        }
+    </script>
 {% endblock %}

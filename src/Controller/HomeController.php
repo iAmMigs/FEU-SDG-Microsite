@@ -24,7 +24,7 @@ final class HomeController extends AbstractController
         $activeSdgs = $sdgRepository->findBy(['isActive' => true]);
         $activeSdgIds = array_map(fn($sdg) => $sdg->getId(), $activeSdgs);
         
-        $leadingVoices = $leadingVoiceRepository->findBy([], null, 4);
+        $leadingVoices = $leadingVoiceRepository->findBy([], null);
 
         return $this->render('SDG-Microsite/home.html.twig', [
             'latest_activities' => $latestActivities,
