@@ -57,12 +57,8 @@ class Thesis
     #[ORM\Column(length: 255, nullable: true)]
     private ?string $publicationLink = null;
 
-    /*
-     * Consolidates both month and year into a single date object.
-     * Defaults to January 1 for records where only the year is known.
-     */
-    #[ORM\Column(type: Types::DATE_IMMUTABLE, nullable: true)]
-    private ?\DateTimeImmutable $researchDate = null;
+    #[ORM\Column(type: Types::INTEGER, nullable: true)]
+    private ?int $researchYear = null;
 
     #[ORM\Column(type: 'boolean', options: ['default' => false])]
     private ?bool $isActive = false;
@@ -140,8 +136,8 @@ class Thesis
     public function getPublicationLink(): ?string { return $this->publicationLink; }
     public function setPublicationLink(?string $publicationLink): static { $this->publicationLink = $publicationLink; return $this; }
 
-    public function getResearchDate(): ?\DateTimeImmutable { return $this->researchDate; }
-    public function setResearchDate(?\DateTimeImmutable $researchDate): static { $this->researchDate = $researchDate; return $this; }
+    public function getResearchYear(): ?int { return $this->researchYear; }
+    public function setResearchYear(?int $researchYear): static { $this->researchYear = $researchYear; return $this; }
 
     /** @return Collection<int, Sdg> */
     public function getSdgs(): Collection { return $this->sdgs; }

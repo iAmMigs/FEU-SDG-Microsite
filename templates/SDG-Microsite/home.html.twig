@@ -164,7 +164,7 @@
                 </p>
             </div>
             
-            {% if leading_voices|length > 4 %}
+            {% if leading_voices|length > 0 %}
                 <style>
                     @keyframes marquee-voices {
                         0% { transform: translateX(0%); }
@@ -173,7 +173,7 @@
                     .animate-marquee-voices {
                         display: flex;
                         width: max-content;
-                        animation: marquee-voices 35s linear infinite;
+                        animation: marquee-voices 55s linear infinite;
                     }
                     .animate-marquee-voices:hover {
                         animation-play-state: paused;
@@ -193,58 +193,108 @@
                         box-sizing: border-box !important;
                     }
                 </style>
-                {# Extended negative margins to stretch carousel towards screen edges #}
-                <div class="relative z-10 -mx-6 md:-mx-12 lg:-mx-16 overflow-hidden py-8 carousel-edge-fade">
-                    <div class="animate-marquee-voices flex gap-8 px-4">
-                        {% for i in 0..1 %}
-                            {% for voice in leading_voices %}
-                                <div class="voice-card-static bg-white rounded-2xl p-6 text-center shadow-xl hover:-translate-y-2 transition duration-300 group flex flex-col items-center justify-start">
-                                    {% if voice.image %}
-                                        <img src="{{ asset('uploads/voices/' ~ voice.image) }}" alt="{{ voice.name }}" class="w-20 h-20 shrink-0 mx-auto rounded-full object-cover mb-4 border-4 border-[#FCC30B] shadow-sm transition group-hover:scale-110">
-                                    {% else %}
-                                        {% set name_parts = voice.name|split(' ') %}
-                                        {% set initials = (name_parts|first|slice(0,1) ~ name_parts|last|slice(0,1))|upper %}
-                                        <div class="w-20 h-20 shrink-0 mx-auto bg-feu-green-100 text-feu-green-800 rounded-full flex items-center justify-center text-2xl font-black font-bebas mb-4 border-4 border-[#FCC30B] shadow-sm group-hover:bg-[#FCC30B] group-hover:text-feu-green-900 transition group-hover:scale-110">
-                                            {{ initials }}
-                                        </div>
-                                    {% endif %}
-                                    <h3 class="text-xl font-bold text-gray-900 font-bebas tracking-wide mb-1 line-clamp-1 w-full">{{ voice.name }}</h3>
-                                    <p class="text-xs font-bold text-feu-green-700 uppercase tracking-widest mb-3 font-work line-clamp-1 w-full">{{ voice.title }}</p>
-                                    <p class="text-sm text-gray-600 font-work leading-relaxed line-clamp-4 w-full">{{ voice.description }}</p>
-                                </div>
+                
+                {% set repeat_count = (leading_voices|length < 5) ? 5 : 1 %}
+
+                {# Relative wrapper for arrow positioning — arrows sit within max-w-7xl visible bounds #}
+                <div class="relative z-20 py-8">
+
+                    {# Left Hover Arrow — anchored to the left side of the visible container #}
+                    <button type="button" id="voice-arrow-left" aria-label="Scroll left"
+                            class="absolute left-0 top-1/2 -translate-y-1/2 z-40 w-14 h-14 bg-white text-feu-green-900 rounded-full shadow-2xl border-2 border-[#FCC30B] flex items-center justify-center cursor-pointer opacity-50 hover:opacity-100 hover:bg-[#FCC30B] hover:text-feu-green-950 transition-all duration-300 hover:scale-110 active:scale-95 group">
+                        <svg class="w-7 h-7 transition-transform group-hover:-translate-x-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M10.5 19.5L3 12m0 0l7.5-7.5M3 12h18" />
+                        </svg>
+                    </button>
+
+                    {# Right Hover Arrow — anchored to the right side of the visible container #}
+                    <button type="button" id="voice-arrow-right" aria-label="Scroll right"
+                            class="absolute right-0 top-1/2 -translate-y-1/2 z-40 w-14 h-14 bg-white text-feu-green-900 rounded-full shadow-2xl border-2 border-[#FCC30B] flex items-center justify-center cursor-pointer opacity-50 hover:opacity-100 hover:bg-[#FCC30B] hover:text-feu-green-950 transition-all duration-300 hover:scale-110 active:scale-95 group">
+                        <svg class="w-7 h-7 transition-transform group-hover:translate-x-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M13.5 4.5L21 12m0 0l-7.5 7.5M21 12H3" />
+                        </svg>
+                    </button>
+
+                    {# Carousel track extends beyond container with negative margins for full-bleed effect #}
+                    <div class="-mx-6 md:-mx-12 lg:-mx-16">
+                    <div class="overflow-hidden carousel-edge-fade">
+                        <div id="voice-marquee-track" class="animate-marquee-voices flex gap-8 px-4">
+                            {% for i in 0..repeat_count %}
+                                {% for voice in leading_voices %}
+                                    <div class="voice-card-static bg-white rounded-2xl p-6 text-center shadow-xl hover:-translate-y-2 transition duration-300 group flex flex-col items-center justify-start">
+                                        {% if voice.image %}
+                                            <img src="{{ asset('uploads/voices/' ~ voice.image) }}" alt="{{ voice.name }}" class="w-20 h-20 shrink-0 mx-auto rounded-full object-cover mb-4 border-4 border-[#FCC30B] shadow-sm transition group-hover:scale-110">
+                                        {% else %}
+                                            {% set name_parts = voice.name|split(' ') %}
+                                            {% set initials = (name_parts|first|slice(0,1) ~ name_parts|last|slice(0,1))|upper %}
+                                            <div class="w-20 h-20 shrink-0 mx-auto bg-feu-green-100 text-feu-green-800 rounded-full flex items-center justify-center text-2xl font-black font-bebas mb-4 border-4 border-[#FCC30B] shadow-sm group-hover:bg-[#FCC30B] group-hover:text-feu-green-900 transition group-hover:scale-110">
+                                                {{ initials }}
+                                            </div>
+                                        {% endif %}
+                                        <h3 class="text-xl font-bold text-gray-900 font-bebas tracking-wide mb-1 line-clamp-1 w-full break-words overflow-hidden" title="{{ voice.name }}">{{ voice.name|length > 22 ? voice.name|slice(0, 22) ~ '...' : voice.name }}</h3>
+                                        <p class="text-xs font-bold text-feu-green-700 uppercase tracking-wide mb-3 font-work line-clamp-1 w-full break-words overflow-hidden" title="{{ voice.title }}">{{ voice.title|length > 18 ? voice.title|slice(0, 18) ~ '...' : voice.title }}</p>
+                                        <p class="text-sm text-gray-600 font-work leading-relaxed line-clamp-4 w-full break-words overflow-hidden" title="{{ voice.description }}">{{ voice.description|length > 100 ? voice.description|slice(0, 100) ~ '...' : voice.description }}</p>
+                                    </div>
+                                {% endfor %}
                             {% endfor %}
-                        {% endfor %}
+                    </div>
+                    </div>
                     </div>
                 </div>
-            {% elseif leading_voices|length > 0 %}
-                {% set grid_class = 'lg:grid-cols-4' %}
-                {% if leading_voices|length == 3 %}
-                    {% set grid_class = 'lg:grid-cols-3 max-w-5xl mx-auto' %}
-                {% elseif leading_voices|length == 2 %}
-                    {% set grid_class = 'lg:grid-cols-2 max-w-3xl mx-auto' %}
-                {% elseif leading_voices|length == 1 %}
-                    {% set grid_class = 'lg:grid-cols-1 max-w-sm mx-auto' %}
-                {% endif %}
 
-                <div class="grid grid-cols-1 sm:grid-cols-2 {{ grid_class }} gap-8 py-4">
-                    {% for voice in leading_voices %}
-                        <div class="h-[350px] bg-white rounded-2xl p-6 text-center shadow-xl hover:-translate-y-2 transition duration-300 group flex flex-col items-center justify-start">
-                            {% if voice.image %}
-                                <img src="{{ asset('uploads/voices/' ~ voice.image) }}" alt="{{ voice.name }}" class="w-20 h-20 shrink-0 mx-auto rounded-full object-cover mb-4 border-4 border-[#FCC30B] shadow-sm transition group-hover:scale-110">
-                            {% else %}
-                                {% set name_parts = voice.name|split(' ') %}
-                                {% set initials = (name_parts|first|slice(0,1) ~ name_parts|last|slice(0,1))|upper %}
-                                <div class="w-20 h-20 shrink-0 mx-auto bg-feu-green-100 text-feu-green-800 rounded-full flex items-center justify-center text-2xl font-black font-bebas mb-4 border-4 border-[#FCC30B] shadow-sm group-hover:bg-[#FCC30B] group-hover:text-feu-green-900 transition group-hover:scale-110">
-                                    {{ initials }}
-                                </div>
-                            {% endif %}
-                            
-                            <h3 class="text-xl font-bold text-gray-900 font-bebas tracking-wide mb-1 line-clamp-1 w-full">{{ voice.name }}</h3>
-                            <p class="text-xs font-bold text-feu-green-700 uppercase tracking-widest mb-3 font-work line-clamp-1 w-full">{{ voice.title }}</p>
-                            <p class="text-sm text-gray-600 font-work leading-relaxed line-clamp-4 w-full">{{ voice.description }}</p>
-                        </div>
-                    {% endfor %}
-                </div>
+                <script>
+                    (function() {
+                        function setupVoiceMarqueeHover() {
+                            const track = document.getElementById('voice-marquee-track');
+                            const leftBtn = document.getElementById('voice-arrow-left');
+                            const rightBtn = document.getElementById('voice-arrow-right');
+
+                            if (!track || !leftBtn || !rightBtn) return;
+
+                            function getMarqueeAnimation() {
+                                const anims = track.getAnimations();
+                                return anims.length > 0 ? anims[0] : null;
+                            }
+
+                            leftBtn.addEventListener('mouseenter', () => {
+                                const anim = getMarqueeAnimation();
+                                if (anim) {
+                                    anim.play();
+                                    anim.playbackRate = -3.5;
+                                }
+                            });
+
+                            leftBtn.addEventListener('mouseleave', () => {
+                                const anim = getMarqueeAnimation();
+                                if (anim) {
+                                    anim.playbackRate = 1;
+                                }
+                            });
+
+                            rightBtn.addEventListener('mouseenter', () => {
+                                const anim = getMarqueeAnimation();
+                                if (anim) {
+                                    anim.play();
+                                    anim.playbackRate = 3.5;
+                                }
+                            });
+
+                            rightBtn.addEventListener('mouseleave', () => {
+                                const anim = getMarqueeAnimation();
+                                if (anim) {
+                                    anim.playbackRate = 1;
+                                }
+                            });
+                        }
+
+                        if (document.readyState === 'loading') {
+                            document.addEventListener('DOMContentLoaded', setupVoiceMarqueeHover);
+                        } else {
+                            setupVoiceMarqueeHover();
+                        }
+                        document.addEventListener('turbo:load', setupVoiceMarqueeHover);
+                    })();
+                </script>
             {% else %}
                 <div class="text-center p-12 bg-white/10 backdrop-blur-md rounded-2xl border border-white/20">
                     <p class="text-feu-green-50 font-medium font-work">Voices will appear here once added in the dashboard.</p>

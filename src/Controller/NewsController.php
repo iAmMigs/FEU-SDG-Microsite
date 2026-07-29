@@ -3,13 +3,15 @@
 namespace App\Controller;
 
 use App\Entity\Activity;
+use App\Entity\College;
 use App\Repository\ActivityRepository;
+use App\Repository\SdgRepository;
+use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\Tools\Pagination\Paginator;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
-use App\Repository\SdgRepository;
 
 /**
  * Handles the display and filtering of news and activities.
@@ -17,27 +19,34 @@ use App\Repository\SdgRepository;
 final class NewsController extends AbstractController
 {
     #[Route('/news', name: 'app_news')]
-    public function index(Request $request, ActivityRepository $activityRepository, SdgRepository $sdgRepository): Response
+    public function index(Request $request, ActivityRepository $activityRepository, SdgRepository $sdgRepository, EntityManagerInterface $em): Response
     {
         $selectedSdgs = $request->query->all('goals');
         $dateFilter = $request->query->get('date_filter', 'all');
         $startDate = $request->query->get('start_date');
         $endDate = $request->query->get('end_date');
+        $selectedCollege = $request->query->get('college');
         
         $page = max(1, $request->query->getInt('page', 1));
-        $limit = 5;
+        $limit = 6;
 
         /**
          * leftJoin and addSelect pre-fetches all associated SDGs in the initial query
          */
         $qb = $activityRepository->createQueryBuilder('a')
             ->leftJoin('a.sdgs', 'all_sdgs')
-            ->addSelect('all_sdgs')
+            ->leftJoin('a.college', 'c')
+            ->addSelect('all_sdgs', 'c')
             ->where('a.isActive = :active')
             ->andWhere('a.publishAt IS NULL OR a.publishAt <= :now')
             ->setParameter('active', true)
             ->setParameter('now', new \DateTime())
             ->orderBy('a.eventDate', 'DESC');
+
+        if ($selectedCollege) {
+            $qb->andWhere('c.id = :collegeId')
+               ->setParameter('collegeId', $selectedCollege);
+        }
 
         if ($dateFilter && $dateFilter !== 'all' && $dateFilter !== 'date_range') {
             if ($dateFilter === 'past_year') {
@@ -93,6 +102,7 @@ final class NewsController extends AbstractController
 
         $activities = iterator_to_array($paginator);
         $allSdgs = $sdgRepository->findBy([], ['id' => 'ASC']);
+        $allColleges = $em->getRepository(College::class)->findBy([], ['name' => 'ASC']);
 
         return $this->render('SDG-Microsite/news.html.twig', [
             'activities' => $activities,
@@ -100,6 +110,8 @@ final class NewsController extends AbstractController
             'date_filter' => $dateFilter,
             'start_date' => $startDate,
             'end_date' => $endDate,
+            'selected_college' => $selectedCollege,
+            'all_colleges' => $allColleges,
             'current_page' => $page,
             'total_pages' => $totalPages,
             'total_count' => $totalCount,

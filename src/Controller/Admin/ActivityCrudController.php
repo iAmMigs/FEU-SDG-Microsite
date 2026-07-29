@@ -113,6 +113,7 @@ class ActivityCrudController extends AbstractCrudController
         return [
             TextField::new('title', 'Article Title'),
             AssociationField::new('category', 'Category')->setRequired(true),
+            AssociationField::new('college', 'College')->setRequired(false),
             ImageField::new('image', 'Main Cover Image')
                 ->setBasePath('uploads/activities/')
                 ->setUploadDir('public/uploads/activities/')

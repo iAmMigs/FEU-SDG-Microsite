@@ -25,6 +25,9 @@ class Activity
     #[ORM\ManyToOne(targetEntity: ActivityCategory::class)]
     private ?ActivityCategory $category = null;
 
+    #[ORM\ManyToOne(targetEntity: College::class)]
+    private ?College $college = null;
+
     #[ORM\Column(type: Types::TEXT)]
     private ?string $content = null;
 
@@ -62,6 +65,9 @@ class Activity
 
     public function getCategory(): ?ActivityCategory { return $this->category; }
     public function setCategory(?ActivityCategory $category): static { $this->category = $category; return $this; }
+
+    public function getCollege(): ?College { return $this->college; }
+    public function setCollege(?College $college): static { $this->college = $college; return $this; }
 
     public function setContent(?string $content): static 
     { 
