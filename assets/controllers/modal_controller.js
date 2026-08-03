@@ -33,7 +33,7 @@ export default class extends Controller {
             // This safely directs to the News Controller and applies the checkbox filter
             this.activityBtnTarget.href = `${activityBaseUrl}?goals[]=${goalNum}`;
         } else {
-            this.actionPromptTarget.textContent = 'SDG is currently not actively focused.';
+            this.actionPromptTarget.textContent = '';
             this.buttonsContainerTarget.style.display = 'none';
         }
 

@@ -37,8 +37,18 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
 use Doctrine\ORM\QueryBuilder;
 
+use EasyCorp\Bundle\EasyAdminBundle\Config\Filters;
+use EasyCorp\Bundle\EasyAdminBundle\Filter\EntityFilter;
+
 class ThesisCrudController extends AbstractCrudController
 {
+
+    public function configureFilters(Filters $filters): Filters
+    {
+        return $filters
+            ->add(EntityFilter::new('college', 'College'))
+            ->add(EntityFilter::new('type', 'Publication Type'));
+    }
 
     public function createIndexQueryBuilder(SearchDto $searchDto, EntityDto $entityDto, FieldCollection $fields, FilterCollection $filters): QueryBuilder
     {
@@ -448,10 +458,10 @@ class ThesisCrudController extends AbstractCrudController
                 ->setHelp('Separate multiple authors with a semicolon (;) to match our dataset format.')
                 ->hideOnIndex(),
             
-            AssociationField::new('type', 'Type')
+            AssociationField::new('type', 'Publication Type')
                 ->setRequired(false)
                 ->formatValue(function ($value) {
-                    return $value ?: '<span class="text-muted small">Not Specified</span>';
+                    return $value ? (string) $value : '<span class="text-muted small">Not Specified</span>';
                 }),
             AssociationField::new('college', 'College')->setRequired(false)
                 ->hideOnIndex(),

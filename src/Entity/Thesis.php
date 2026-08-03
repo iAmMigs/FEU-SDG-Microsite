@@ -12,7 +12,7 @@ use Doctrine\ORM\Mapping as ORM;
  * Represents a student research project, academic thesis, or official publication.
  */
 #[ORM\Entity(repositoryClass: ThesisRepository::class)]
-#[ORM\Index(name: 'idx_thesis_search', columns: ['title', 'authors'])]
+#[ORM\Index(name: 'idx_thesis_search', columns: ['title'])]
 #[ORM\Index(name: 'idx_thesis_trending', columns: ['views'])]
 class Thesis
 {
@@ -27,7 +27,7 @@ class Thesis
     #[ORM\Column(type: Types::TEXT, nullable: true)]
     private ?string $description = null;
 
-    #[ORM\Column(length: 255)]
+    #[ORM\Column(type: Types::TEXT, nullable: true)]
     private ?string $authors = null;
 
     #[ORM\ManyToOne(targetEntity: ProjectType::class)]
@@ -85,7 +85,7 @@ class Thesis
     public function setDescription(?string $description): static { $this->description = $description; return $this; }
 
     public function getAuthors(): ?string { return $this->authors; }
-    public function setAuthors(string $authors): static { $this->authors = $authors; return $this; }
+    public function setAuthors(?string $authors): static { $this->authors = $authors; return $this; }
 
     public function getType(): ?ProjectType { return $this->type; }
     public function setType(?ProjectType $type): static { $this->type = $type; return $this; }
