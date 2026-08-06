@@ -1,32 +1,33 @@
 {% extends '@EasyAdmin/crud/index.html.twig' %}
 
-{% block page_actions %}
-    <div class="d-flex align-items-center gap-2 me-2">
-        <select class="form-select" id="yearFilter" onchange="applyYearFilter(this.value)" style="width: auto; height: 38px;">
-            <option value="">Filter by Year</option>
-            {% for year in range("now"|date("Y"), 1990) %}
-                <option value="{{ year }}" {% if app.request.query.get('researchYear') == year %}selected{% endif %}>{{ year }}</option>
-            {% endfor %}
-        </select>
-    </div>
+{% block head_stylesheets %}
     {{ parent() }}
+    <style>
+        /* Hide confusing comparison operator dropdowns ("is same", "is not same") */
+        .filter-field .col-filter-comparison,
+        .filter-field select[name*="[comparison]"],
+        .ea-filter-wrapper select[name*="[comparison]"],
+        #filters-modal select[name*="[comparison]"],
+        .action-filters-modal select[name*="[comparison]"],
+        .modal-body select[name*="[comparison]"] {
+            display: none !important;
+        }
+
+        /* Make filter value select inputs span 100% full width */
+        .filter-field .col-filter-value,
+        .filter-field select[name*="[value]"],
+        .filter-field input[name*="[value]"],
+        #filters-modal select[name*="[value]"],
+        .modal-body select[name*="[value]"] {
+            width: 100% !important;
+            flex: 0 0 100% !important;
+            max-width: 100% !important;
+        }
+    </style>
 {% endblock %}
 
 {% block body_javascript %}
     {{ parent() }}
-    <script>
-        function applyYearFilter(year) {
-            const url = new URL(window.location.href);
-            if (year) {
-                url.searchParams.set('researchYear', year);
-            } else {
-                url.searchParams.delete('researchYear');
-            }
-            // Reset to page 1 when filtering
-            url.searchParams.delete('page');
-            window.location.href = url.toString();
-        }
-    </script>
     
     <div class="modal fade" id="csvImportModal" tabindex="-1" aria-labelledby="csvImportModalLabel" aria-hidden="true">
         <div class="modal-dialog modal-dialog-centered">

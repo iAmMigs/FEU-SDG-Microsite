@@ -3,7 +3,7 @@ import { Controller } from '@hotwired/stimulus';
 export default class extends Controller {
     static targets = [
         'backdrop', 'panel', 'title', 'description', 'image', 
-        'actionPrompt', 'buttonsContainer', 'libraryBtn', 'activityBtn'
+        'actionPrompt', 'buttonsContainer', 'libraryBtn', 'activityBtn', 'footerContainer'
     ];
 
     open(event) {
@@ -21,20 +21,39 @@ export default class extends Controller {
 
         // 3. Handle Active vs Inactive State
         if (isActive) {
-            this.actionPromptTarget.textContent = 'Which would you like to visit?';
-            this.buttonsContainerTarget.style.display = 'flex';
+            if (this.hasFooterContainerTarget) {
+                this.footerContainerTarget.style.display = 'flex';
+            }
+            if (this.hasActionPromptTarget) {
+                this.actionPromptTarget.textContent = 'Which would you like to visit?';
+                this.actionPromptTarget.style.display = 'block';
+            }
+            if (this.hasButtonsContainerTarget) {
+                this.buttonsContainerTarget.style.display = 'flex';
+            }
             
             // Use base URLs from data attributes or fallback to hardcoded paths
-            const libraryBaseUrl = this.libraryBtnTarget.dataset.baseUrl || '/library';
-            const activityBaseUrl = this.activityBtnTarget.dataset.baseUrl || '/news';
+            const libraryBaseUrl = this.hasLibraryBtnTarget ? (this.libraryBtnTarget.dataset.baseUrl || '/library') : '/library';
+            const activityBaseUrl = this.hasActivityBtnTarget ? (this.activityBtnTarget.dataset.baseUrl || '/news') : '/news';
             
-            this.libraryBtnTarget.href = `${libraryBaseUrl}?goals[]=${goalNum}`; 
+            if (this.hasLibraryBtnTarget) {
+                this.libraryBtnTarget.href = `${libraryBaseUrl}?goals[]=${goalNum}`; 
+            }
             
-            // This safely directs to the News Controller and applies the checkbox filter
-            this.activityBtnTarget.href = `${activityBaseUrl}?goals[]=${goalNum}`;
+            if (this.hasActivityBtnTarget) {
+                this.activityBtnTarget.href = `${activityBaseUrl}?goals[]=${goalNum}`;
+            }
         } else {
-            this.actionPromptTarget.textContent = '';
-            this.buttonsContainerTarget.style.display = 'none';
+            if (this.hasActionPromptTarget) {
+                this.actionPromptTarget.textContent = '';
+                this.actionPromptTarget.style.display = 'none';
+            }
+            if (this.hasButtonsContainerTarget) {
+                this.buttonsContainerTarget.style.display = 'none';
+            }
+            if (this.hasFooterContainerTarget) {
+                this.footerContainerTarget.style.display = 'none';
+            }
         }
 
         // 4. Animate modal in

@@ -39,15 +39,20 @@ use Doctrine\ORM\QueryBuilder;
 
 use EasyCorp\Bundle\EasyAdminBundle\Config\Filters;
 use EasyCorp\Bundle\EasyAdminBundle\Filter\EntityFilter;
+use EasyCorp\Bundle\EasyAdminBundle\Filter\ChoiceFilter;
 
 class ThesisCrudController extends AbstractCrudController
 {
 
     public function configureFilters(Filters $filters): Filters
     {
+        $years = range((int)date('Y'), 1990);
+        $yearChoices = array_combine($years, $years);
+
         return $filters
             ->add(EntityFilter::new('college', 'College'))
-            ->add(EntityFilter::new('type', 'Publication Type'));
+            ->add(EntityFilter::new('type', 'Publication Type'))
+            ->add(ChoiceFilter::new('researchYear', 'Year of Research')->setChoices($yearChoices));
     }
 
     public function createIndexQueryBuilder(SearchDto $searchDto, EntityDto $entityDto, FieldCollection $fields, FilterCollection $filters): QueryBuilder
@@ -463,8 +468,11 @@ class ThesisCrudController extends AbstractCrudController
                 ->formatValue(function ($value) {
                     return $value ? (string) $value : '<span class="text-muted small">Not Specified</span>';
                 }),
-            AssociationField::new('college', 'College')->setRequired(false)
-                ->hideOnIndex(),
+            AssociationField::new('college', 'College')
+                ->setRequired(false)
+                ->formatValue(function ($value) {
+                    return $value ? (string) $value : '<span class="text-muted small">Not Specified</span>';
+                }),
             
             TextareaField::new('description', 'Abstract')->setNumOfRows(6)->hideOnIndex()->setRequired(false),
             
