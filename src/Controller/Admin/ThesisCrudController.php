@@ -59,6 +59,10 @@ class ThesisCrudController extends AbstractCrudController
     {
         $qb = parent::createIndexQueryBuilder($searchDto, $entityDto, $fields, $filters);
         
+        $qb->leftJoin('entity.college', 'c')->addSelect('c')
+           ->leftJoin('entity.type', 'pt')->addSelect('pt')
+           ->leftJoin('entity.sdgs', 's')->addSelect('s');
+        
         $request = $this->getContext()->getRequest();
         $researchYear = $request->query->get('researchYear');
         
@@ -459,15 +463,19 @@ class ThesisCrudController extends AbstractCrudController
             IdField::new('id')->hideOnForm()->hideOnIndex(),
             BooleanField::new('isActive', 'Active'),
             TextField::new('title', 'Title'),
-            TextField::new('authors', 'Authors')
+            TextareaField::new('authors', 'Authors')
+                ->setNumOfRows(3)
                 ->setHelp('Separate multiple authors with a semicolon (;) to match our dataset format.')
                 ->hideOnIndex(),
             
-            AssociationField::new('type', 'Publication Type')
-                ->setRequired(false)
+            TextField::new('type', 'Publication Type')
+                ->hideOnForm()
                 ->formatValue(function ($value) {
                     return $value ? (string) $value : '<span class="text-muted small">Not Specified</span>';
                 }),
+            AssociationField::new('type', 'Publication Type')
+                ->setRequired(false)
+                ->hideOnIndex(),
             AssociationField::new('college', 'College')
                 ->setRequired(false)
                 ->formatValue(function ($value) {

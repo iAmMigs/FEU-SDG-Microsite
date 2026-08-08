@@ -30,7 +30,7 @@ class Thesis
     #[ORM\Column(type: Types::TEXT, nullable: true)]
     private ?string $authors = null;
 
-    #[ORM\ManyToOne(targetEntity: ProjectType::class)]
+    #[ORM\ManyToOne(targetEntity: ProjectType::class, inversedBy: 'theses')]
     private ?ProjectType $type = null;
 
     #[ORM\ManyToOne(targetEntity: College::class)]

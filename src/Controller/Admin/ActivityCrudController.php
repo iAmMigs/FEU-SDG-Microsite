@@ -12,6 +12,10 @@ use EasyCorp\Bundle\EasyAdminBundle\Field\DateTimeField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\ImageField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\TextareaField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\TextField;
+use EasyCorp\Bundle\EasyAdminBundle\Collection\FieldCollection;
+use EasyCorp\Bundle\EasyAdminBundle\Collection\FilterCollection;
+use EasyCorp\Bundle\EasyAdminBundle\Dto\EntityDto;
+use EasyCorp\Bundle\EasyAdminBundle\Dto\SearchDto;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\QueryBuilder;
 
@@ -27,6 +31,17 @@ class ActivityCrudController extends AbstractCrudController
         return $crud
             ->setPaginatorPageSize(10)
             ->setDefaultSort(['createdAt' => 'DESC']);
+    }
+
+    public function createIndexQueryBuilder(SearchDto $searchDto, EntityDto $entityDto, FieldCollection $fields, FilterCollection $filters): QueryBuilder
+    {
+        $qb = parent::createIndexQueryBuilder($searchDto, $entityDto, $fields, $filters);
+        
+        $qb->leftJoin('entity.category', 'cat')->addSelect('cat')
+           ->leftJoin('entity.college', 'c')->addSelect('c')
+           ->leftJoin('entity.sdgs', 's')->addSelect('s');
+        
+        return $qb;
     }
 
     public function configureAssets(Assets $assets): Assets

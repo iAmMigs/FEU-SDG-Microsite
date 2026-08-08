@@ -28,6 +28,16 @@ class ProjectTypeCrudController extends AbstractCrudController
 
     public function configureActions(Actions $actions): Actions
     {
-        return $actions->disable(Action::DELETE);
+        return $actions
+            ->update(Crud::PAGE_INDEX, Action::DELETE, function (Action $action) {
+                return $action->displayIf(static function (ProjectType $projectType) {
+                    return $projectType->getTheses()->isEmpty();
+                });
+            })
+            ->update(Crud::PAGE_DETAIL, Action::DELETE, function (Action $action) {
+                return $action->displayIf(static function (ProjectType $projectType) {
+                    return $projectType->getTheses()->isEmpty();
+                });
+            });
     }
 }
