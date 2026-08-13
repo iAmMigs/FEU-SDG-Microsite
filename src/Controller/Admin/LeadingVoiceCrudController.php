@@ -24,7 +24,8 @@ class LeadingVoiceCrudController extends AbstractCrudController
     {
         return $crud
             ->setEntityLabelInSingular('Featured voice in research')
-            ->setEntityLabelInPlural('Featured voices in research');
+            ->setEntityLabelInPlural('Featured voices in research')
+            ->setDefaultRowAction(null);
     }
 
     public function configureFields(string $pageName): iterable

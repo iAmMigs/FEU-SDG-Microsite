@@ -22,7 +22,8 @@ class SubmissionCategoryCrudController extends AbstractCrudController
         return $crud
             ->setEntityLabelInSingular('Requirement Category')
             ->setEntityLabelInPlural('Requirement Categories')
-            ->setDefaultSort(['id' => 'ASC']);
+            ->setDefaultSort(['id' => 'ASC'])
+            ->setDefaultRowAction(null);
     }
 
     public function configureFields(string $pageName): iterable

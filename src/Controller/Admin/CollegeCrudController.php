@@ -14,4 +14,12 @@ class CollegeCrudController extends AbstractCrudController
     {
         return College::class;
     }
+
+    public function configureCrud(\EasyCorp\Bundle\EasyAdminBundle\Config\Crud $crud): \EasyCorp\Bundle\EasyAdminBundle\Config\Crud
+    {
+        return $crud
+            ->setEntityLabelInSingular('College')
+            ->setEntityLabelInPlural('Colleges')
+            ->setDefaultRowAction(null);
+    }
 }

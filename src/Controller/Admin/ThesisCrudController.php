@@ -86,6 +86,7 @@ class ThesisCrudController extends AbstractCrudController
             ->setEntityLabelInPlural('Projects')
             ->setPaginatorPageSize(10)
             ->setDefaultSort(['createdAt' => 'DESC'])
+            ->setDefaultRowAction(null)
             ->overrideTemplate('crud/index', 'Admin-Microsite/thesis_index.html.twig');
     }
 
@@ -476,11 +477,14 @@ class ThesisCrudController extends AbstractCrudController
             AssociationField::new('type', 'Publication Type')
                 ->setRequired(false)
                 ->hideOnIndex(),
-            AssociationField::new('college', 'College')
-                ->setRequired(false)
+            TextField::new('college', 'College')
+                ->hideOnForm()
                 ->formatValue(function ($value) {
                     return $value ? (string) $value : '<span class="text-muted small">Not Specified</span>';
                 }),
+            AssociationField::new('college', 'College')
+                ->setRequired(false)
+                ->hideOnIndex(),
             
             TextareaField::new('description', 'Abstract')->setNumOfRows(6)->hideOnIndex()->setRequired(false),
             

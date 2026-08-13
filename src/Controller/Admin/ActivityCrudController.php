@@ -30,7 +30,8 @@ class ActivityCrudController extends AbstractCrudController
     {
         return $crud
             ->setPaginatorPageSize(10)
-            ->setDefaultSort(['createdAt' => 'DESC']);
+            ->setDefaultSort(['createdAt' => 'DESC'])
+            ->setDefaultRowAction(null);
     }
 
     public function createIndexQueryBuilder(SearchDto $searchDto, EntityDto $entityDto, FieldCollection $fields, FilterCollection $filters): QueryBuilder
@@ -98,18 +99,10 @@ class ActivityCrudController extends AbstractCrudController
                          */
                         ['change', 'input'].forEach(evt => {
                             document.body.addEventListener(evt, function(e) {
-                                if (!e.target || !e.target.name) return;
-
-                                if (e.target.name.includes('[isActive]') && e.target.checked) {
-                                    document.querySelectorAll('input[name*=\"[publishAt]\"]').forEach(input => {
-                                        input.value = '';
-                                    });
-                                }
-
-                                if (e.target.name.includes('[publishAt]') && e.target.value !== '') {
-                                    const activeSwitch = document.querySelector('input[type=\"checkbox\"][name*=\"[isActive]\"]');
-                                    if (activeSwitch && activeSwitch.checked) {
-                                        activeSwitch.checked = false;
+                                if (e.target && e.target.id === 'Activity_isActive') {
+                                    const publishAtInput = document.getElementById('Activity_publishAt');
+                                    if (publishAtInput && !e.target.checked) {
+                                        // Keeping user custom future dates if intentionally scheduling
                                     }
                                 }
                             });
@@ -127,8 +120,18 @@ class ActivityCrudController extends AbstractCrudController
     {
         return [
             TextField::new('title', 'Article Title'),
-            AssociationField::new('category', 'Category')->setRequired(true),
-            AssociationField::new('college', 'College')->setRequired(false),
+            TextField::new('category', 'Category')
+                ->hideOnForm()
+                ->formatValue(function ($value) {
+                    return $value ? (string) $value : '<span class="text-muted small">Not Specified</span>';
+                }),
+            AssociationField::new('category', 'Category')->setRequired(true)->hideOnIndex(),
+            TextField::new('college', 'College')
+                ->hideOnForm()
+                ->formatValue(function ($value) {
+                    return $value ? (string) $value : '<span class="text-muted small">Not Specified</span>';
+                }),
+            AssociationField::new('college', 'College')->setRequired(false)->hideOnIndex(),
             ImageField::new('image', 'Main Cover Image')
                 ->setBasePath('uploads/activities/')
                 ->setUploadDir('public/uploads/activities/')

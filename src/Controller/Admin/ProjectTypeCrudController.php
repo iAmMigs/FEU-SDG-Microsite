@@ -23,7 +23,8 @@ class ProjectTypeCrudController extends AbstractCrudController
     {
         return $crud
             ->setEntityLabelInSingular('Publication Type')
-            ->setEntityLabelInPlural('Publication Types');
+            ->setEntityLabelInPlural('Publication Types')
+            ->setDefaultRowAction(null);
     }
 
     public function configureActions(Actions $actions): Actions
