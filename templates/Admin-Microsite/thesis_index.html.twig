@@ -1,32 +1,33 @@
 {% extends '@EasyAdmin/crud/index.html.twig' %}
 
-{% block page_actions %}
-    <div class="d-flex align-items-center gap-2 me-2">
-        <select class="form-select" id="yearFilter" onchange="applyYearFilter(this.value)" style="width: auto; height: 38px;">
-            <option value="">Filter by Year</option>
-            {% for year in range("now"|date("Y"), 1990) %}
-                <option value="{{ year }}" {% if app.request.query.get('researchYear') == year %}selected{% endif %}>{{ year }}</option>
-            {% endfor %}
-        </select>
-    </div>
+{% block head_stylesheets %}
     {{ parent() }}
+    <style>
+        /* Hide confusing comparison operator dropdowns ("is same", "is not same") */
+        .filter-field .col-filter-comparison,
+        .filter-field select[name*="[comparison]"],
+        .ea-filter-wrapper select[name*="[comparison]"],
+        #filters-modal select[name*="[comparison]"],
+        .action-filters-modal select[name*="[comparison]"],
+        .modal-body select[name*="[comparison]"] {
+            display: none !important;
+        }
+
+        /* Make filter value select inputs span 100% full width */
+        .filter-field .col-filter-value,
+        .filter-field select[name*="[value]"],
+        .filter-field input[name*="[value]"],
+        #filters-modal select[name*="[value]"],
+        .modal-body select[name*="[value]"] {
+            width: 100% !important;
+            flex: 0 0 100% !important;
+            max-width: 100% !important;
+        }
+    </style>
 {% endblock %}
 
 {% block body_javascript %}
     {{ parent() }}
-    <script>
-        function applyYearFilter(year) {
-            const url = new URL(window.location.href);
-            if (year) {
-                url.searchParams.set('researchYear', year);
-            } else {
-                url.searchParams.delete('researchYear');
-            }
-            // Reset to page 1 when filtering
-            url.searchParams.delete('page');
-            window.location.href = url.toString();
-        }
-    </script>
     
     <div class="modal fade" id="csvImportModal" tabindex="-1" aria-labelledby="csvImportModalLabel" aria-hidden="true">
         <div class="modal-dialog modal-dialog-centered">
@@ -171,6 +172,9 @@
                     </div>
                     <button type="button" class="btn btn-link text-muted fw-bold text-decoration-none px-4" data-bs-dismiss="modal">Cancel</button>
                     <div class="btn-group gap-2">
+                        <button type="button" class="btn btn-danger fw-bold px-4 shadow-sm" style="border-radius: 8px !important; border: none;" onclick="batchManager.executeDelete()" id="btnDeleteBatch" disabled>
+                            <i class="fas fa-trash-alt me-2"></i> DELETE
+                        </button>
                         <button type="button" class="btn btn-warning fw-bold px-4 shadow-sm" style="border-radius: 8px !important; background-color: #FCC30B; border: none;" onclick="batchManager.execute(0)" id="btnDeactivateBatch" disabled>
                             <i class="fas fa-times-circle me-2"></i> DEACTIVATE
                         </button>
@@ -300,6 +304,7 @@
                 const hasTargets = this.targetedProjects.length > 0;
                 document.getElementById('btnActivateBatch').disabled = !hasTargets;
                 document.getElementById('btnDeactivateBatch').disabled = !hasTargets;
+                document.getElementById('btnDeleteBatch').disabled = !hasTargets;
             },
 
             target: function(id) {
@@ -340,6 +345,27 @@
                     const result = await response.json();
                     if (result.success) {
                         alert(`${result.count} projects updated successfully!`);
+                        location.reload();
+                    }
+                } catch (e) {
+                    alert("Execution failed. Please try again.");
+                    console.error(e);
+                }
+            },
+
+            executeDelete: async function() {
+                const ids = this.targetedProjects.map(p => p.id);
+                if (!confirm(`WARNING: This action is irreversible. Are you sure you want to PERMANENTLY DELETE these ${ids.length} projects?`)) return;
+
+                try {
+                    const response = await fetch('{{ path('admin_project_batch_execute_delete') }}', {
+                        method: 'POST',
+                        body: JSON.stringify({ ids }),
+                        headers: { 'Content-Type': 'application/json' }
+                    });
+                    const result = await response.json();
+                    if (result.success) {
+                        alert(`${result.count} projects deleted successfully!`);
                         location.reload();
                     }
                 } catch (e) {

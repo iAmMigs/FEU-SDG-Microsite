@@ -37,21 +37,38 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
 use Doctrine\ORM\QueryBuilder;
 
+use EasyCorp\Bundle\EasyAdminBundle\Config\Filters;
+use EasyCorp\Bundle\EasyAdminBundle\Filter\EntityFilter;
+use EasyCorp\Bundle\EasyAdminBundle\Filter\ChoiceFilter;
+
 class ThesisCrudController extends AbstractCrudController
 {
+
+    public function configureFilters(Filters $filters): Filters
+    {
+        $years = range((int)date('Y'), 1990);
+        $yearChoices = array_combine($years, $years);
+
+        return $filters
+            ->add(EntityFilter::new('college', 'College'))
+            ->add(EntityFilter::new('type', 'Publication Type'))
+            ->add(ChoiceFilter::new('researchYear', 'Year of Research')->setChoices($yearChoices));
+    }
 
     public function createIndexQueryBuilder(SearchDto $searchDto, EntityDto $entityDto, FieldCollection $fields, FilterCollection $filters): QueryBuilder
     {
         $qb = parent::createIndexQueryBuilder($searchDto, $entityDto, $fields, $filters);
         
+        $qb->leftJoin('entity.college', 'c')->addSelect('c')
+           ->leftJoin('entity.type', 'pt')->addSelect('pt')
+           ->leftJoin('entity.sdgs', 's')->addSelect('s');
+        
         $request = $this->getContext()->getRequest();
         $researchYear = $request->query->get('researchYear');
         
         if ($researchYear) {
-            $qb->andWhere('entity.researchDate >= :yearStart')
-               ->andWhere('entity.researchDate <= :yearEnd')
-               ->setParameter('yearStart', new \DateTimeImmutable($researchYear . '-01-01 00:00:00'))
-               ->setParameter('yearEnd', new \DateTimeImmutable($researchYear . '-12-31 23:59:59'));
+            $qb->andWhere('entity.researchYear = :researchYear')
+               ->setParameter('researchYear', (int) $researchYear);
         }
         
         return $qb;
@@ -69,6 +86,7 @@ class ThesisCrudController extends AbstractCrudController
             ->setEntityLabelInPlural('Projects')
             ->setPaginatorPageSize(10)
             ->setDefaultSort(['createdAt' => 'DESC'])
+            ->setDefaultRowAction(null)
             ->overrideTemplate('crud/index', 'Admin-Microsite/thesis_index.html.twig');
     }
 
@@ -167,22 +185,10 @@ class ThesisCrudController extends AbstractCrudController
     {
         $sdgs = $entityManager->getRepository(\App\Entity\Sdg::class)->findBy([], ['id' => 'ASC']);
         $types = $entityManager->getRepository(\App\Entity\ProjectType::class)->findBy([], ['name' => 'ASC']);
-        
-        $dates = $entityManager->createQueryBuilder()
-            ->select('DISTINCT t.researchDate')
-            ->from(Thesis::class, 't')
-            ->where('t.researchDate IS NOT NULL')
-            ->getQuery()
-            ->getSingleColumnResult();
-
-        $years = [];
-        foreach ($dates as $date) {
-            if ($date instanceof \DateTimeInterface) {
-                $years[] = $date->format('Y');
-            }
-        }
-        $years = array_values(array_unique($years));
-        rsort($years);
+        $conn = $entityManager->getConnection();
+        $years = $conn->fetchFirstColumn(
+            'SELECT DISTINCT research_year AS yr FROM thesis WHERE research_year IS NOT NULL ORDER BY yr DESC'
+        );
 
         return new JsonResponse([
             'sdgs' => array_map(fn($s) => ['id' => $s->getId(), 'name' => $s->getName(), 'number' => $s->getId()], $sdgs),
@@ -205,7 +211,7 @@ class ThesisCrudController extends AbstractCrudController
         $isActive = $data['isActive'] ?? null;
 
         $qb = $entityManager->getRepository(Thesis::class)->createQueryBuilder('t')
-            ->select('t.id', 't.title', 't.researchDate', 't.isActive');
+            ->select('t.id', 't.title', 't.researchYear', 't.isActive');
 
         if ($keyword) {
             $qb->andWhere('t.title LIKE :keyword')
@@ -217,10 +223,8 @@ class ThesisCrudController extends AbstractCrudController
                ->setParameter('sdgId', $sdgId);
         }
         if ($year) {
-            $qb->andWhere('t.researchDate >= :startDate')
-               ->andWhere('t.researchDate <= :endDate')
-               ->setParameter('startDate', new \DateTimeImmutable($year . '-01-01 00:00:00'))
-               ->setParameter('endDate', new \DateTimeImmutable($year . '-12-31 23:59:59'));
+            $qb->andWhere('t.researchYear = :year')
+               ->setParameter('year', (int)$year);
         }
         if ($typeId) {
             $qb->andWhere('t.type = :typeId')
@@ -231,12 +235,10 @@ class ThesisCrudController extends AbstractCrudController
                ->setParameter('isActive', (bool)$isActive);
         }
 
-        $projects = $qb->orderBy('t.researchDate', 'DESC')->addOrderBy('t.title', 'ASC')->getQuery()->getArrayResult();
+        $projects = $qb->orderBy('t.researchYear', 'DESC')->addOrderBy('t.title', 'ASC')->getQuery()->getArrayResult();
 
         foreach ($projects as &$project) {
-            $project['year'] = $project['researchDate'] instanceof \DateTimeInterface 
-                ? $project['researchDate']->format('Y') 
-                : null;
+            $project['year'] = $project['researchYear'] ?? null;
         }
 
         return new JsonResponse($projects);
@@ -261,6 +263,29 @@ class ThesisCrudController extends AbstractCrudController
             ->set('t.isActive', ':status')
             ->where('t.id IN (:ids)')
             ->setParameter('status', (bool)$targetStatus)
+            ->setParameter('ids', $ids)
+            ->getQuery()
+            ->execute();
+
+        return new JsonResponse(['success' => true, 'count' => count($ids)]);
+    }
+
+    /**
+     * Executes the bulk deletion of targeted projects.
+     */
+    #[Route('/admin/projects/batch-execute-delete', name: 'admin_project_batch_execute_delete', methods: ['POST'])]
+    public function executeBatchDelete(Request $request, EntityManagerInterface $entityManager): JsonResponse
+    {
+        $data = json_decode($request->getContent(), true);
+        $ids = $data['ids'] ?? [];
+
+        if (empty($ids)) {
+            return new JsonResponse(['success' => false, 'message' => 'No projects selected.'], 400);
+        }
+
+        $entityManager->createQueryBuilder()
+            ->delete(Thesis::class, 't')
+            ->where('t.id IN (:ids)')
             ->setParameter('ids', $ids)
             ->getQuery()
             ->execute();
@@ -339,7 +364,7 @@ class ThesisCrudController extends AbstractCrudController
                         $project->setViews(0);
                         $project->setRegionViews([]);
                         
-                        $project->setResearchDate(new \DateTimeImmutable($researchYear . '-01-01'));
+                        $project->setResearchYear((int) $researchYear);
 
                         if ($typeIdx !== -1 && !empty(trim($data[$typeIdx] ?? ''))) {
                             $typeStr = trim($data[$typeIdx]);
@@ -438,17 +463,27 @@ class ThesisCrudController extends AbstractCrudController
         return [
             IdField::new('id')->hideOnForm()->hideOnIndex(),
             BooleanField::new('isActive', 'Active'),
-            TextField::new('title', 'Thesis Title'),
-            TextField::new('authors', 'Authors')
+            TextField::new('title', 'Title'),
+            TextareaField::new('authors', 'Authors')
+                ->setNumOfRows(3)
                 ->setHelp('Separate multiple authors with a semicolon (;) to match our dataset format.')
                 ->hideOnIndex(),
             
-            AssociationField::new('type', 'Type')
-                ->setRequired(false)
+            TextField::new('type', 'Publication Type')
+                ->hideOnForm()
                 ->formatValue(function ($value) {
-                    return $value ?: '<span class="text-muted small">Not Specified</span>';
+                    return $value ? (string) $value : '<span class="text-muted small">Not Specified</span>';
                 }),
-            AssociationField::new('college', 'College')->setRequired(false)
+            AssociationField::new('type', 'Publication Type')
+                ->setRequired(false)
+                ->hideOnIndex(),
+            TextField::new('college', 'College')
+                ->hideOnForm()
+                ->formatValue(function ($value) {
+                    return $value ? (string) $value : '<span class="text-muted small">Not Specified</span>';
+                }),
+            AssociationField::new('college', 'College')
+                ->setRequired(false)
                 ->hideOnIndex(),
             
             TextareaField::new('description', 'Abstract')->setNumOfRows(6)->hideOnIndex()->setRequired(false),
@@ -466,8 +501,8 @@ class ThesisCrudController extends AbstractCrudController
                 ->setHelp('Paste the URL to an external journal or publication if applicable')->setRequired(false)
                 ->hideOnIndex(),
             
-            DateField::new('researchDate', 'Date of Research')
-                ->setHelp('Required: Select the specific date or year the research was conducted. (January 1 will be displayed simply as the Year).')
+            IntegerField::new('researchYear', 'Year of Research')
+                ->setHelp('Enter the year the research was conducted (e.g. 2024).')
                 ->setRequired(true),
                 
             TextField::new('documentFile', 'PDF Document')

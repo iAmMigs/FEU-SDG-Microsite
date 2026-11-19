@@ -6,6 +6,8 @@ use App\Repository\LeadingVoiceRepository;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 
+use Symfony\Component\Validator\Constraints as Assert;
+
 /**
  * Represents a featured researcher, faculty member, or public figure.
  */
@@ -18,12 +20,15 @@ class LeadingVoice
     private ?int $id = null;
 
     #[ORM\Column(length: 255)]
+    #[Assert\Length(max: 22, maxMessage: 'The name cannot be longer than {{ limit }} characters.')]
     private ?string $name = null;
 
     #[ORM\Column(length: 255)]
+    #[Assert\Length(max: 18, maxMessage: 'The professional title cannot be longer than {{ limit }} characters.')]
     private ?string $title = null;
 
     #[ORM\Column(type: Types::TEXT)]
+    #[Assert\Length(max: 100, maxMessage: 'The description cannot be longer than {{ limit }} characters.')]
     private ?string $description = null;
 
     #[ORM\Column(length: 255, nullable: true)]

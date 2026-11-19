@@ -33,7 +33,8 @@ class AdminCrudController extends AbstractCrudController
         return $crud
             ->setEntityLabelInSingular('Administrator')
             ->setEntityLabelInPlural('Administrators')
-            ->setSearchFields(['employeeId', 'fullName', 'email']);
+            ->setSearchFields(['employeeId', 'fullName', 'email'])
+            ->setDefaultRowAction(null);
     }
 
     public function configureFields(string $pageName): iterable

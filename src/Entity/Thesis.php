@@ -12,7 +12,7 @@ use Doctrine\ORM\Mapping as ORM;
  * Represents a student research project, academic thesis, or official publication.
  */
 #[ORM\Entity(repositoryClass: ThesisRepository::class)]
-#[ORM\Index(name: 'idx_thesis_search', columns: ['title', 'authors'])]
+#[ORM\Index(name: 'idx_thesis_search', columns: ['title'])]
 #[ORM\Index(name: 'idx_thesis_trending', columns: ['views'])]
 class Thesis
 {
@@ -27,10 +27,10 @@ class Thesis
     #[ORM\Column(type: Types::TEXT, nullable: true)]
     private ?string $description = null;
 
-    #[ORM\Column(length: 255)]
+    #[ORM\Column(type: Types::TEXT, nullable: true)]
     private ?string $authors = null;
 
-    #[ORM\ManyToOne(targetEntity: ProjectType::class)]
+    #[ORM\ManyToOne(targetEntity: ProjectType::class, inversedBy: 'theses')]
     private ?ProjectType $type = null;
 
     #[ORM\ManyToOne(targetEntity: College::class)]
@@ -57,12 +57,8 @@ class Thesis
     #[ORM\Column(length: 255, nullable: true)]
     private ?string $publicationLink = null;
 
-    /*
-     * Consolidates both month and year into a single date object.
-     * Defaults to January 1 for records where only the year is known.
-     */
-    #[ORM\Column(type: Types::DATE_IMMUTABLE, nullable: true)]
-    private ?\DateTimeImmutable $researchDate = null;
+    #[ORM\Column(type: Types::INTEGER, nullable: true)]
+    private ?int $researchYear = null;
 
     #[ORM\Column(type: 'boolean', options: ['default' => false])]
     private ?bool $isActive = false;
@@ -89,7 +85,7 @@ class Thesis
     public function setDescription(?string $description): static { $this->description = $description; return $this; }
 
     public function getAuthors(): ?string { return $this->authors; }
-    public function setAuthors(string $authors): static { $this->authors = $authors; return $this; }
+    public function setAuthors(?string $authors): static { $this->authors = $authors; return $this; }
 
     public function getType(): ?ProjectType { return $this->type; }
     public function setType(?ProjectType $type): static { $this->type = $type; return $this; }
@@ -140,8 +136,8 @@ class Thesis
     public function getPublicationLink(): ?string { return $this->publicationLink; }
     public function setPublicationLink(?string $publicationLink): static { $this->publicationLink = $publicationLink; return $this; }
 
-    public function getResearchDate(): ?\DateTimeImmutable { return $this->researchDate; }
-    public function setResearchDate(?\DateTimeImmutable $researchDate): static { $this->researchDate = $researchDate; return $this; }
+    public function getResearchYear(): ?int { return $this->researchYear; }
+    public function setResearchYear(?int $researchYear): static { $this->researchYear = $researchYear; return $this; }
 
     /** @return Collection<int, Sdg> */
     public function getSdgs(): Collection { return $this->sdgs; }

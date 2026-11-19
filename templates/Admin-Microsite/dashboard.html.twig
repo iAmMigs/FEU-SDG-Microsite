@@ -1,6 +1,6 @@
 {% extends '@EasyAdmin/page/content.html.twig' %}
 
-{% block content_title %}System Overview{% endblock %}
+{% block content_title %}SDG - Admin{% endblock %}
 
 {% block main %}
     <div class="row">
@@ -66,7 +66,6 @@
     </div>
 
     <div class="row mt-2">
-        
         <div class="col-lg-6 mb-4">
             <div class="card shadow-sm border-0 h-100" style="border-radius: 12px;">
                 <div class="card-header bg-transparent border-0 pt-4 pb-0">
@@ -101,7 +100,65 @@
                 </div>
             </div>
         </div>
+    </div>
 
+    <!-- Country Visitor Analytics Section (Full Width, Anonymized Summary) -->
+    <div class="row mt-2">
+        <div class="col-lg-12 mb-4">
+            <div class="card shadow-sm border-0 h-100" style="border-radius: 12px;">
+                <div class="card-header bg-transparent border-0 pt-4 pb-2 d-flex justify-content-between align-items-center">
+                    <h6 class="fw-bold mb-0 text-secondary text-uppercase" style="letter-spacing: 1px;">
+                        <i class="fas fa-globe-asia text-success me-2"></i>Website Traffic by Country
+                    </h6>
+                    <span class="badge bg-success bg-opacity-10 text-success px-3 py-2 rounded-pill fw-semibold">
+                        Total Tracked Visits: {{ total_visits_count }}
+                    </span>
+                </div>
+                <div class="card-body">
+                    {% if country_visits is empty %}
+                        <div class="text-center py-5 text-muted">
+                            <i class="fas fa-chart-bar fa-2x mb-2 opacity-50"></i>
+                            <p class="mb-0">No country visit data recorded yet.</p>
+                        </div>
+                    {% else %}
+                        <div class="table-responsive">
+                            <table class="table table-hover align-middle mb-0">
+                                <thead class="table-light">
+                                    <tr>
+                                        <th scope="col" style="font-size: 0.8rem; text-transform: uppercase;">Country</th>
+                                        <th scope="col" style="font-size: 0.8rem; text-transform: uppercase; text-align: center;">Country Code</th>
+                                        <th scope="col" style="font-size: 0.8rem; text-transform: uppercase; text-align: right;">Total Visits</th>
+                                        <th scope="col" style="font-size: 0.8rem; text-transform: uppercase; text-align: right;">Share of Traffic</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for country in country_visits %}
+                                        {% set percentage = total_visits_count > 0 ? ((country.visitCount / total_visits_count) * 100)|number_format(1) : 0 %}
+                                        <tr>
+                                            <td class="fw-semibold">
+                                                <i class="fas fa-location-dot me-2 text-success"></i>{{ country.countryName }}
+                                            </td>
+                                            <td class="text-center">
+                                                <span class="badge bg-light text-dark border px-2 py-1">{{ country.countryCode }}</span>
+                                            </td>
+                                            <td class="text-end fw-bold">{{ country.visitCount }}</td>
+                                            <td class="text-end" style="min-width: 200px;">
+                                                <div class="d-flex align-items-center justify-content-end gap-2">
+                                                    <div class="progress flex-grow-1" style="height: 8px; background-color: rgba(148, 163, 184, 0.2);">
+                                                        <div class="progress-bar bg-success" role="progressbar" style="width: {{ percentage }}%;"></div>
+                                                    </div>
+                                                    <span class="small fw-semibold text-muted" style="font-size: 0.85rem;">{{ percentage }}%</span>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>

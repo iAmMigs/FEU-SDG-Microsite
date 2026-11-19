@@ -24,7 +24,8 @@ class LeadingVoiceCrudController extends AbstractCrudController
     {
         return $crud
             ->setEntityLabelInSingular('Featured voice in research')
-            ->setEntityLabelInPlural('Featured voices in research');
+            ->setEntityLabelInPlural('Featured voices in research')
+            ->setDefaultRowAction(null);
     }
 
     public function configureFields(string $pageName): iterable
@@ -44,13 +45,32 @@ class LeadingVoiceCrudController extends AbstractCrudController
                 ])
                 ->setHelp('Upload a square 2x2 image. Will be automatically rounded on the frontend.'),
                 
-            TextField::new('name', 'Full Name'),
+            TextField::new('name', 'Full Name')
+                ->setMaxLength(22)
+                ->setFormTypeOptions([
+                    'attr' => [
+                        'maxlength' => 22,
+                    ],
+                ])
+                ->setHelp('Maximum of 22 characters.'),
             
             TextField::new('title', 'Professional Title')
-                ->setHelp('e.g., Lead Researcher, Engineering Director'),
+                ->setMaxLength(18)
+                ->setFormTypeOptions([
+                    'attr' => [
+                        'maxlength' => 18,
+                    ],
+                ])
+                ->setHelp('Maximum of 18 characters.'),
             
             TextareaField::new('description', 'Description / Bio')
-                ->setNumOfRows(6),
+                ->setNumOfRows(5)
+                ->setFormTypeOptions([
+                    'attr' => [
+                        'maxlength' => 100,
+                    ],
+                ])
+                ->setHelp('Maximum of 100 characters.'),
         ];
     }
 }

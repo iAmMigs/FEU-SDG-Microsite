@@ -59,14 +59,14 @@
                             data-action="click->modal#open"
                             data-goal="{{ sdg.num }}"
                             data-title="{{ sdg.title }}"
-                            data-description="{{ sdg.desc }}"
+                            data-description="{{ sdg.long_desc }}"
                             data-active="{{ is_active ? 'true' : 'false' }}"
                             data-image="{{ asset('images/sdg/E-WEB-Goal-' ~ formatted_num ~ '.png') }}"
                             style="{{ is_active ? 'display: block; opacity: 1; transform: scale(1);' : 'display: none; opacity: 0; transform: scale(0.95);' }}"
-                            class="sdg-card group relative rounded-2xl overflow-hidden shadow-md hover:shadow-2xl transition-all duration-300 hover:-translate-y-2 border border-gray-100 bg-white aspect-square text-left focus:outline-none focus:ring-4 focus:ring-green-700/30 cursor-pointer">
+                            class="sdg-card group relative rounded-2xl overflow-hidden shadow-md hover:shadow-2xl transition-all duration-150 hover:-translate-y-2 border border-gray-100 bg-white aspect-square text-left focus:outline-none focus:ring-4 focus:ring-green-700/30 cursor-pointer">
                         
-                        <img src="{{ asset('images/sdg/E-WEB-Goal-' ~ formatted_num ~ '.png') }}" alt="Goal {{ sdg.num }}" class="absolute inset-0 w-full h-full object-cover transition-opacity duration-300 opacity-100 group-hover:opacity-0">
-                        <img src="{{ asset('images/sdg/E Inverted Icons_WEB-' ~ formatted_num ~ '.png') }}" alt="Goal {{ sdg.num }}" class="absolute inset-0 w-full h-full object-cover transition-opacity duration-300 opacity-0 group-hover:opacity-100">
+                        <img src="{{ asset('images/sdg/E-WEB-Goal-' ~ formatted_num ~ '.png') }}" alt="Goal {{ sdg.num }}" loading="lazy" class="absolute inset-0 w-full h-full object-cover transition-opacity duration-150 opacity-100 group-hover:opacity-0">
+                        <img src="{{ asset('images/sdg/E Inverted Icons_WEB-' ~ formatted_num ~ '.png') }}" alt="Goal {{ sdg.num }}" loading="lazy" class="absolute inset-0 w-full h-full object-cover transition-opacity duration-150 opacity-0 group-hover:opacity-100">
                     </button>
                 {% endfor %}
             </div>
@@ -74,36 +74,48 @@
             <div data-modal-target="backdrop" class="fixed inset-0 z-[100] hidden opacity-0 transition-opacity duration-300 flex items-center justify-center p-4 md:p-6">
                 <div class="absolute inset-0 bg-black/60 backdrop-blur-md cursor-pointer" data-action="click->modal#close"></div>
                 
-                <div data-modal-target="panel" class="relative bg-white rounded-3xl overflow-hidden shadow-2xl w-full max-w-4xl flex flex-col md:flex-row transform opacity-0 scale-95 translate-y-4 transition-all duration-300 ease-out z-10">
-                    <button type="button" data-action="click->modal#close" class="absolute top-4 right-4 z-20 bg-white/50 hover:bg-white backdrop-blur-sm text-gray-900 p-2 rounded-full transition duration-200 shadow-sm focus:outline-none cursor-pointer">
+                <div data-modal-target="panel" class="relative bg-white rounded-3xl overflow-hidden shadow-2xl w-full max-w-4xl flex flex-col md:flex-row transform opacity-0 scale-95 translate-y-4 transition-all duration-300 ease-out z-10 max-h-[90vh]">
+                    
+                    {# Close Button #}
+                    <button type="button" data-action="click->modal#close" class="absolute top-6 right-6 z-20 text-gray-400 hover:text-gray-800 transition duration-200 focus:outline-none cursor-pointer">
                         <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
                     </button>
 
-                    <div class="md:w-1/2 h-64 md:h-auto relative bg-white">
-                        <img data-modal-target="image" src="" alt="SDG Target Cover" class="absolute inset-0 w-full h-full object-contain p-8">
+                    {# LEFT SIDE: Image properly contained #}
+                    <div class="md:w-1/2 p-8 md:p-12 flex items-center justify-center bg-white shrink-0">
+                        <img data-modal-target="image" src="" alt="SDG Target Cover" class="w-full max-w-[320px] h-auto object-contain shadow-sm">
                     </div>
                     
-                    <div class="md:w-1/2 p-10 md:p-14 flex flex-col justify-center bg-white">
-                        <h2 data-modal-target="title" class="text-4xl md:text-5xl font-bold text-green-950 mb-6 font-bebas tracking-wide leading-none">
-                            Goal Title
-                        </h2>
-                        <p data-modal-target="description" class="text-gray-600 text-lg leading-relaxed font-work">
-                            Goal Description
-                        </p>
-                        
-                        <div class="mt-10 pt-8 border-t border-gray-100 flex flex-col gap-3 text-center">
-                            <h4 data-modal-target="actionPrompt" class="text-sm font-bold text-gray-400 uppercase tracking-widest font-work mb-4">Which would you like to visit?</h4>
+                    {# RIGHT SIDE: Content, Title, and Buttons #}
+                    <div class="md:w-1/2 p-8 md:p-12 md:pl-0 flex flex-col justify-center bg-white overflow-y-auto">
+                        <div class="flex-grow flex flex-col justify-center">
                             
-                            <div data-modal-target="buttonsContainer" class="flex-col gap-3" style="display: flex;">
-                                <a href="#" data-modal-target="libraryBtn" class="block w-full text-center bg-feu-green-900 text-white font-bold px-6 py-4 rounded-xl hover:bg-feu-green-800 transition duration-300 font-work shadow-md">
+                            <h2 data-modal-target="title" class="text-3xl md:text-4xl font-bold text-feu-green-950 mb-4 font-bebas tracking-wide leading-tight uppercase pr-8">
+                                Goal Title
+                            </h2>
+                            
+                            <p data-modal-target="description" class="text-gray-600 text-sm md:text-base leading-relaxed font-work">
+                                Goal Description
+                            </p>
+                        </div>
+                        
+                        <div data-modal-target="footerContainer" class="mt-8 pt-6 border-t border-gray-100 flex flex-col gap-4 text-center shrink-0">
+                            <h4 data-modal-target="actionPrompt" class="text-xs font-bold text-gray-400 uppercase tracking-widest font-work">Which would you like to visit?</h4>
+                            
+                            <div data-modal-target="buttonsContainer" class="flex flex-col gap-3">
+                                {# Library Button (Green) #}
+                                <a href="#" data-modal-target="libraryBtn" data-base-url="{{ path('app_library') }}" class="block w-full text-center bg-feu-green-900 text-white font-bold px-5 py-3.5 rounded-xl hover:bg-feu-green-800 transition duration-300 font-work shadow-sm text-sm">
                                     SDG Related Project Library
                                 </a>
-                                <a href="#" data-modal-target="activityBtn" class="block w-full text-center bg-feu-gold-400 text-feu-green-900 font-bold px-6 py-4 rounded-xl hover:bg-feu-gold-500 transition duration-300 font-work shadow-md">
+
+                                {# Activities Button (Gold/Yellow) #}
+                                <a href="#" data-modal-target="activityBtn" data-base-url="{{ path('app_news') }}" class="block w-full text-center bg-[#FCC30B] text-yellow-950 font-bold px-5 py-3.5 rounded-xl hover:bg-yellow-500 transition duration-300 font-work shadow-sm text-sm">
                                     SDG Related Activities
                                 </a>
                             </div>
                         </div>
                     </div>
+                    
                 </div>
             </div>
             
@@ -143,7 +155,7 @@
                                 if (currentMode === 'focused' && !isActive) {
                                     card.style.display = 'none';
                                 }
-                            }, 300);
+                            }, 150);
                         }
                     });
                 }
@@ -165,40 +177,136 @@
             </div>
             
             {% if leading_voices|length > 0 %}
-                {# Dynamic Grid sizing based on how many voices exist (Max 4) #}
-                {% set grid_class = 'lg:grid-cols-4' %}
-                {% if leading_voices|length == 3 %}
-                    {% set grid_class = 'lg:grid-cols-3 max-w-5xl mx-auto' %}
-                {% elseif leading_voices|length == 2 %}
-                    {% set grid_class = 'lg:grid-cols-2 max-w-3xl mx-auto' %}
-                {% elseif leading_voices|length == 1 %}
-                    {% set grid_class = 'lg:grid-cols-1 max-w-sm mx-auto' %}
-                {% endif %}
+                <style>
+                    @keyframes marquee-voices {
+                        0% { transform: translateX(0%); }
+                        100% { transform: translateX(-50%); }
+                    }
+                    .animate-marquee-voices {
+                        display: flex;
+                        width: max-content;
+                        animation: marquee-voices 55s linear infinite;
+                    }
+                    .animate-marquee-voices:hover {
+                        animation-play-state: paused;
+                    }
+                    .carousel-edge-fade {
+                        mask-image: linear-gradient(to right, transparent 0%, black 7%, black 93%, transparent 100%);
+                        -webkit-mask-image: linear-gradient(to right, transparent 0%, black 7%, black 93%, transparent 100%);
+                    }
+                    .voice-card-static {
+                        width: 275px !important;
+                        min-width: 275px !important;
+                        max-width: 275px !important;
+                        height: 350px !important;
+                        min-height: 350px !important;
+                        max-height: 350px !important;
+                        flex-shrink: 0 !important;
+                        box-sizing: border-box !important;
+                    }
+                </style>
+                
+                {% set repeat_count = (leading_voices|length < 5) ? 5 : 1 %}
 
-                <div class="grid grid-cols-1 sm:grid-cols-2 {{ grid_class }} gap-8">
-                    {% for voice in leading_voices %}
-                        <div class="bg-white rounded-2xl p-8 text-center shadow-xl hover:-translate-y-2 transition duration-300 group">
-                            
-                            {# Image / Initials Fallback #}
-                            {% if voice.image %}
-                                {# UPDATED: Changed border color to #FCC30B (FEU Institute of Technology Gold) #}
-                                <img src="{{ asset('uploads/voices/' ~ voice.image) }}" alt="{{ voice.name }}" class="w-20 h-20 mx-auto rounded-full object-cover mb-4 border-4 border-[#FCC30B] shadow-sm transition group-hover:scale-110">
-                            {% else %}
-                                {% set name_parts = voice.name|split(' ') %}
-                                {% set initials = (name_parts|first|slice(0,1) ~ name_parts|last|slice(0,1))|upper %}
-                                
-                                {# UPDATED: Changed border color to #FCC30B (FEU Tech Gold) #}
-                                <div class="w-20 h-20 mx-auto bg-feu-green-100 text-feu-green-800 rounded-full flex items-center justify-center text-2xl font-black font-bebas mb-4 border-4 border-[#FCC30B] shadow-sm group-hover:bg-[#FCC30B] group-hover:text-feu-green-900 transition group-hover:scale-110">
-                                    {{ initials }}
-                                </div>
-                            {% endif %}
-                            
-                            <h3 class="text-xl font-bold text-gray-900 font-bebas tracking-wide mb-1">{{ voice.name }}</h3>
-                            <p class="text-xs font-bold text-feu-green-700 uppercase tracking-widest mb-3 font-work">{{ voice.title }}</p>
-                            <p class="text-sm text-gray-600 font-work leading-relaxed">{{ voice.description }}</p>
-                        </div>
-                    {% endfor %}
+                {# Relative wrapper for arrow positioning — arrows sit within max-w-7xl visible bounds #}
+                <div class="relative z-20 py-8">
+
+                    {# Left Hover Arrow — anchored to the left side of the visible container #}
+                    <button type="button" id="voice-arrow-left" aria-label="Scroll left"
+                            class="absolute left-0 top-1/2 -translate-y-1/2 z-40 w-14 h-14 bg-white text-feu-green-900 rounded-full shadow-2xl border-2 border-[#FCC30B] flex items-center justify-center cursor-pointer opacity-50 hover:opacity-100 hover:bg-[#FCC30B] hover:text-feu-green-950 transition-all duration-300 hover:scale-110 active:scale-95 group">
+                        <svg class="w-7 h-7 transition-transform group-hover:-translate-x-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M10.5 19.5L3 12m0 0l7.5-7.5M3 12h18" />
+                        </svg>
+                    </button>
+
+                    {# Right Hover Arrow — anchored to the right side of the visible container #}
+                    <button type="button" id="voice-arrow-right" aria-label="Scroll right"
+                            class="absolute right-0 top-1/2 -translate-y-1/2 z-40 w-14 h-14 bg-white text-feu-green-900 rounded-full shadow-2xl border-2 border-[#FCC30B] flex items-center justify-center cursor-pointer opacity-50 hover:opacity-100 hover:bg-[#FCC30B] hover:text-feu-green-950 transition-all duration-300 hover:scale-110 active:scale-95 group">
+                        <svg class="w-7 h-7 transition-transform group-hover:translate-x-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M13.5 4.5L21 12m0 0l-7.5 7.5M21 12H3" />
+                        </svg>
+                    </button>
+
+                    {# Carousel track extends beyond container with negative margins for full-bleed effect #}
+                    <div class="-mx-6 md:-mx-12 lg:-mx-16">
+                    <div class="overflow-hidden carousel-edge-fade">
+                        <div id="voice-marquee-track" class="animate-marquee-voices flex gap-8 px-4">
+                            {% for i in 0..repeat_count %}
+                                {% for voice in leading_voices %}
+                                    <div class="voice-card-static bg-white rounded-2xl p-6 text-center shadow-xl hover:-translate-y-2 transition duration-300 group flex flex-col items-center justify-start">
+                                        {% if voice.image %}
+                                            <img src="{{ asset('uploads/voices/' ~ voice.image) }}" alt="{{ voice.name }}" class="w-20 h-20 shrink-0 mx-auto rounded-full object-cover mb-4 border-4 border-[#FCC30B] shadow-sm transition group-hover:scale-110">
+                                        {% else %}
+                                            {% set name_parts = voice.name|split(' ') %}
+                                            {% set initials = (name_parts|first|slice(0,1) ~ name_parts|last|slice(0,1))|upper %}
+                                            <div class="w-20 h-20 shrink-0 mx-auto bg-feu-green-100 text-feu-green-800 rounded-full flex items-center justify-center text-2xl font-black font-bebas mb-4 border-4 border-[#FCC30B] shadow-sm group-hover:bg-[#FCC30B] group-hover:text-feu-green-900 transition group-hover:scale-110">
+                                                {{ initials }}
+                                            </div>
+                                        {% endif %}
+                                        <h3 class="text-xl font-bold text-gray-900 font-bebas tracking-wide mb-1 line-clamp-1 w-full break-words overflow-hidden" title="{{ voice.name }}">{{ voice.name|length > 22 ? voice.name|slice(0, 22) ~ '...' : voice.name }}</h3>
+                                        <p class="text-xs font-bold text-feu-green-700 uppercase tracking-wide mb-3 font-work line-clamp-1 w-full break-words overflow-hidden" title="{{ voice.title }}">{{ voice.title|length > 18 ? voice.title|slice(0, 18) ~ '...' : voice.title }}</p>
+                                        <p class="text-sm text-gray-600 font-work leading-relaxed line-clamp-4 w-full break-words overflow-hidden" title="{{ voice.description }}">{{ voice.description|length > 100 ? voice.description|slice(0, 100) ~ '...' : voice.description }}</p>
+                                    </div>
+                                {% endfor %}
+                            {% endfor %}
+                    </div>
+                    </div>
+                    </div>
                 </div>
+
+                <script>
+                    (function() {
+                        function setupVoiceMarqueeHover() {
+                            const track = document.getElementById('voice-marquee-track');
+                            const leftBtn = document.getElementById('voice-arrow-left');
+                            const rightBtn = document.getElementById('voice-arrow-right');
+
+                            if (!track || !leftBtn || !rightBtn) return;
+
+                            function getMarqueeAnimation() {
+                                const anims = track.getAnimations();
+                                return anims.length > 0 ? anims[0] : null;
+                            }
+
+                            leftBtn.addEventListener('mouseenter', () => {
+                                const anim = getMarqueeAnimation();
+                                if (anim) {
+                                    anim.play();
+                                    anim.playbackRate = -3.5;
+                                }
+                            });
+
+                            leftBtn.addEventListener('mouseleave', () => {
+                                const anim = getMarqueeAnimation();
+                                if (anim) {
+                                    anim.playbackRate = 1;
+                                }
+                            });
+
+                            rightBtn.addEventListener('mouseenter', () => {
+                                const anim = getMarqueeAnimation();
+                                if (anim) {
+                                    anim.play();
+                                    anim.playbackRate = 3.5;
+                                }
+                            });
+
+                            rightBtn.addEventListener('mouseleave', () => {
+                                const anim = getMarqueeAnimation();
+                                if (anim) {
+                                    anim.playbackRate = 1;
+                                }
+                            });
+                        }
+
+                        if (document.readyState === 'loading') {
+                            document.addEventListener('DOMContentLoaded', setupVoiceMarqueeHover);
+                        } else {
+                            setupVoiceMarqueeHover();
+                        }
+                        document.addEventListener('turbo:load', setupVoiceMarqueeHover);
+                    })();
+                </script>
             {% else %}
                 <div class="text-center p-12 bg-white/10 backdrop-blur-md rounded-2xl border border-white/20">
                     <p class="text-feu-green-50 font-medium font-work">Voices will appear here once added in the dashboard.</p>
@@ -226,6 +334,16 @@
                 {% for activity in latest_activities|slice(0, 3) %}
                     <article class="bg-white rounded-2xl shadow-sm border border-gray-100 flex flex-col hover:shadow-xl transition duration-300 group relative">
                         <div class="h-56 relative bg-gray-100 overflow-hidden shrink-0">
+                            {% if activity.college %}
+                                <div class="absolute z-20" style="top: 1.25rem; left: 1.25rem;">
+                                    <span class="text-white text-[11px] font-bold rounded-full uppercase tracking-wider font-work inline-flex items-center gap-2 shrink-0 shadow-md border border-feu-gold-500/30 whitespace-nowrap" style="background-color: #0f4c28; color: #ffffff; padding: 0.35rem 1.1rem;">
+                                        <svg xmlns="http://www.w3.org/2000/svg" class="w-3.5 h-3.5 shrink-0" style="color: #f59e0b;" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+                                            <path stroke-linecap="round" stroke-linejoin="round" d="M12 21v-8.25M15.75 21v-8.25M8.25 21v-8.25M3 9l9-6 9 6m-1.5 12V10.5M4.5 21V10.5" />
+                                        </svg>
+                                        <span>{{ activity.college.name }}</span>
+                                    </span>
+                                </div>
+                            {% endif %}
                             {% if activity.image %}
                                 <img src="{{ asset('uploads/activities/' ~ activity.image) }}" alt="{{ activity.title }}" class="absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition duration-500">
                             {% else %}
@@ -235,9 +353,11 @@
   
                         <div class="p-8 flex flex-col flex-grow">
                              <div class="mb-4">
-                                <div class="flex flex-wrap items-center gap-2 mb-3">
-                                    <span class="bg-feu-green-900 text-white text-[10px] font-bold px-3 py-1.5 rounded-full uppercase tracking-widest shadow-sm">{{ activity.category }}</span>
-                                    {% include 'SDG-Microsite/partials/sdg_tags.html.twig' with { 'tags': activity.sdgs, 'limit': 2 } %}
+                                <div class="flex flex-nowrap items-center gap-2 mb-3 overflow-hidden">
+                                    {% if activity.category %}
+                                        <span class="bg-feu-green-900 text-white text-[10px] font-bold px-3 py-1.5 rounded-full uppercase tracking-widest shadow-sm shrink-0 whitespace-nowrap">{{ activity.category }}</span>
+                                    {% endif %}
+                                    {% include 'SDG-Microsite/partials/sdg_tags.html.twig' with { 'tags': activity.sdgs, 'limit': activity.category ? 1 : 2 } %}
                                 </div>
                                 <span class="text-gray-400 text-xs font-medium">{{ activity.eventDate|date('M j, Y') }}</span>
                             </div>

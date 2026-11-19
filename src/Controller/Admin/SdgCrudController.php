@@ -18,6 +18,14 @@ class SdgCrudController extends AbstractCrudController
         return Sdg::class;
     }
 
+    public function configureCrud(\EasyCorp\Bundle\EasyAdminBundle\Config\Crud $crud): \EasyCorp\Bundle\EasyAdminBundle\Config\Crud
+    {
+        return $crud
+            ->setEntityLabelInSingular('SDG Category')
+            ->setEntityLabelInPlural('SDG Categories')
+            ->setDefaultRowAction(null);
+    }
+
     public function configureFields(string $pageName): iterable
     {
         return [
